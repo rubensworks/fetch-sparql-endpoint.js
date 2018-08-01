@@ -4,6 +4,9 @@ import {SparqlEndpointFetcher} from "../lib/SparqlEndpointFetcher";
 
 const stringifyStream = require('stream-to-string');
 const streamifyString = require('streamify-string');
+const arrayifyStream = require('arrayify-stream');
+
+// tslint:disable:no-trailing-whitespace
 
 describe('SparqlEndpointFetcher', () => {
 
@@ -138,6 +141,85 @@ describe('SparqlEndpointFetcher', () => {
         const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
         return expect(await stringifyStream(await fetcherThis.fetchRawStream(endpoint, querySelect)))
           .toEqual(`abc`);
+      });
+    });
+
+    describe('#fetchBindings', () => {
+      it('should parse bindings', async () => {
+        const fetchCbThis = (url) => Promise.resolve(<Response> {
+          body: streamifyString(`{
+  "head": { "vars": [ "p" ] },
+  "results": {
+    "bindings": [
+      {
+        "p": { "type": "uri" , "value": "p1" }
+      },
+      {
+        "p": { "type": "uri" , "value": "p2" }
+      },
+      {
+        "p": { "type": "uri" , "value": "p3" }
+      }
+    ]
+  }
+}`),
+          ok: true,
+          status: 200,
+          statusText: 'Ok!',
+        });
+        const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
+        return expect(await arrayifyStream(await fetcherThis.fetchBindings(endpoint, querySelect)))
+          .toEqual([
+            { '?p': namedNode('p1') },
+            { '?p': namedNode('p2') },
+            { '?p': namedNode('p3') },
+          ]);
+      });
+
+      it('should parse empty bindings', async () => {
+        const fetchCbThis = (url) => Promise.resolve(<Response> {
+          body: streamifyString(`{
+  "head": { "vars": [ "p" ] },
+  "results": {
+    "bindings": []
+  }
+}`),
+          ok: true,
+          status: 200,
+          statusText: 'Ok!',
+        });
+        const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
+        return expect(await arrayifyStream(await fetcherThis.fetchBindings(endpoint, querySelect)))
+          .toEqual([]);
+      });
+
+      it('should parse no bindings', async () => {
+        const fetchCbThis = (url) => Promise.resolve(<Response> {
+          body: streamifyString(`{
+  "head": { "vars": [ "p" ] },
+  "results": {}
+}`),
+          ok: true,
+          status: 200,
+          statusText: 'Ok!',
+        });
+        const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
+        return expect(await arrayifyStream(await fetcherThis.fetchBindings(endpoint, querySelect)))
+          .toEqual([]);
+      });
+
+      it('should parse no results', async () => {
+        const fetchCbThis = (url) => Promise.resolve(<Response> {
+          body: streamifyString(`{
+  "head": { "vars": [ "p" ] }
+}`),
+          ok: true,
+          status: 200,
+          statusText: 'Ok!',
+        });
+        const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
+        return expect(await arrayifyStream(await fetcherThis.fetchBindings(endpoint, querySelect)))
+          .toEqual([]);
       });
     });
   });

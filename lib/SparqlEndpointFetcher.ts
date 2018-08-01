@@ -1,4 +1,6 @@
+import "isomorphic-fetch";
 import * as RDF from "rdf-js";
+import {Transform} from "stream";
 
 /**
  * A SparqlEndpointFetcher can send queries to SPARQL endpoints,
@@ -11,7 +13,7 @@ export class SparqlEndpointFetcher {
 
   constructor(args?: ISparqlEndpointFetcherArgs) {
     args = args || {};
-    this.fetchCb = args.fetch || require('isomorphic-fetch');
+    this.fetchCb = args.fetch || fetch;
     this.dataFactory = args.dataFactory || require('rdf-data-model');
   }
 
@@ -45,6 +47,23 @@ export class SparqlEndpointFetcher {
       bindings['?' + key] = value;
     }
     return bindings;
+  }
+
+  /**
+   * Send a SELECT query to the given endpoint URL and return the resulting bindings stream.
+   * @see IBindings
+   * @param {string} endpoint A SPARQL endpoint URL. (without the `?query=` suffix).
+   * @param {string} query    A SPARQL query string.
+   * @return {Promise<NodeJS.ReadableStream>} A stream of {@link IBindings}.
+   */
+  public async fetchBindings(endpoint: string, query: string): Promise<NodeJS.ReadableStream> {
+    const rawStream = await this.fetchRawStream(endpoint, query);
+    return rawStream
+      .pipe(require('JSONStream').parse('results.bindings.*'))
+      .pipe(new Transform({
+        objectMode: true,
+        transform: (rawBinding, encoding, cb) => cb(null, this.parseJsonBindings(rawBinding)),
+      }));
   }
 
   /**
