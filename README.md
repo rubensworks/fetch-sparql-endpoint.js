@@ -77,7 +77,7 @@ This will output `true` or `false`.
 queries returns a (promise to a) stream of triples.
 
 ```js
-const tripleStream = await fetcher.fetchBindings('https://dbpedia.org/sparql', 'CONSTRUCT { ?s ?p ?o } LIMIT 100');
+const tripleStream = await fetcher.fetchTriples('https://dbpedia.org/sparql', 'CONSTRUCT { ?s ?p ?o } LIMIT 100');
 tripleStream.on('data', (triple) => console.log(triple));
 ```
 
