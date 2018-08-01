@@ -1,6 +1,8 @@
 import "isomorphic-fetch";
 import * as RDF from "rdf-js";
+import {Parser as SparqlParser} from "sparqljs";
 import {Transform} from "stream";
+
 // tslint:disable-next-line:no-var-requires
 const n3 = require('n3');
 
@@ -11,7 +13,7 @@ const n3 = require('n3');
 export class SparqlEndpointFetcher {
 
   public static CONTENTTYPE_SPARQL_JSON: string = 'application/sparql-results+json';
-  public static CONTENTTYPE_TURTLE: string = 'turtle';
+  public static CONTENTTYPE_TURTLE: string = 'text/turtle';
 
   public readonly fetchCb: (input?: Request | string, init?: RequestInit) => Promise<Response>;
   public readonly dataFactory: RDF.DataFactory;
@@ -52,6 +54,20 @@ export class SparqlEndpointFetcher {
       bindings['?' + key] = value;
     }
     return bindings;
+  }
+
+  /**
+   * Get the query type of the given query.
+   *
+   * This will parse the query and thrown an exception on syntax errors.
+   *
+   * @param {string} query A query.
+   * @return {"SELECT" | "ASK" | "CONSTRUCT" | "UNKNOWN"} The query type.
+   */
+  public getQueryType(query: string): "SELECT" | "ASK" | "CONSTRUCT" | "UNKNOWN" {
+    const parsedQuery = new SparqlParser().parse(query);
+    return parsedQuery.type === 'query'
+      ? (parsedQuery.queryType === 'DESCRIBE' ? 'CONSTRUCT' : parsedQuery.queryType) : "UNKNOWN";
   }
 
   /**

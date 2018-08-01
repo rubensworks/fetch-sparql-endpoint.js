@@ -36,6 +36,8 @@ describe('SparqlEndpointFetcher', () => {
     const endpoint = 'https://dbpedia.org/sparql';
     const querySelect = 'SELECT * WHERE { ?s ?p ?o }';
     const queryAsk = 'ASK WHERE { ?s ?p ?o }';
+    const queryConstruct = 'CONSTRUCT WHERE { ?s ?p ?o }';
+    const queryDescribe = 'DESCRIBE <http://ex.org>';
 
     let fetchCb;
     let fetcher;
@@ -94,6 +96,32 @@ describe('SparqlEndpointFetcher', () => {
           '?book4': literal('abc', 'en-us'),
           '?book5': literal('abc', namedNode('http://ex')),
         });
+      });
+    });
+
+    describe('#getQueryType', () => {
+      it('should detect a select query', () => {
+        return expect(fetcher.getQueryType(querySelect)).toEqual('SELECT');
+      });
+
+      it('should detect an ask query', () => {
+        return expect(fetcher.getQueryType(queryAsk)).toEqual('ASK');
+      });
+
+      it('should detect a construct query', () => {
+        return expect(fetcher.getQueryType(queryConstruct)).toEqual('CONSTRUCT');
+      });
+
+      it('should detect a describe query as a construct query', () => {
+        return expect(fetcher.getQueryType(queryDescribe)).toEqual('CONSTRUCT');
+      });
+
+      it('should detect an unknown query', () => {
+        return expect(fetcher.getQueryType('INSERT { ?s ?p ?o } WHERE {}')).toEqual('UNKNOWN');
+      });
+
+      it('should throw an error on invalid queries', () => {
+        return expect(() => fetcher.getQueryType('{{{')).toThrow();
       });
     });
 
@@ -280,7 +308,7 @@ describe('SparqlEndpointFetcher', () => {
           statusText: 'Ok!',
         });
         const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
-        return expect(await arrayifyStream(await fetcherThis.fetchTriples(endpoint, querySelect)))
+        return expect(await arrayifyStream(await fetcherThis.fetchTriples(endpoint, queryConstruct)))
           .toEqualRdfQuadArray([
             triple(namedNode('http://ex.org/s'), namedNode('http://ex.org/p'), namedNode('http://ex.org/o1')),
             triple(namedNode('http://ex.org/s'), namedNode('http://ex.org/p'), namedNode('http://ex.org/o2')),
