@@ -1,4 +1,5 @@
-import {blankNode, literal, namedNode} from "rdf-data-model";
+import "jest-rdf";
+import {blankNode, literal, namedNode, triple} from "rdf-data-model";
 import {Readable} from "stream";
 import {SparqlEndpointFetcher} from "../lib/SparqlEndpointFetcher";
 
@@ -100,9 +101,9 @@ describe('SparqlEndpointFetcher', () => {
       it('should pass the correct URL and HTTP headers', () => {
         const fetchCbThis = jest.fn(() => Promise.resolve(new Response(streamifyString('dummy'))));
         const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
-        fetcherThis.fetchRawStream(endpoint, querySelect);
+        fetcherThis.fetchRawStream(endpoint, querySelect, 'myacceptheader');
         const headers: Headers = new Headers();
-        headers.append('Accept', 'application/sparql-results+json');
+        headers.append('Accept', 'myacceptheader');
         return expect(fetchCbThis).toBeCalledWith(
           'https://dbpedia.org/sparql?query=SELECT%20*%20WHERE%20%7B%20%3Fs%20%3Fp%20%3Fo%20%7D', { headers });
       });
@@ -116,7 +117,7 @@ describe('SparqlEndpointFetcher', () => {
           statusText: 'Error!',
         });
         const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
-        return expect(stringifyStream(await fetcherThis.fetchRawStream(endpoint, querySelect)))
+        return expect(stringifyStream(await fetcherThis.fetchRawStream(endpoint, querySelect, 'myacceptheader')))
           .rejects.toEqual(new Error('Invalid SPARQL endpoint (https://dbpedia.org/sparql) response: 500'));
       });
 
@@ -128,7 +129,7 @@ describe('SparqlEndpointFetcher', () => {
           statusText: 'Ok!',
         });
         const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
-        return expect(await stringifyStream(await fetcherThis.fetchRawStream(endpoint, querySelect)))
+        return expect(await stringifyStream(await fetcherThis.fetchRawStream(endpoint, querySelect, 'myacceptheader')))
           .toEqual(`abc`);
       });
 
@@ -140,7 +141,7 @@ describe('SparqlEndpointFetcher', () => {
           statusText: 'Ok!',
         });
         const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
-        return expect(await stringifyStream(await fetcherThis.fetchRawStream(endpoint, querySelect)))
+        return expect(await stringifyStream(await fetcherThis.fetchRawStream(endpoint, querySelect, 'myacceptheader')))
           .toEqual(`abc`);
       });
     });
@@ -265,6 +266,25 @@ describe('SparqlEndpointFetcher', () => {
         const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
         return expect(fetcherThis.fetchAsk(endpoint, queryAsk)).rejects
           .toEqual(new Error('No valid ASK response was found.'));
+      });
+    });
+
+    describe('#fetchTriples', () => {
+      it('should parse triples', async () => {
+        const fetchCbThis = () => Promise.resolve(<Response> {
+          body: streamifyString(`
+<http://ex.org/s> <http://ex.org/p> <http://ex.org/o1>, <http://ex.org/o2>.
+`),
+          ok: true,
+          status: 200,
+          statusText: 'Ok!',
+        });
+        const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
+        return expect(await arrayifyStream(await fetcherThis.fetchTriples(endpoint, querySelect)))
+          .toEqualRdfQuadArray([
+            triple(namedNode('http://ex.org/s'), namedNode('http://ex.org/p'), namedNode('http://ex.org/o1')),
+            triple(namedNode('http://ex.org/s'), namedNode('http://ex.org/p'), namedNode('http://ex.org/o2')),
+          ]);
       });
     });
   });

@@ -1,12 +1,17 @@
 import "isomorphic-fetch";
 import * as RDF from "rdf-js";
 import {Transform} from "stream";
+// tslint:disable-next-line:no-var-requires
+const n3 = require('n3');
 
 /**
  * A SparqlEndpointFetcher can send queries to SPARQL endpoints,
  * and retrieve and parse the results.
  */
 export class SparqlEndpointFetcher {
+
+  public static CONTENTTYPE_SPARQL_JSON: string = 'application/sparql-results+json';
+  public static CONTENTTYPE_TURTLE: string = 'turtle';
 
   public readonly fetchCb: (input?: Request | string, init?: RequestInit) => Promise<Response>;
   public readonly dataFactory: RDF.DataFactory;
@@ -57,7 +62,7 @@ export class SparqlEndpointFetcher {
    * @return {Promise<NodeJS.ReadableStream>} A stream of {@link IBindings}.
    */
   public async fetchBindings(endpoint: string, query: string): Promise<NodeJS.ReadableStream> {
-    const rawStream = await this.fetchRawStream(endpoint, query);
+    const rawStream = await this.fetchRawStream(endpoint, query, SparqlEndpointFetcher.CONTENTTYPE_SPARQL_JSON);
     return rawStream
       .pipe(require('JSONStream').parse('results.bindings.*'))
       .pipe(new Transform({
@@ -73,7 +78,7 @@ export class SparqlEndpointFetcher {
    * @return {Promise<boolean>} A boolean resolving to the answer.
    */
   public async fetchAsk(endpoint: string, query: string): Promise<boolean> {
-    const rawStream = await this.fetchRawStream(endpoint, query);
+    const rawStream = await this.fetchRawStream(endpoint, query, SparqlEndpointFetcher.CONTENTTYPE_SPARQL_JSON);
     return new Promise<boolean>((resolve, reject) => {
       rawStream
         .pipe(require('JSONStream').parse('boolean'))
@@ -83,20 +88,32 @@ export class SparqlEndpointFetcher {
   }
 
   /**
+   * Send a CONSTRUCT/DESCRIBE query to the given endpoint URL and return the resulting triple stream.
+   * @param {string} endpoint A SPARQL endpoint URL. (without the `?query=` suffix).
+   * @param {string} query    A SPARQL query string.
+   * @return {Promise<Stream>} A stream of triples.
+   */
+  public async fetchTriples(endpoint: string, query: string): Promise<RDF.Stream> {
+    const rawStream = await this.fetchRawStream(endpoint, query, SparqlEndpointFetcher.CONTENTTYPE_TURTLE);
+    return rawStream.pipe(new n3.StreamParser({ format: SparqlEndpointFetcher.CONTENTTYPE_TURTLE }));
+  }
+
+  /**
    * Send a query to the given endpoint URL and return the resulting stream.
    *
    * This will only accept responses with the application/sparql-results+json content type.
    *
-   * @param {string} endpoint A SPARQL endpoint URL. (without the `?query=` suffix).
-   * @param {string} query    A SPARQL query string.
+   * @param {string} endpoint     A SPARQL endpoint URL. (without the `?query=` suffix).
+   * @param {string} query        A SPARQL query string.
+   * @param {string} acceptHeader The HTTP accept to use.
    * @return {Promise<NodeJS.ReadableStream>} The SPARQL endpoint response stream.
    */
-  public async fetchRawStream(endpoint: string, query: string): Promise<NodeJS.ReadableStream> {
+  public async fetchRawStream(endpoint: string, query: string, acceptHeader: string): Promise<NodeJS.ReadableStream> {
     const url: string = endpoint + '?query=' + encodeURIComponent(query);
 
     // Initiate request
     const headers: Headers = new Headers();
-    headers.append('Accept', 'application/sparql-results+json');
+    headers.append('Accept', acceptHeader);
     const httpResponse: Response = await this.fetchCb(url, { headers });
 
     // Wrap WhatWG readable stream into a Node.js readable stream
