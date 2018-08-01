@@ -67,6 +67,22 @@ export class SparqlEndpointFetcher {
   }
 
   /**
+   * Send an ASK query to the given endpoint URL and return a promise resolving to the boolean answer.
+   * @param {string} endpoint A SPARQL endpoint URL. (without the `?query=` suffix).
+   * @param {string} query    A SPARQL query string.
+   * @return {Promise<boolean>} A boolean resolving to the answer.
+   */
+  public async fetchAsk(endpoint: string, query: string): Promise<boolean> {
+    const rawStream = await this.fetchRawStream(endpoint, query);
+    return new Promise<boolean>((resolve, reject) => {
+      rawStream
+        .pipe(require('JSONStream').parse('boolean'))
+        .on('data', resolve)
+        .on('end', () => reject(new Error('No valid ASK response was found.')));
+    });
+  }
+
+  /**
    * Send a query to the given endpoint URL and return the resulting stream.
    *
    * This will only accept responses with the application/sparql-results+json content type.

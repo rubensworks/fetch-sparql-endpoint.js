@@ -34,6 +34,7 @@ describe('SparqlEndpointFetcher', () => {
 
     const endpoint = 'https://dbpedia.org/sparql';
     const querySelect = 'SELECT * WHERE { ?s ?p ?o }';
+    const queryAsk = 'ASK WHERE { ?s ?p ?o }';
 
     let fetchCb;
     let fetcher;
@@ -97,7 +98,7 @@ describe('SparqlEndpointFetcher', () => {
 
     describe('#fetchRawStream', () => {
       it('should pass the correct URL and HTTP headers', () => {
-        const fetchCbThis = jest.fn((url) => Promise.resolve(new Response(streamifyString('dummy'))));
+        const fetchCbThis = jest.fn(() => Promise.resolve(new Response(streamifyString('dummy'))));
         const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
         fetcherThis.fetchRawStream(endpoint, querySelect);
         const headers: Headers = new Headers();
@@ -108,7 +109,7 @@ describe('SparqlEndpointFetcher', () => {
 
       it('should emit an error in the stream for an invalid server response', async () => {
         const readable = new Readable();
-        const fetchCbThis = (url) => Promise.resolve(<Response> {
+        const fetchCbThis = () => Promise.resolve(<Response> {
           body: <ReadableStream> <any> readable,
           ok: false,
           status: 500,
@@ -120,7 +121,7 @@ describe('SparqlEndpointFetcher', () => {
       });
 
       it('should fetch with a node stream', async () => {
-        const fetchCbThis = (url) => Promise.resolve(<Response> {
+        const fetchCbThis = () => Promise.resolve(<Response> {
           body: streamifyString(`abc`),
           ok: true,
           status: 200,
@@ -132,7 +133,7 @@ describe('SparqlEndpointFetcher', () => {
       });
 
       it('should fetch with a web stream', async () => {
-        const fetchCbThis = (url) => Promise.resolve(<Response> {
+        const fetchCbThis = () => Promise.resolve(<Response> {
           body: require('node-web-streams').toWebReadableStream(streamifyString(`abc`)),
           ok: true,
           status: 200,
@@ -146,7 +147,7 @@ describe('SparqlEndpointFetcher', () => {
 
     describe('#fetchBindings', () => {
       it('should parse bindings', async () => {
-        const fetchCbThis = (url) => Promise.resolve(<Response> {
+        const fetchCbThis = () => Promise.resolve(<Response> {
           body: streamifyString(`{
   "head": { "vars": [ "p" ] },
   "results": {
@@ -177,7 +178,7 @@ describe('SparqlEndpointFetcher', () => {
       });
 
       it('should parse empty bindings', async () => {
-        const fetchCbThis = (url) => Promise.resolve(<Response> {
+        const fetchCbThis = () => Promise.resolve(<Response> {
           body: streamifyString(`{
   "head": { "vars": [ "p" ] },
   "results": {
@@ -194,7 +195,7 @@ describe('SparqlEndpointFetcher', () => {
       });
 
       it('should parse no bindings', async () => {
-        const fetchCbThis = (url) => Promise.resolve(<Response> {
+        const fetchCbThis = () => Promise.resolve(<Response> {
           body: streamifyString(`{
   "head": { "vars": [ "p" ] },
   "results": {}
@@ -209,7 +210,7 @@ describe('SparqlEndpointFetcher', () => {
       });
 
       it('should parse no results', async () => {
-        const fetchCbThis = (url) => Promise.resolve(<Response> {
+        const fetchCbThis = () => Promise.resolve(<Response> {
           body: streamifyString(`{
   "head": { "vars": [ "p" ] }
 }`),
@@ -220,6 +221,50 @@ describe('SparqlEndpointFetcher', () => {
         const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
         return expect(await arrayifyStream(await fetcherThis.fetchBindings(endpoint, querySelect)))
           .toEqual([]);
+      });
+    });
+
+    describe('#fetchAsk', () => {
+      it('should parse true', async () => {
+        const fetchCbThis = () => Promise.resolve(<Response> {
+          body: streamifyString(`{
+  "head": { },
+  "boolean": true
+}`),
+          ok: true,
+          status: 200,
+          statusText: 'Ok!',
+        });
+        const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
+        return expect(await fetcherThis.fetchAsk(endpoint, queryAsk)).toEqual(true);
+      });
+
+      it('should parse false', async () => {
+        const fetchCbThis = () => Promise.resolve(<Response> {
+          body: streamifyString(`{
+  "head": { },
+  "boolean": false
+}`),
+          ok: true,
+          status: 200,
+          statusText: 'Ok!',
+        });
+        const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
+        return expect(await fetcherThis.fetchAsk(endpoint, queryAsk)).toEqual(false);
+      });
+
+      it('should reject on an invalid response', async () => {
+        const fetchCbThis = () => Promise.resolve(<Response> {
+          body: streamifyString(`{
+  "head": { }
+}`),
+          ok: true,
+          status: 200,
+          statusText: 'Ok!',
+        });
+        const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
+        return expect(fetcherThis.fetchAsk(endpoint, queryAsk)).rejects
+          .toEqual(new Error('No valid ASK response was found.'));
       });
     });
   });
