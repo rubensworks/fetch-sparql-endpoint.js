@@ -5,6 +5,9 @@ import minimist = require("minimist");
 import {quadToStringQuad, termToString} from "rdf-string";
 import {SparqlEndpointFetcher} from "../index";
 
+// tslint:disable-next-line:no-var-requires
+const n3 = require('n3');
+
 process.argv.splice(0, 2);
 const args = minimist(process.argv);
 if (args._.length === 0 || args._.length > 2 || args.h || args.help) {
@@ -86,10 +89,9 @@ function queryAsk(fetcher: SparqlEndpointFetcher, query: string) {
 function queryConstruct(fetcher: SparqlEndpointFetcher, query: string) {
   fetcher.fetchTriples(endpoint, query)
     .then((tripleStream) => {
-      tripleStream.on('data', (triple) => {
-        const tripleString = quadToStringQuad(triple);
-        process.stdout.write(JSON.stringify(tripleString, null, '  ') + '\n');
-      });
+      (<any> tripleStream)
+        .pipe(new n3.StreamWriter(SparqlEndpointFetcher.CONTENTTYPE_TURTLE))
+        .pipe(process.stdout);
     })
     .catch((error) => {
       process.stderr.write(error.message + '\n');
