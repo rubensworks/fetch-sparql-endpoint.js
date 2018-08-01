@@ -1,12 +1,14 @@
 {
   "name": "fetch-sparql-endpoint",
   "version": "1.0.0",
-  "description": "Send a query to a SPARQL endpoint and parse the results",
+  "description": "A simple, lightweight module to send queries to SPARQL endpoints and retrieve their results in a streaming fashion.",
   "keywords": [
     "sparql",
+    "query",
     "semantic web",
     "rdf",
-    "rdfjs"
+    "rdfjs",
+    "streaming"
   ],
   "main": "index.js",
   "typings": "index",

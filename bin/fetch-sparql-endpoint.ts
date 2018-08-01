@@ -16,7 +16,7 @@ if (args._.length === 0 || args._.length > 2 || args.h || args.help) {
   process.stderr.write(`fetch-sparql-endpoint Sends a query to a SPARQL endpoint
 
 Usage:
-  fetch-sparql-endpoint https://dbpedia.org/sparql [-q] 'SELECT * WHERE { ?s ?p ?o }'
+  fetch-sparql-endpoint https://dbpedia.org/sparql [-q] 'SELECT * WHERE { ?s ?p ?o } 100'
   fetch-sparql-endpoint https://dbpedia.org/sparql -f query.sparql
   cat query.sparql | fetch-sparql-endpoint https://dbpedia.org/sparql
 
