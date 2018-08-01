@@ -29,15 +29,17 @@
     "test"
   ],
   "dependencies": {
+    "isomorphic-fetch": "^2.2.1",
     "rdf-data-model": "^1.0.0"
   },
   "devDependencies": {
+    "@types/jest": "^21.1.8",
     "@types/rdf-data-model": "^1.0.1",
     "@types/rdf-js": "^1.0.1",
-    "@types/jest": "^21.1.8",
     "coveralls": "^3.0.0",
     "jest": "^21.2.1",
     "pre-commit": "^1.2.2",
+    "streamify-string": "^1.0.1",
     "ts-jest": "^21.2.3",
     "tslint": "^5.8.0",
     "tslint-eslint-rules": "^4.1.1",
