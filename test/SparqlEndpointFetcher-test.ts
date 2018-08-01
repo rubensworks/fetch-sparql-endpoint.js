@@ -1,5 +1,9 @@
 import {blankNode, literal, namedNode} from "rdf-data-model";
+import {Readable} from "stream";
 import {SparqlEndpointFetcher} from "../lib/SparqlEndpointFetcher";
+
+const stringifyStream = require('stream-to-string');
+const streamifyString = require('streamify-string');
 
 describe('SparqlEndpointFetcher', () => {
 
@@ -24,6 +28,9 @@ describe('SparqlEndpointFetcher', () => {
   });
 
   describe('constructed with fetch callback', () => {
+
+    const endpoint = 'https://dbpedia.org/sparql';
+    const querySelect = 'SELECT * WHERE { ?s ?p ?o }';
 
     let fetchCb;
     let fetcher;
@@ -82,6 +89,55 @@ describe('SparqlEndpointFetcher', () => {
           '?book4': literal('abc', 'en-us'),
           '?book5': literal('abc', namedNode('http://ex')),
         });
+      });
+    });
+
+    describe('#fetchRawStream', () => {
+      it('should pass the correct URL and HTTP headers', () => {
+        const fetchCbThis = jest.fn((url) => Promise.resolve(new Response(streamifyString('dummy'))));
+        const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
+        fetcherThis.fetchRawStream(endpoint, querySelect);
+        const headers: Headers = new Headers();
+        headers.append('Accept', 'application/sparql-results+json');
+        return expect(fetchCbThis).toBeCalledWith(
+          'https://dbpedia.org/sparql?query=SELECT%20*%20WHERE%20%7B%20%3Fs%20%3Fp%20%3Fo%20%7D', { headers });
+      });
+
+      it('should emit an error in the stream for an invalid server response', async () => {
+        const readable = new Readable();
+        const fetchCbThis = (url) => Promise.resolve(<Response> {
+          body: <ReadableStream> <any> readable,
+          ok: false,
+          status: 500,
+          statusText: 'Error!',
+        });
+        const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
+        return expect(stringifyStream(await fetcherThis.fetchRawStream(endpoint, querySelect)))
+          .rejects.toEqual(new Error('Invalid SPARQL endpoint (https://dbpedia.org/sparql) response: 500'));
+      });
+
+      it('should fetch with a node stream', async () => {
+        const fetchCbThis = (url) => Promise.resolve(<Response> {
+          body: streamifyString(`abc`),
+          ok: true,
+          status: 200,
+          statusText: 'Ok!',
+        });
+        const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
+        return expect(await stringifyStream(await fetcherThis.fetchRawStream(endpoint, querySelect)))
+          .toEqual(`abc`);
+      });
+
+      it('should fetch with a web stream', async () => {
+        const fetchCbThis = (url) => Promise.resolve(<Response> {
+          body: require('node-web-streams').toWebReadableStream(streamifyString(`abc`)),
+          ok: true,
+          status: 200,
+          statusText: 'Ok!',
+        });
+        const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
+        return expect(await stringifyStream(await fetcherThis.fetchRawStream(endpoint, querySelect)))
+          .toEqual(`abc`);
       });
     });
   });

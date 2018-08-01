@@ -29,7 +29,9 @@
     "test"
   ],
   "dependencies": {
+    "is-stream": "^1.1.0",
     "isomorphic-fetch": "^2.2.1",
+    "node-web-streams": "^0.2.2",
     "rdf-data-model": "^1.0.0"
   },
   "devDependencies": {
@@ -39,6 +41,7 @@
     "coveralls": "^3.0.0",
     "jest": "^21.2.1",
     "pre-commit": "^1.2.2",
+    "stream-to-string": "^1.1.0",
     "streamify-string": "^1.0.1",
     "ts-jest": "^21.2.3",
     "tslint": "^5.8.0",
