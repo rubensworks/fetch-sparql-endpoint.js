@@ -28,7 +28,7 @@ This package also works out-of-the-box in browsers via tools such as [webpack](h
 #### Create a new fetcher
 
 ```js
-import {fetch-sparql-endpoint} from "fetch-sparql-endpoint";
+import {SparqlEndpointFetcher} from "fetch-sparql-endpoint";
 
 const myFetcher = new SparqlEndpointFetcher();
 ```
