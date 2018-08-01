@@ -1,7 +1,7 @@
 import "isomorphic-fetch";
 import * as RDF from "rdf-js";
 import {Parser as SparqlParser} from "sparqljs";
-import {Transform} from "stream";
+import {ISettings, SparqlJsonParser} from "sparqljson-parse";
 
 // tslint:disable-next-line:no-var-requires
 const n3 = require('n3');
@@ -16,44 +16,12 @@ export class SparqlEndpointFetcher {
   public static CONTENTTYPE_TURTLE: string = 'text/turtle';
 
   public readonly fetchCb: (input?: Request | string, init?: RequestInit) => Promise<Response>;
-  public readonly dataFactory: RDF.DataFactory;
+  public readonly sparqlJsonParser: SparqlJsonParser;
 
   constructor(args?: ISparqlEndpointFetcherArgs) {
     args = args || {};
     this.fetchCb = args.fetch || fetch;
-    this.dataFactory = args.dataFactory || require('rdf-data-model');
-  }
-
-  /**
-   * Convert a SPARQL JSON result binding to a bindings object.
-   * @param rawBindings A SPARQL json result binding.
-   * @return {Bindings} A bindings object.
-   */
-  public parseJsonBindings(rawBindings: any): IBindings {
-    const bindings: IBindings = {};
-    for (const key in rawBindings) {
-      const rawValue: any = rawBindings[key];
-      let value: RDF.Term = null;
-      switch (rawValue.type) {
-      case 'bnode':
-        value = this.dataFactory.blankNode(rawValue.value);
-        break;
-      case 'literal':
-        if (rawValue['xml:lang']) {
-          value = this.dataFactory.literal(rawValue.value, rawValue['xml:lang']);
-        } else if (rawValue.datatype) {
-          value = this.dataFactory.literal(rawValue.value, this.dataFactory.namedNode(rawValue.datatype));
-        } else {
-          value = this.dataFactory.literal(rawValue.value);
-        }
-        break;
-      default:
-        value = this.dataFactory.namedNode(rawValue.value);
-        break;
-      }
-      bindings['?' + key] = value;
-    }
-    return bindings;
+    this.sparqlJsonParser = new SparqlJsonParser(args);
   }
 
   /**
@@ -78,13 +46,8 @@ export class SparqlEndpointFetcher {
    * @return {Promise<NodeJS.ReadableStream>} A stream of {@link IBindings}.
    */
   public async fetchBindings(endpoint: string, query: string): Promise<NodeJS.ReadableStream> {
-    const rawStream = await this.fetchRawStream(endpoint, query, SparqlEndpointFetcher.CONTENTTYPE_SPARQL_JSON);
-    return rawStream
-      .pipe(require('JSONStream').parse('results.bindings.*'))
-      .pipe(new Transform({
-        objectMode: true,
-        transform: (rawBinding, encoding, cb) => cb(null, this.parseJsonBindings(rawBinding)),
-      }));
+    return this.sparqlJsonParser.parseJsonResultsStream(
+      await this.fetchRawStream(endpoint, query, SparqlEndpointFetcher.CONTENTTYPE_SPARQL_JSON));
   }
 
   /**
@@ -94,13 +57,8 @@ export class SparqlEndpointFetcher {
    * @return {Promise<boolean>} A boolean resolving to the answer.
    */
   public async fetchAsk(endpoint: string, query: string): Promise<boolean> {
-    const rawStream = await this.fetchRawStream(endpoint, query, SparqlEndpointFetcher.CONTENTTYPE_SPARQL_JSON);
-    return new Promise<boolean>((resolve, reject) => {
-      rawStream
-        .pipe(require('JSONStream').parse('boolean'))
-        .on('data', resolve)
-        .on('end', () => reject(new Error('No valid ASK response was found.')));
-    });
+    return this.sparqlJsonParser.parseJsonBooleanStream(
+      await this.fetchRawStream(endpoint, query, SparqlEndpointFetcher.CONTENTTYPE_SPARQL_JSON));
   }
 
   /**
@@ -148,9 +106,8 @@ export class SparqlEndpointFetcher {
 
 }
 
-export interface ISparqlEndpointFetcherArgs {
+export interface ISparqlEndpointFetcherArgs extends ISettings {
   fetch?: (input?: Request | string, init?: RequestInit) => Promise<Response>;
-  dataFactory?: RDF.DataFactory;
 }
 
 export interface IBindings {
