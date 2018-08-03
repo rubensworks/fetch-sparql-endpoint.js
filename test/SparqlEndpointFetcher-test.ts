@@ -189,6 +189,18 @@ describe('SparqlEndpointFetcher', () => {
         return expect(await arrayifyStream(await fetcherThis.fetchBindings(endpoint, querySelect)))
           .toEqual([]);
       });
+
+      it('should emit an error on a server error', async () => {
+        const fetchCbThis = () => Promise.resolve(<Response> {
+          body: <any> new Readable(),
+          ok: false,
+          status: 500,
+          statusText: 'Error!',
+        });
+        const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
+        return expect(arrayifyStream(await fetcherThis.fetchBindings(endpoint, querySelect)))
+          .rejects.toBeTruthy();
+      });
     });
 
     describe('#fetchAsk', () => {
@@ -228,6 +240,18 @@ describe('SparqlEndpointFetcher', () => {
           ok: true,
           status: 200,
           statusText: 'Ok!',
+        });
+        const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
+        return expect(fetcherThis.fetchAsk(endpoint, queryAsk)).rejects
+          .toEqual(new Error('No valid ASK response was found.'));
+      });
+
+      it('should reject on a server error', async () => {
+        const fetchCbThis = () => Promise.resolve(<Response> {
+          body: <any> new Readable(),
+          ok: false,
+          status: 500,
+          statusText: 'Error!',
         });
         const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
         return expect(fetcherThis.fetchAsk(endpoint, queryAsk)).rejects

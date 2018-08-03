@@ -43,7 +43,7 @@
     "node-web-streams": "^0.2.2",
     "rdf-string": "^1.1.1",
     "sparqljs": "^2.0.3",
-    "sparqljson-parse": "^1.1.0",
+    "sparqljson-parse": "^1.1.1",
     "stream-to-string": "^1.1.0"
   },
   "devDependencies": {
