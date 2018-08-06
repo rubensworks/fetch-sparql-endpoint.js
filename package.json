@@ -41,15 +41,14 @@
     "minimist": "^1.2.0",
     "n3": "^1.0.0-beta.1",
     "node-web-streams": "^0.2.2",
-    "rdf-string": "^1.1.1",
+    "rdf-string": "^1.2.0",
     "sparqljs": "^2.0.3",
-    "sparqljson-parse": "^1.1.1",
+    "sparqljson-parse": "^1.2.0",
     "stream-to-string": "^1.1.0"
   },
   "devDependencies": {
     "@types/jest": "^21.1.8",
     "@types/minimist": "^1.2.0",
-    "@types/rdf-data-model": "^1.0.1",
     "@types/rdf-js": "^1.0.1",
     "@types/sparqljs": "^1.5.0",
     "arrayify-stream": "^1.0.0",
@@ -57,7 +56,7 @@
     "jest": "^21.2.1",
     "jest-rdf": "^1.0.0",
     "pre-commit": "^1.2.2",
-    "rdf-data-model": "^1.0.0",
+    "@rdfjs/data-model": "^1.1.0",
     "streamify-string": "^1.0.1",
     "ts-jest": "^21.2.3",
     "tslint": "^5.8.0",
@@ -77,8 +76,8 @@
       "js"
     ],
     "collectCoverage": true,
-    "mapCoverage": true,
-    "setupTestFrameworkScriptFile": "jest-rdf"
+    "setupTestFrameworkScriptFile": "jest-rdf",
+    "testEnvironment": "node"
   },
   "scripts": {
     "test": "jest ${1}",

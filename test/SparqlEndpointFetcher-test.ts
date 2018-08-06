@@ -1,5 +1,5 @@
+import {blankNode, literal, namedNode, triple} from "@rdfjs/data-model";
 import "jest-rdf";
-import {blankNode, literal, namedNode, triple} from "rdf-data-model";
 import {Readable} from "stream";
 import {SparqlEndpointFetcher} from "../lib/SparqlEndpointFetcher";
 
