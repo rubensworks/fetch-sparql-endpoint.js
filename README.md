@@ -109,7 +109,7 @@ A command-line tool is provided to quickly query any SPARQL endpoint:
 
 Usage:
 ```
-$ fetch-sparql-endpoint https://dbpedia.org/sparql [-q] 'SELECT * WHERE { ?s ?p ?o } 100'
+$ fetch-sparql-endpoint https://dbpedia.org/sparql [-q] 'SELECT * WHERE { ?s ?p ?o } LIMIT 100'
 $ fetch-sparql-endpoint https://dbpedia.org/sparql -f query.sparql
 $ cat query.sparql | fetch-sparql-endpoint https://dbpedia.org/sparql
 ```
