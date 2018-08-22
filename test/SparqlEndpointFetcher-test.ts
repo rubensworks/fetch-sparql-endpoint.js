@@ -1,4 +1,4 @@
-import {blankNode, literal, namedNode, triple} from "@rdfjs/data-model";
+import {namedNode, triple} from "@rdfjs/data-model";
 import "jest-rdf";
 import {Readable} from "stream";
 import {SparqlEndpointFetcher} from "../lib/SparqlEndpointFetcher";
@@ -78,37 +78,79 @@ describe('SparqlEndpointFetcher', () => {
         const readable = new Readable();
         const fetchCbThis = () => Promise.resolve(<Response> {
           body: <ReadableStream> <any> readable,
+          headers: new Headers(),
           ok: false,
           status: 500,
           statusText: 'Error!',
         });
         const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
-        return expect(stringifyStream(await fetcherThis.fetchRawStream(endpoint, querySelect, 'myacceptheader')))
+        return expect(stringifyStream((await fetcherThis.fetchRawStream(endpoint, querySelect, 'myacceptheader'))[1]))
           .rejects.toEqual(new Error('Invalid SPARQL endpoint (https://dbpedia.org/sparql) response: 500'));
       });
 
       it('should fetch with a node stream', async () => {
         const fetchCbThis = () => Promise.resolve(<Response> {
           body: streamifyString(`abc`),
+          headers: new Headers(),
           ok: true,
           status: 200,
           statusText: 'Ok!',
         });
         const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
-        return expect(await stringifyStream(await fetcherThis.fetchRawStream(endpoint, querySelect, 'myacceptheader')))
-          .toEqual(`abc`);
+        return expect(await stringifyStream((
+          await fetcherThis.fetchRawStream(endpoint, querySelect, 'myacceptheader'))[1])).toEqual(`abc`);
       });
 
       it('should fetch with a web stream', async () => {
         const fetchCbThis = () => Promise.resolve(<Response> {
           body: require('node-web-streams').toWebReadableStream(streamifyString(`abc`)),
+          headers: new Headers(),
           ok: true,
           status: 200,
           statusText: 'Ok!',
         });
         const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
-        return expect(await stringifyStream(await fetcherThis.fetchRawStream(endpoint, querySelect, 'myacceptheader')))
-          .toEqual(`abc`);
+        return expect(await stringifyStream((
+          await fetcherThis.fetchRawStream(endpoint, querySelect, 'myacceptheader'))[1])).toEqual(`abc`);
+      });
+
+      it('should fetch and get a dummy content type when none is provided', async () => {
+        const fetchCbThis = () => Promise.resolve(<Response> {
+          body: streamifyString(`abc`),
+          headers: new Headers(),
+          ok: true,
+          status: 200,
+          statusText: 'Ok!',
+        });
+        const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
+        return expect((await fetcherThis.fetchRawStream(endpoint, querySelect, 'myacceptheader'))[0])
+          .toEqual('');
+      });
+
+      it('should fetch and get the content type', async () => {
+        const fetchCbThis = () => Promise.resolve(<Response> {
+          body: streamifyString(`abc`),
+          headers: new Headers({ 'Content-Type': 'abc' }),
+          ok: true,
+          status: 200,
+          statusText: 'Ok!',
+        });
+        const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
+        return expect((await fetcherThis.fetchRawStream(endpoint, querySelect, 'myacceptheader'))[0])
+          .toEqual('abc');
+      });
+
+      it('should fetch and get the content type that has a suffix', async () => {
+        const fetchCbThis = () => Promise.resolve(<Response> {
+          body: streamifyString(`abc`),
+          headers: new Headers({ 'Content-Type': 'abc; bla' }),
+          ok: true,
+          status: 200,
+          statusText: 'Ok!',
+        });
+        const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
+        return expect((await fetcherThis.fetchRawStream(endpoint, querySelect, 'myacceptheader'))[0])
+          .toEqual('abc');
       });
     });
 
@@ -131,6 +173,7 @@ describe('SparqlEndpointFetcher', () => {
     ]
   }
 }`),
+          headers: new Headers({ 'Content-Type': SparqlEndpointFetcher.CONTENTTYPE_SPARQL_JSON }),
           ok: true,
           status: 200,
           statusText: 'Ok!',
@@ -144,7 +187,7 @@ describe('SparqlEndpointFetcher', () => {
           ]);
       });
 
-      it('should parse empty bindings', async () => {
+      it('should parse empty JSON bindings', async () => {
         const fetchCbThis = () => Promise.resolve(<Response> {
           body: streamifyString(`{
   "head": { "vars": [ "p" ] },
@@ -152,6 +195,26 @@ describe('SparqlEndpointFetcher', () => {
     "bindings": []
   }
 }`),
+          headers: new Headers({ 'Content-Type': SparqlEndpointFetcher.CONTENTTYPE_SPARQL_JSON }),
+          ok: true,
+          status: 200,
+          statusText: 'Ok!',
+        });
+        const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
+        return expect(await arrayifyStream(await fetcherThis.fetchBindings(endpoint, querySelect)))
+          .toEqual([]);
+      });
+
+      it('should parse empty XML bindings', async () => {
+        const fetchCbThis = () => Promise.resolve(<Response> {
+          body: streamifyString(`<?xml version="1.0"?>
+<sparql xmlns="http://www.w3.org/2005/sparql-results#">
+  <head>
+  </head>
+  <results>
+  </results>
+</sparql>`),
+          headers: new Headers({ 'Content-Type': SparqlEndpointFetcher.CONTENTTYPE_SPARQL_XML }),
           ok: true,
           status: 200,
           statusText: 'Ok!',
@@ -167,6 +230,7 @@ describe('SparqlEndpointFetcher', () => {
   "head": { "vars": [ "p" ] },
   "results": {}
 }`),
+          headers: new Headers({ 'Content-Type': SparqlEndpointFetcher.CONTENTTYPE_SPARQL_JSON }),
           ok: true,
           status: 200,
           statusText: 'Ok!',
@@ -181,6 +245,7 @@ describe('SparqlEndpointFetcher', () => {
           body: streamifyString(`{
   "head": { "vars": [ "p" ] }
 }`),
+          headers: new Headers({ 'Content-Type': SparqlEndpointFetcher.CONTENTTYPE_SPARQL_JSON }),
           ok: true,
           status: 200,
           statusText: 'Ok!',
@@ -191,8 +256,11 @@ describe('SparqlEndpointFetcher', () => {
       });
 
       it('should emit an error on a server error', async () => {
+        const body = <any> new Readable();
+        body._read = () => { return; };
         const fetchCbThis = () => Promise.resolve(<Response> {
-          body: <any> new Readable(),
+          body,
+          headers: new Headers({ 'Content-Type': SparqlEndpointFetcher.CONTENTTYPE_SPARQL_JSON }),
           ok: false,
           status: 500,
           statusText: 'Error!',
@@ -200,6 +268,19 @@ describe('SparqlEndpointFetcher', () => {
         const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
         return expect(arrayifyStream(await fetcherThis.fetchBindings(endpoint, querySelect)))
           .rejects.toBeTruthy();
+      });
+
+      it('should reject on an invalid content type', async () => {
+        const fetchCbThis = () => Promise.resolve(<Response> {
+          body: streamifyString(''),
+          headers: new Headers({ 'Content-Type': 'bla' }),
+          ok: true,
+          status: 200,
+          statusText: 'Error!',
+        });
+        const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
+        return expect(fetcherThis.fetchBindings(endpoint, querySelect)).rejects
+          .toEqual(new Error('Unknown SPARQL results content type: bla'));
       });
     });
 
@@ -210,6 +291,7 @@ describe('SparqlEndpointFetcher', () => {
   "head": { },
   "boolean": true
 }`),
+          headers: new Headers({ 'Content-Type': SparqlEndpointFetcher.CONTENTTYPE_SPARQL_JSON }),
           ok: true,
           status: 200,
           statusText: 'Ok!',
@@ -218,12 +300,28 @@ describe('SparqlEndpointFetcher', () => {
         return expect(await fetcherThis.fetchAsk(endpoint, queryAsk)).toEqual(true);
       });
 
-      it('should parse false', async () => {
+      it('should parse false in JSON', async () => {
         const fetchCbThis = () => Promise.resolve(<Response> {
           body: streamifyString(`{
   "head": { },
   "boolean": false
 }`),
+          headers: new Headers({ 'Content-Type': SparqlEndpointFetcher.CONTENTTYPE_SPARQL_JSON }),
+          ok: true,
+          status: 200,
+          statusText: 'Ok!',
+        });
+        const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
+        return expect(await fetcherThis.fetchAsk(endpoint, queryAsk)).toEqual(false);
+      });
+
+      it('should parse false in XML', async () => {
+        const fetchCbThis = () => Promise.resolve(<Response> {
+          body: streamifyString(`<?xml version="1.0"?>
+<sparql xmlns="http://www.w3.org/2005/sparql-results#">
+  <boolean>false</boolean>
+</sparql>`),
+          headers: new Headers({ 'Content-Type': SparqlEndpointFetcher.CONTENTTYPE_SPARQL_XML }),
           ok: true,
           status: 200,
           statusText: 'Ok!',
@@ -237,6 +335,7 @@ describe('SparqlEndpointFetcher', () => {
           body: streamifyString(`{
   "head": { }
 }`),
+          headers: new Headers({ 'Content-Type': SparqlEndpointFetcher.CONTENTTYPE_SPARQL_JSON }),
           ok: true,
           status: 200,
           statusText: 'Ok!',
@@ -247,15 +346,31 @@ describe('SparqlEndpointFetcher', () => {
       });
 
       it('should reject on a server error', async () => {
+        const body = <any> new Readable();
+        body._read = () => { return; };
         const fetchCbThis = () => Promise.resolve(<Response> {
-          body: <any> new Readable(),
+          body,
+          headers: new Headers({ 'Content-Type': SparqlEndpointFetcher.CONTENTTYPE_SPARQL_JSON }),
           ok: false,
           status: 500,
           statusText: 'Error!',
         });
         const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
         return expect(fetcherThis.fetchAsk(endpoint, queryAsk)).rejects
-          .toEqual(new Error('No valid ASK response was found.'));
+          .toEqual(new Error('Invalid SPARQL endpoint (https://dbpedia.org/sparql) response: Error!'));
+      });
+
+      it('should reject on an invalid content type', async () => {
+        const fetchCbThis = () => Promise.resolve(<Response> {
+          body: streamifyString(''),
+          headers: new Headers({ 'Content-Type': 'bla' }),
+          ok: true,
+          status: 200,
+          statusText: 'Error!',
+        });
+        const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
+        return expect(fetcherThis.fetchAsk(endpoint, queryAsk)).rejects
+          .toEqual(new Error('Unknown SPARQL results content type: bla'));
       });
     });
 
@@ -265,6 +380,7 @@ describe('SparqlEndpointFetcher', () => {
           body: streamifyString(`
 <http://ex.org/s> <http://ex.org/p> <http://ex.org/o1>, <http://ex.org/o2>.
 `),
+          headers: new Headers(),
           ok: true,
           status: 200,
           statusText: 'Ok!',

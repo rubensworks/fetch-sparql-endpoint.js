@@ -2,6 +2,7 @@ import "isomorphic-fetch";
 import * as RDF from "rdf-js";
 import {Parser as SparqlParser} from "sparqljs";
 import {ISettings, SparqlJsonParser} from "sparqljson-parse";
+import {SparqlXmlParser} from "sparqlxml-parse";
 
 // tslint:disable-next-line:no-var-requires
 const n3 = require('n3');
@@ -13,15 +14,35 @@ const n3 = require('n3');
 export class SparqlEndpointFetcher {
 
   public static CONTENTTYPE_SPARQL_JSON: string = 'application/sparql-results+json';
+  public static CONTENTTYPE_SPARQL_XML: string = 'application/sparql-results+xml';
+  public static CONTENTTYPE_SPARQL: string =
+    `${SparqlEndpointFetcher.CONTENTTYPE_SPARQL_JSON};q=1.0,${SparqlEndpointFetcher.CONTENTTYPE_SPARQL_XML};q=0.7`;
   public static CONTENTTYPE_TURTLE: string = 'text/turtle';
 
   public readonly fetchCb: (input?: Request | string, init?: RequestInit) => Promise<Response>;
+  public readonly sparqlParsers: {[contentType: string]: ISparqlResultsParser};
   public readonly sparqlJsonParser: SparqlJsonParser;
+  public readonly sparqlXmlParser: SparqlXmlParser;
 
   constructor(args?: ISparqlEndpointFetcherArgs) {
     args = args || {};
     this.fetchCb = args.fetch || fetch;
     this.sparqlJsonParser = new SparqlJsonParser(args);
+    this.sparqlXmlParser = new SparqlXmlParser(args);
+    this.sparqlParsers = {
+      [SparqlEndpointFetcher.CONTENTTYPE_SPARQL_JSON]: {
+        parseBooleanStream: (sparqlResponseStream) =>
+          this.sparqlJsonParser.parseJsonBooleanStream(sparqlResponseStream),
+        parseResultsStream: (sparqlResponseStream) =>
+          this.sparqlJsonParser.parseJsonResultsStream(sparqlResponseStream),
+      },
+      [SparqlEndpointFetcher.CONTENTTYPE_SPARQL_XML]: {
+        parseBooleanStream: (sparqlResponseStream) =>
+          this.sparqlXmlParser.parseXmlBooleanStream(sparqlResponseStream),
+        parseResultsStream: (sparqlResponseStream) =>
+          this.sparqlXmlParser.parseXmlResultsStream(sparqlResponseStream),
+      },
+    };
   }
 
   /**
@@ -46,8 +67,13 @@ export class SparqlEndpointFetcher {
    * @return {Promise<NodeJS.ReadableStream>} A stream of {@link IBindings}.
    */
   public async fetchBindings(endpoint: string, query: string): Promise<NodeJS.ReadableStream> {
-    return this.sparqlJsonParser.parseJsonResultsStream(
-      await this.fetchRawStream(endpoint, query, SparqlEndpointFetcher.CONTENTTYPE_SPARQL_JSON));
+    const [contentType, responseStream]: [string, NodeJS.ReadableStream] = await this
+      .fetchRawStream(endpoint, query, SparqlEndpointFetcher.CONTENTTYPE_SPARQL);
+    const parser: ISparqlResultsParser = this.sparqlParsers[contentType];
+    if (!parser) {
+      throw new Error('Unknown SPARQL results content type: ' + contentType);
+    }
+    return parser.parseResultsStream(responseStream);
   }
 
   /**
@@ -57,8 +83,13 @@ export class SparqlEndpointFetcher {
    * @return {Promise<boolean>} A boolean resolving to the answer.
    */
   public async fetchAsk(endpoint: string, query: string): Promise<boolean> {
-    return this.sparqlJsonParser.parseJsonBooleanStream(
-      await this.fetchRawStream(endpoint, query, SparqlEndpointFetcher.CONTENTTYPE_SPARQL_JSON));
+    const [contentType, responseStream]: [string, NodeJS.ReadableStream] = await this
+      .fetchRawStream(endpoint, query, SparqlEndpointFetcher.CONTENTTYPE_SPARQL);
+    const parser: ISparqlResultsParser = this.sparqlParsers[contentType];
+    if (!parser) {
+      throw new Error('Unknown SPARQL results content type: ' + contentType);
+    }
+    return parser.parseBooleanStream(responseStream);
   }
 
   /**
@@ -68,7 +99,7 @@ export class SparqlEndpointFetcher {
    * @return {Promise<Stream>} A stream of triples.
    */
   public async fetchTriples(endpoint: string, query: string): Promise<RDF.Stream> {
-    const rawStream = await this.fetchRawStream(endpoint, query, SparqlEndpointFetcher.CONTENTTYPE_TURTLE);
+    const rawStream = (await this.fetchRawStream(endpoint, query, SparqlEndpointFetcher.CONTENTTYPE_TURTLE))[1];
     return rawStream.pipe(new n3.StreamParser({ format: SparqlEndpointFetcher.CONTENTTYPE_TURTLE }));
   }
 
@@ -80,9 +111,10 @@ export class SparqlEndpointFetcher {
    * @param {string} endpoint     A SPARQL endpoint URL. (without the `?query=` suffix).
    * @param {string} query        A SPARQL query string.
    * @param {string} acceptHeader The HTTP accept to use.
-   * @return {Promise<NodeJS.ReadableStream>} The SPARQL endpoint response stream.
+   * @return {Promise<[string, NodeJS.ReadableStream]>} The content type and SPARQL endpoint response stream.
    */
-  public async fetchRawStream(endpoint: string, query: string, acceptHeader: string): Promise<NodeJS.ReadableStream> {
+  public async fetchRawStream(endpoint: string, query: string, acceptHeader: string)
+    : Promise<[string, NodeJS.ReadableStream]> {
     const url: string = endpoint + '?query=' + encodeURIComponent(query);
 
     // Initiate request
@@ -95,13 +127,19 @@ export class SparqlEndpointFetcher {
     const responseStream: NodeJS.ReadableStream = require('is-stream')(httpResponse.body)
       ? httpResponse.body : require('node-web-streams').toNodeReadable(httpResponse.body);
 
+    // Determine the content type and emit it to the stream
+    let contentType = httpResponse.headers.get('Content-Type') || '';
+    if (contentType.indexOf(';') > 0) {
+      contentType = contentType.substr(0, contentType.indexOf(';'));
+    }
+
     // Emit an error if the server returned an invalid response
     if (!httpResponse.ok) {
       setImmediate(() => responseStream.emit('error',
         new Error('Invalid SPARQL endpoint (' + endpoint + ') response: ' + httpResponse.statusText)));
     }
 
-    return responseStream;
+    return [ contentType, responseStream ];
   }
 
 }
@@ -112,4 +150,9 @@ export interface ISparqlEndpointFetcherArgs extends ISettings {
 
 export interface IBindings {
   [key: string]: RDF.Term;
+}
+
+export interface ISparqlResultsParser {
+  parseResultsStream(sparqlResponseStream: NodeJS.ReadableStream): NodeJS.ReadableStream;
+  parseBooleanStream(sparqlResponseStream: NodeJS.ReadableStream): Promise<boolean>;
 }

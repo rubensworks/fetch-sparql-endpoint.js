@@ -11,6 +11,11 @@ All results are compatible with the [RDFJS specification](http://rdf.js.org/).
 Currently, SPARQL queries such as `SELECT`, `ASK`, `CONSTRUCT` and `DESCRIBE` are supported.
 [SPARQL UPDATE](https://www.w3.org/TR/sparql11-update/) to insert, delete and patch data is not supported yet.
 
+Internally, this library supports SPARQL results in
+[SPARQL JSON](https://www.w3.org/TR/sparql11-results-json/),
+[SPARQL XML](https://www.w3.org/TR/rdf-sparql-XMLres/),
+and [Turtle](https://www.w3.org/TR/turtle/).
+
 ## Install
 
 This package can be installed via [npm](https://www.npmjs.com/package/jsonld-context-parser).
