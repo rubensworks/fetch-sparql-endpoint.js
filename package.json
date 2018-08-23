@@ -1,6 +1,6 @@
 {
   "name": "fetch-sparql-endpoint",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "A simple, lightweight module to send queries to SPARQL endpoints and retrieve their results in a streaming fashion.",
   "keywords": [
     "sparql",
