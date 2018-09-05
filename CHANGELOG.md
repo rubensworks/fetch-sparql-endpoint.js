@@ -1,6 +1,11 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="1.3.1"></a>
+## [1.3.1](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v1.3.0...v1.3.1) - 2018-09-05
+### Fixes
+- [Remove tslib dependency](https://github.com/rubensworks/fetch-sparql-endpoint.js/commit/b5805407ac842fdf12d148d9794a82b7be4b34b6)
+
 <a name="1.3.0"></a>
 ## [1.3.0](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v1.2.0...v1.3.0) - 2018-08-23
 ### Changed
