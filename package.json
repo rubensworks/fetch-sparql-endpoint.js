@@ -20,7 +20,7 @@
   "homepage": "https://github.com/rubensworks/fetch-sparql-endpoint.js#readme",
   "license": "MIT",
   "bin": {
-    "fetch-sparql-endpoint": "fetch-sparql-endpoint.js"
+    "fetch-sparql-endpoint": "bin/fetch-sparql-endpoint.js"
   },
   "files": [
     "bin/**/*.d.ts",
