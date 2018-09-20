@@ -59,14 +59,19 @@
     "jest-rdf": "^1.0.0",
     "pre-commit": "^1.2.2",
     "streamify-string": "^1.0.1",
-    "ts-jest": "^23.1.4",
+    "ts-jest": "^23.10.0",
     "tslint": "^5.8.0",
     "tslint-eslint-rules": "^5.4.0",
     "typescript": "^3.0.1"
   },
   "jest": {
+    "globals": {
+      "ts-jest": {
+        "tsConfig": "test/tsconfig.json"
+      }
+    },
     "transform": {
-      "^.+\\.ts$": "<rootDir>/node_modules/ts-jest/preprocessor.js"
+      "^.+\\.ts$": "ts-jest"
     },
     "transformIgnorePatterns": [
       "[/\\\\]node_modules[/\\\\].+\\.(js|jsx)$"
