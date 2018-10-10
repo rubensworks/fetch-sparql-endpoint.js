@@ -52,7 +52,7 @@
     "@types/jest": "^23.3.1",
     "@types/minimist": "^1.2.0",
     "@types/rdf-js": "^1.0.1",
-    "@types/sparqljs": "^1.5.0",
+    "@types/sparqljs": "^2.1.0",
     "arrayify-stream": "^1.0.0",
     "coveralls": "^3.0.0",
     "jest": "^23.5.0",
