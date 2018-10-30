@@ -32,9 +32,9 @@
   version "10.5.5"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-10.5.5.tgz#8e84d24e896cd77b0d4f73df274027e3149ec2ba"
 
-"@types/rdf-js@^1.0.1":
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/@types/rdf-js/-/rdf-js-1.0.1.tgz#312e8478b608c3e2f66d3a2cae0c96c052c495a6"
+"@types/rdf-js@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@types/rdf-js/-/rdf-js-2.0.0.tgz#1cc201ee3086ecfabbf0471dcec7813ff56c0247"
   dependencies:
     "@types/node" "*"
 
