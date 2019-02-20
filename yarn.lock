@@ -2686,10 +2686,10 @@ ms@^2.1.1:
   resolved "https://registry.yarnpkg.com/ms/-/ms-2.1.1.tgz#30a5864eb3ebb0a66f2ebe6d727af06a09d86e0a"
   integrity sha512-tgp+dl5cGk28utYktBsrFqA7HKgrhgPsg6Z/EfhWI4gl1Hwq8B/GmY/0oXZ6nF8hDVesS/FpnYaD/kOWhYQvyg==
 
-n3@^1.0.0:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/n3/-/n3-1.0.1.tgz#f590b4bcbfff93bc6eab40fe314bfbc7deaf82f0"
-  integrity sha512-2suWrEdCpe6BYKcPBEQgGV+BKO9GkgkNpEQ3xC2iSHti4Qb4bxHm3XRFLJP8u1MdBZv3EFs/WaNH34pFBoKm1Q==
+n3@^1.0.4:
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/n3/-/n3-1.0.4.tgz#6c7d67e1cf307e1e5e37d9d040bdd7d15b9108bd"
+  integrity sha512-iMHI7n3OsmMsUf6u9un6f8TCPgN1Zs6uKKcXrpTFUNXaswaOFk3H2/YuzuLE4T5Mhd+1haXAuufBFmsbRaULzw==
 
 nan@^2.9.2:
   version "2.11.1"
