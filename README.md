@@ -41,9 +41,9 @@ const myFetcher = new SparqlEndpointFetcher();
 Optionally, you can pass an options object with the following optional entries:
 ```js
 const myFetcher = new SparqlEndpointFetcher({
-  fetch: fetch,                     # A custom fetch-API-supporting function
-  dataFactory: DataFactory,         # A custom RDFJS data factory
-  prefixVariableQuestionMark: false # If variable names in bindings should be prefixed with '?', defaults to false
+  fetch: fetch,                     // A custom fetch-API-supporting function
+  dataFactory: DataFactory,         // A custom RDFJS data factory
+  prefixVariableQuestionMark: false // If variable names in bindings should be prefixed with '?', defaults to false
 });
 ```
 
