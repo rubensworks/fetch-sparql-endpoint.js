@@ -76,6 +76,7 @@ describe('SparqlEndpointFetcher', () => {
 
       it('should emit an error in the stream for an invalid server response', async () => {
         const readable = new Readable();
+        readable._read = () => { return; };
         const fetchCbThis = () => Promise.resolve(<Response> {
           body: <ReadableStream> <any> readable,
           headers: new Headers(),
@@ -85,7 +86,7 @@ describe('SparqlEndpointFetcher', () => {
         });
         const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
         return expect(stringifyStream((await fetcherThis.fetchRawStream(endpoint, querySelect, 'myacceptheader'))[1]))
-          .rejects.toEqual(new Error('Invalid SPARQL endpoint (https://dbpedia.org/sparql) response: 500'));
+          .rejects.toEqual(new Error('Invalid SPARQL endpoint (https://dbpedia.org/sparql) response: Error!'));
       });
 
       it('should fetch with a node stream', async () => {
