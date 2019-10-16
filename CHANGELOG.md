@@ -1,6 +1,13 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v1.4.1"></a>
+## [v1.4.1](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v1.3.3...v1.4.1) - 2019-10-16
+
+### Changed
+* [Update sparqljs to version 3.0.0](https://github.com/rubensworks/fetch-sparql-endpoint.js/commit/45a77d3f8bc39d3ab1918e3cf2a60e964bf6d0db)
+* [Update is-stream to version 2.0.0](https://github.com/rubensworks/fetch-sparql-endpoint.js/commit/048d51c9ab9bd2e9ee5a2902a76e14fd19ddfb0f)
+
 <a name="v1.4.0"></a>
 ## [v1.4.0](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v1.3.3...v1.4.0) - 2018-11-08
 
