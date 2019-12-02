@@ -6,7 +6,7 @@
       "es6",
       "dom"
     ],
-    "target": "es6",
+    "target": "es2017",
     "noImplicitAny": true,
     "removeComments": false,
     "preserveConstEnums": true,
