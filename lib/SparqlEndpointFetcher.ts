@@ -7,7 +7,7 @@ import {SparqlXmlParser} from "sparqlxml-parse";
 // tslint:disable:no-var-requires
 const n3 = require('n3');
 const isStream = require('is-stream');
-const toNodeReadable = require('node-web-streams').toNodeReadable;
+const toNodeReadable = require('web-streams-node').toNodeReadable;
 
 /**
  * A SparqlEndpointFetcher can send queries to SPARQL endpoints,
