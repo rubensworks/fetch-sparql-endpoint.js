@@ -4,8 +4,10 @@ import {Parser as SparqlParser} from "sparqljs";
 import {ISettings, SparqlJsonParser} from "sparqljson-parse";
 import {SparqlXmlParser} from "sparqlxml-parse";
 
-// tslint:disable-next-line:no-var-requires
+// tslint:disable:no-var-requires
 const n3 = require('n3');
+const isStream = require('is-stream');
+const toNodeReadable = require('node-web-streams').toNodeReadable;
 
 /**
  * A SparqlEndpointFetcher can send queries to SPARQL endpoints,
@@ -124,8 +126,8 @@ export class SparqlEndpointFetcher {
 
     // Wrap WhatWG readable stream into a Node.js readable stream
     // If the body already is a Node.js stream (in the case of node-fetch), don't do explicit conversion.
-    const responseStream: NodeJS.ReadableStream = require('is-stream')(httpResponse.body)
-      ? httpResponse.body : require('node-web-streams').toNodeReadable(httpResponse.body);
+    const responseStream: NodeJS.ReadableStream = isStream(httpResponse.body)
+      ? httpResponse.body : toNodeReadable(httpResponse.body);
 
     // Determine the content type and emit it to the stream
     let contentType = httpResponse.headers.get('Content-Type') || '';
