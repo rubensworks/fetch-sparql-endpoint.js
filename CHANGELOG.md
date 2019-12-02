@@ -1,6 +1,14 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v1.5.0"></a>
+## [v1.5.0](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v1.4.1...v1.5.0) - 2019-12-02
+
+### Changed
+* [Swap node-web-streams package with web-streams-node](https://github.com/rubensworks/fetch-sparql-endpoint.js/commit/2dca4f2f50acc69b823b16ea6144b1d45870471c)
+* [Preload require calls for fixing jest issues](https://github.com/rubensworks/fetch-sparql-endpoint.js/commit/ae702c6ed211136f8243a9997a7a14c7ac3cd690)
+* [Compile to es2017 for improving performance](https://github.com/rubensworks/fetch-sparql-endpoint.js/commit/ba44979ae8aa14b9e82b75d9de34935285e41909)
+
 <a name="v1.4.1"></a>
 ## [v1.4.1](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v1.3.3...v1.4.1) - 2019-10-16
 
