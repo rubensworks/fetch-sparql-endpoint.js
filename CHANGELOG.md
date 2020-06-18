@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v1.6.0"></a>
+## [v1.6.0](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v1.5.0...v1.6.0) - 2020-06-18
+
+### Changed
+* [Reject promise on error server responses](https://github.com/rubensworks/fetch-sparql-endpoint.js/commit/99a76d221dc2f3dc9a7c9aae7682085fd36d54f3)
+
 <a name="v1.5.0"></a>
 ## [v1.5.0](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v1.4.1...v1.5.0) - 2019-12-02
 
