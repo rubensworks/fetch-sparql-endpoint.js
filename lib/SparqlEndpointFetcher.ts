@@ -137,8 +137,7 @@ export class SparqlEndpointFetcher {
 
     // Emit an error if the server returned an invalid response
     if (!httpResponse.ok) {
-      setImmediate(() => responseStream.emit('error',
-        new Error('Invalid SPARQL endpoint (' + endpoint + ') response: ' + httpResponse.statusText)));
+      throw new Error('Invalid SPARQL endpoint (' + endpoint + ') response: ' + httpResponse.statusText);
     }
 
     return [ contentType, responseStream ];
