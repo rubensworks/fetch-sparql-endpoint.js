@@ -1,6 +1,6 @@
 {
   "name": "fetch-sparql-endpoint",
-  "version": "1.6.0",
+  "version": "1.6.1",
   "description": "A simple, lightweight module to send queries to SPARQL endpoints and retrieve their results in a streaming fashion.",
   "keywords": [
     "sparql",
@@ -82,7 +82,9 @@
       "js"
     ],
     "collectCoverage": true,
-    "setupFilesAfterEnv": [ "jest-rdf" ],
+    "setupFilesAfterEnv": [
+      "jest-rdf"
+    ],
     "testEnvironment": "node"
   },
   "scripts": {
