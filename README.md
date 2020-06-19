@@ -66,6 +66,14 @@ and values and [RDFJS terms](http://rdf.js.org/#term-interface):
 ...
 ```
 
+Optionally, you can obtain a list of variables by listening to the `'variables'` event:
+```js
+const bindingsStream = await fetcher.fetchBindings('https://dbpedia.org/sparql', 'SELECT * WHERE { ?s ?p ?o } LIMIT 100');
+bindingsStream.on('data', (bindings) => console.log(bindings));
+// Will print [ variable('s'), variable('p'), variable('o') ]
+bindingsStream.on('variables', (variables) => console.log(variables));
+```
+
 ### Fetch ask
 
 [SPARQL ASK](https://www.w3.org/TR/rdf-sparql-query/#ask) queries answer with a (promise to a) boolean value.

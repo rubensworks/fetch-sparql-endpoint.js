@@ -82,7 +82,7 @@
       "js"
     ],
     "collectCoverage": true,
-    "setupTestFrameworkScriptFile": "jest-rdf",
+    "setupFilesAfterEnv": [ "jest-rdf" ],
     "testEnvironment": "node"
   },
   "scripts": {

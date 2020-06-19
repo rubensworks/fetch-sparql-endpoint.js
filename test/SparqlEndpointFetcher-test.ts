@@ -1,4 +1,4 @@
-import {namedNode, triple} from "@rdfjs/data-model";
+import {namedNode, triple, variable} from "@rdfjs/data-model";
 import "jest-rdf";
 import {Readable} from "stream";
 import {SparqlEndpointFetcher} from "../lib/SparqlEndpointFetcher";
@@ -282,6 +282,36 @@ describe('SparqlEndpointFetcher', () => {
         const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
         return expect(fetcherThis.fetchBindings(endpoint, querySelect)).rejects
           .toEqual(new Error('Unknown SPARQL results content type: bla'));
+      });
+
+      it('should emit the variables event', async () => {
+        const fetchCbThis = () => Promise.resolve(<Response> {
+          body: streamifyString(`{
+  "head": { "vars": [ "p" ] },
+  "results": {
+    "bindings": [
+      {
+        "p": { "type": "uri" , "value": "p1" }
+      },
+      {
+        "p": { "type": "uri" , "value": "p2" }
+      },
+      {
+        "p": { "type": "uri" , "value": "p3" }
+      }
+    ]
+  }
+}`),
+          headers: new Headers({ 'Content-Type': SparqlEndpointFetcher.CONTENTTYPE_SPARQL_JSON }),
+          ok: true,
+          status: 200,
+          statusText: 'Ok!',
+        });
+        const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
+        const results = await fetcherThis.fetchBindings(endpoint, querySelect);
+        const p = new Promise((resolve) => results.on('variables', resolve));
+        await arrayifyStream(results);
+        expect(await p).toEqual([variable('p')]);
       });
     });
 
