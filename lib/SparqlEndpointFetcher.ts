@@ -28,7 +28,7 @@ export class SparqlEndpointFetcher {
 
   constructor(args?: ISparqlEndpointFetcherArgs) {
     args = args || {};
-    this.fetchCb = args.fetch || fetch;
+    this.fetchCb = args.fetch || fetch.bind(this);
     this.sparqlJsonParser = new SparqlJsonParser(args);
     this.sparqlXmlParser = new SparqlXmlParser(args);
     this.sparqlParsers = {

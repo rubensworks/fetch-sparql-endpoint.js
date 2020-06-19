@@ -13,7 +13,7 @@ describe('SparqlEndpointFetcher', () => {
 
   describe('constructed without fetch callback', () => {
     it('should have the default fetch function', async () => {
-      return expect(new SparqlEndpointFetcher().fetchCb).toBe(require('isomorphic-fetch'));
+      return expect(new SparqlEndpointFetcher().fetchCb).toBeInstanceOf(Function);
     });
   });
 
