@@ -21,14 +21,14 @@ export class SparqlEndpointFetcher {
     `${SparqlEndpointFetcher.CONTENTTYPE_SPARQL_JSON};q=1.0,${SparqlEndpointFetcher.CONTENTTYPE_SPARQL_XML};q=0.7`;
   public static CONTENTTYPE_TURTLE: string = 'text/turtle';
 
-  public readonly fetchCb: (input?: Request | string, init?: RequestInit) => Promise<Response>;
+  public readonly fetchCb?: (input?: Request | string, init?: RequestInit) => Promise<Response>;
   public readonly sparqlParsers: {[contentType: string]: ISparqlResultsParser};
   public readonly sparqlJsonParser: SparqlJsonParser;
   public readonly sparqlXmlParser: SparqlXmlParser;
 
   constructor(args?: ISparqlEndpointFetcherArgs) {
     args = args || {};
-    this.fetchCb = args.fetch || fetch.bind(this);
+    this.fetchCb = args.fetch;
     this.sparqlJsonParser = new SparqlJsonParser(args);
     this.sparqlXmlParser = new SparqlXmlParser(args);
     this.sparqlParsers = {
@@ -122,7 +122,7 @@ export class SparqlEndpointFetcher {
     // Initiate request
     const headers: Headers = new Headers();
     headers.append('Accept', acceptHeader);
-    const httpResponse: Response = await this.fetchCb(url, { headers });
+    const httpResponse: Response = await (this.fetchCb || fetch)(url, { headers });
 
     // Wrap WhatWG readable stream into a Node.js readable stream
     // If the body already is a Node.js stream (in the case of node-fetch), don't do explicit conversion.

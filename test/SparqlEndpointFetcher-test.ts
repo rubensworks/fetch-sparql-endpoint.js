@@ -12,8 +12,8 @@ const arrayifyStream = require('arrayify-stream');
 describe('SparqlEndpointFetcher', () => {
 
   describe('constructed without fetch callback', () => {
-    it('should have the default fetch function', async () => {
-      return expect(new SparqlEndpointFetcher().fetchCb).toBeInstanceOf(Function);
+    it('should have an undefined fetch function', async () => {
+      return expect(new SparqlEndpointFetcher().fetchCb).toBeUndefined();
     });
   });
 
