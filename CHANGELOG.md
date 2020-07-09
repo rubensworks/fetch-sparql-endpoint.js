@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v1.6.2"></a>
+## [v1.6.2](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v1.6.1...v1.6.2) - 2020-07-09
+
+### Fixed
+* [Fix fetch in browsers still failing, #27](https://github.com/rubensworks/fetch-sparql-endpoint.js/commit/72e990e9527d28756e4bb18ac10e02e38b73551e)
+
 <a name="v1.6.1"></a>
 ## [v1.6.1](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v1.6.0...v1.6.1) - 2020-06-19
 
