@@ -1,6 +1,13 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v1.7.0"></a>
+## [v1.7.0](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v1.6.2...v1.7.0) - 2020-09-16
+
+### Changed
+* [Migrate to cross-fetch](https://github.com/rubensworks/fetch-sparql-endpoint.js/commit/73420a57911a427c5845125e26cf54e32b4ba36d)
+* [Migrate to rdf-data-factory and @types/rdf-js 4.x](https://github.com/rubensworks/fetch-sparql-endpoint.js/commit/b4b1adbee2d959adbdae775f8f0c90eddab23b85)
+
 <a name="v1.6.2"></a>
 ## [v1.6.2](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v1.6.1...v1.6.2) - 2020-07-09
 
