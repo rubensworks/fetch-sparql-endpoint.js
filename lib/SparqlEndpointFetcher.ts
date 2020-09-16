@@ -1,4 +1,4 @@
-import "isomorphic-fetch";
+import "cross-fetch/polyfill";
 import * as RDF from "rdf-js";
 import {Parser as SparqlParser} from "sparqljs";
 import {ISettings, SparqlJsonParser} from "sparqljson-parse";

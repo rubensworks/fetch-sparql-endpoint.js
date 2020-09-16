@@ -37,9 +37,9 @@
   ],
   "dependencies": {
     "is-stream": "^2.0.0",
-    "isomorphic-fetch": "^2.2.1",
+    "cross-fetch": "^3.0.6",
     "minimist": "^1.2.0",
-    "n3": "^1.0.0",
+    "n3": "^1.6.3",
     "web-streams-node": "^0.4.0",
     "rdf-string": "^1.5.0",
     "sparqljs": "^3.1.2",
