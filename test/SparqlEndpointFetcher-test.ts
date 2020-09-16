@@ -1,4 +1,4 @@
-import {namedNode, triple, variable} from "@rdfjs/data-model";
+import {DataFactory} from "rdf-data-factory";
 import "jest-rdf";
 import {Readable} from "stream";
 import {SparqlEndpointFetcher} from "../lib/SparqlEndpointFetcher";
@@ -6,6 +6,7 @@ import {SparqlEndpointFetcher} from "../lib/SparqlEndpointFetcher";
 const stringifyStream = require('stream-to-string');
 const streamifyString = require('streamify-string');
 const arrayifyStream = require('arrayify-stream');
+const DF = new DataFactory();
 
 // tslint:disable:no-trailing-whitespace
 
@@ -182,9 +183,9 @@ describe('SparqlEndpointFetcher', () => {
         const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
         return expect(await arrayifyStream(await fetcherThis.fetchBindings(endpoint, querySelect)))
           .toEqual([
-            { p: namedNode('p1') },
-            { p: namedNode('p2') },
-            { p: namedNode('p3') },
+            { p: DF.namedNode('p1') },
+            { p: DF.namedNode('p2') },
+            { p: DF.namedNode('p3') },
           ]);
       });
 
@@ -311,7 +312,7 @@ describe('SparqlEndpointFetcher', () => {
         const results = await fetcherThis.fetchBindings(endpoint, querySelect);
         const p = new Promise((resolve) => results.on('variables', resolve));
         await arrayifyStream(results);
-        expect(await p).toEqual([variable('p')]);
+        expect(await p).toEqual([DF.variable('p')]);
       });
     });
 
@@ -419,8 +420,8 @@ describe('SparqlEndpointFetcher', () => {
         const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
         return expect(await arrayifyStream(await fetcherThis.fetchTriples(endpoint, queryConstruct)))
           .toEqualRdfQuadArray([
-            triple(namedNode('http://ex.org/s'), namedNode('http://ex.org/p'), namedNode('http://ex.org/o1')),
-            triple(namedNode('http://ex.org/s'), namedNode('http://ex.org/p'), namedNode('http://ex.org/o2')),
+            DF.quad(DF.namedNode('http://ex.org/s'), DF.namedNode('http://ex.org/p'), DF.namedNode('http://ex.org/o1')),
+            DF.quad(DF.namedNode('http://ex.org/s'), DF.namedNode('http://ex.org/p'), DF.namedNode('http://ex.org/o2')),
           ]);
       });
     });
