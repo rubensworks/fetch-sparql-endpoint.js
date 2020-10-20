@@ -25,6 +25,7 @@ describe('SparqlEndpointFetcher', () => {
     const queryAsk = 'ASK WHERE { ?s ?p ?o }';
     const queryConstruct = 'CONSTRUCT WHERE { ?s ?p ?o }';
     const queryDescribe = 'DESCRIBE <http://ex.org>';
+    const queryDelete = 'DELETE WHERE { ?s ?p ?o }';
 
     let fetchCb;
     let fetcher;
@@ -154,6 +155,28 @@ describe('SparqlEndpointFetcher', () => {
         return expect((await fetcherThis.fetchRawStream(endpoint, querySelect, 'myacceptheader'))[0])
           .toEqual('abc');
       });
+    });
+
+    describe('#fetchUpdate', () => {
+      it('should use POST and the correct content-type', async () => {
+        const fetchCbThis: jest.Mock<Promise<Response>, any[]> = jest.fn(() => Promise.resolve(<Response> {
+          body: streamifyString(`abc`),
+          headers: new Headers(),
+          ok: true,
+          status: 200,
+          statusText: 'Ok!',
+        }));
+        const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
+        await expect(fetcherThis.fetchUpdate(endpoint, queryDelete)).resolves.toBeUndefined();
+        expect(fetchCbThis.mock.calls[0][0]).toBe(endpoint);
+        expect(fetchCbThis.mock.calls[0][1]).toMatchObject({
+          method: 'POST',
+          headers: {
+            'content-type': 'application/sparql-update',
+          },
+          body: queryDelete,
+        });
+      })
     });
 
     describe('#fetchBindings', () => {

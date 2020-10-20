@@ -106,6 +106,24 @@ export class SparqlEndpointFetcher {
   }
 
   /**
+   * Send an update query to the given endpoint URL using POST.
+   *
+   * @param {string} endpoint     A SPARQL endpoint URL. (without the `?query=` suffix).
+   * @param {string} query        A SPARQL query string.
+   */
+  public async fetchUpdate(endpoint: string, query: string): Promise<void> {
+    const init = {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/sparql-update',
+      },
+      body: query,
+    }
+
+    await this.handleFetchCall(endpoint, init);
+  }
+
+  /**
    * Send a query to the given endpoint URL and return the resulting stream.
    *
    * This will only accept responses with the application/sparql-results+json content type.
@@ -122,7 +140,19 @@ export class SparqlEndpointFetcher {
     // Initiate request
     const headers: Headers = new Headers();
     headers.append('Accept', acceptHeader);
-    const httpResponse: Response = await (this.fetchCb || fetch)(url, { headers });
+
+    return this.handleFetchCall(url, { headers });
+  }
+
+  /**
+   * Helper function to generalize internal fetch calls.
+   *
+   * @param {string}      url   The URL to call.
+   * @param {RequestInit} init  Options to pass along to the fetch call.
+   * @return {Promise<[string, NodeJS.ReadableStream]>} The content type and SPARQL endpoint response stream.
+   */
+  private async handleFetchCall(url: string, init: RequestInit): Promise<[string, NodeJS.ReadableStream]> {
+    const httpResponse: Response = await (this.fetchCb || fetch)(url, init);
 
     // Wrap WhatWG readable stream into a Node.js readable stream
     // If the body already is a Node.js stream (in the case of node-fetch), don't do explicit conversion.
@@ -137,12 +167,12 @@ export class SparqlEndpointFetcher {
 
     // Emit an error if the server returned an invalid response
     if (!httpResponse.ok) {
-      throw new Error('Invalid SPARQL endpoint (' + endpoint + ') response: ' + httpResponse.statusText);
+      const simpleUrl = /^[^?]*/u.exec(url)![0];
+      throw new Error('Invalid SPARQL endpoint (' + simpleUrl + ') response: ' + httpResponse.statusText);
     }
 
     return [ contentType, responseStream ];
   }
-
 }
 
 export interface ISparqlEndpointFetcherArgs extends ISettings {
