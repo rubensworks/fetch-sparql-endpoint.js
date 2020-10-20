@@ -3,6 +3,7 @@ import * as RDF from "rdf-js";
 import {Parser as SparqlParser} from "sparqljs";
 import {ISettings, SparqlJsonParser} from "sparqljson-parse";
 import {SparqlXmlParser} from "sparqlxml-parse";
+import {Readable} from "stream";
 
 // tslint:disable:no-var-requires
 const n3 = require('n3');
@@ -100,7 +101,7 @@ export class SparqlEndpointFetcher {
    * @param {string} query    A SPARQL query string.
    * @return {Promise<Stream>} A stream of triples.
    */
-  public async fetchTriples(endpoint: string, query: string): Promise<RDF.Stream> {
+  public async fetchTriples(endpoint: string, query: string): Promise<Readable & RDF.Stream> {
     const rawStream = (await this.fetchRawStream(endpoint, query, SparqlEndpointFetcher.CONTENTTYPE_TURTLE))[1];
     return rawStream.pipe(new n3.StreamParser({ format: SparqlEndpointFetcher.CONTENTTYPE_TURTLE }));
   }
