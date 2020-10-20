@@ -572,6 +572,14 @@
   resolved "https://registry.yarnpkg.com/@types/minimist/-/minimist-1.2.0.tgz#69a23a3ad29caf0097f06eda59b361ee2f0639f6"
   integrity sha1-aaI6OtKcrwCX8G7aWbNh7i8GOfY=
 
+"@types/n3@^1.4.4":
+  version "1.4.4"
+  resolved "https://registry.yarnpkg.com/@types/n3/-/n3-1.4.4.tgz#ed4f58200766ffc850d281e28c566eacb2b0b592"
+  integrity sha512-xsWfwyDh0uAH0CXvwqe9vb2UEDafMjRez/pB7yZwbWpd9Olw2wdxaL32FtdHjmmFE6b9i+j249JfRyZnvWkoqg==
+  dependencies:
+    "@types/node" "*"
+    "@types/rdf-js" "*"
+
 "@types/node@*":
   version "14.10.2"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-14.10.2.tgz#9b47a2c8e4dabd4db73b57e750b24af689600514"
