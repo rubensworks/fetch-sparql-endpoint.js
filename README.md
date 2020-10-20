@@ -8,8 +8,7 @@ A simple, lightweight module to send queries to [_SPARQL endpoints_](https://www
 
 All results are compatible with the [RDFJS specification](http://rdf.js.org/).
 
-Currently, SPARQL queries such as `SELECT`, `ASK`, `CONSTRUCT` and `DESCRIBE` are supported.
-[SPARQL UPDATE](https://www.w3.org/TR/sparql11-update/) to insert, delete and patch data is not supported yet.
+All SPARQL queries are supported, such as `SELECT`, `ASK`, `CONSTRUCT` `DESCRIBE`, `INSERT`, `DELETE`, ...
 
 Internally, this library supports SPARQL results in
 [SPARQL JSON](https://www.w3.org/TR/sparql11-results-json/),
@@ -101,6 +100,16 @@ triple(namedNode('s2'), namedNode('p2'), namedNode('o2'))
 triple(namedNode('s3'), namedNode('p3'), namedNode('o3'))
 ...
 ```
+
+### Fetch update
+
+[SPARQL Update](https://www.w3.org/TR/sparql11-update/) queries answer with a void promise.
+
+```js
+await fetcher.fetchUpdate('https://dbpedia.org/sparql', 'INSERT DATA { <ex:s> <ex:p> <ex:o> }');
+```
+
+The `await` fill throw an error if the update has failed.
 
 ### Detect query type
 
