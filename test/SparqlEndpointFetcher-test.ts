@@ -30,6 +30,7 @@ describe('SparqlEndpointFetcher', () => {
     const queryDelete = 'DELETE WHERE { ?s ?p ?o }';
     const queryInsert = 'INSERT { ?s ?p ?o } WHERE {}';
     const updateDeleteData = prefixes + 'DELETE DATA { GRAPH <http://example.org/g1> { :a foaf:knows :b } }';
+    const updateDeleteData2 = prefixes + 'DELETE DATA { GRAPH <http://example.org/g1> { :b foaf:knows :c } }';
     const updateInsertData = prefixes + 'INSERT DATA { GRAPH <http://example.org/g1> { :Alice foaf:knows :Bob } }';
     const updateMove = prefixes + 'MOVE DEFAULT TO :g1';
     const updateAdd = 'ADD SILENT GRAPH <http://www.example.com/g1> TO DEFAULT'
@@ -118,6 +119,13 @@ describe('SparqlEndpointFetcher', () => {
         });
       });
 
+      it('should detect a delete data query for 2 update operations', () => {
+        return expect(fetcher.getUpdateTypes(updateDeleteData + ';' + updateDeleteData2)).toEqual({
+          management: [],
+          insertDelete: [ 'delete' ]
+        });
+      });
+
       it('should detect an insert data query', () => {
         return expect(fetcher.getUpdateTypes(updateInsertData)).toEqual({
           management: [],
@@ -127,6 +135,13 @@ describe('SparqlEndpointFetcher', () => {
 
       it('should detect a combined insert and delete data query', () => {
         return expect(fetcher.getUpdateTypes(updateInsertData + ';' + updateDeleteData)).toEqual({
+          management: [],
+          insertDelete: [ 'insert', 'delete' ]
+        });
+      });
+
+      it('should detect a combined insert and delete data query (2 delete queries)', () => {
+        return expect(fetcher.getUpdateTypes(updateInsertData + ';' + updateDeleteData + ';' + updateDeleteData)).toEqual({
           management: [],
           insertDelete: [ 'insert', 'delete' ]
         });
