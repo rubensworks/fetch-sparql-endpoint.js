@@ -1,9 +1,9 @@
 import "cross-fetch/polyfill";
 import * as RDF from "rdf-js";
-import { Parser as SparqlParser } from "sparqljs";
-import { ISettings, SparqlJsonParser } from "sparqljson-parse";
-import { SparqlXmlParser } from "sparqlxml-parse";
-import { Readable } from "stream";
+import {Parser as SparqlParser} from "sparqljs";
+import {ISettings, SparqlJsonParser} from "sparqljson-parse";
+import {SparqlXmlParser} from "sparqlxml-parse";
+import {Readable} from "stream";
 
 // tslint:disable:no-var-requires
 const n3 = require('n3');
@@ -23,7 +23,7 @@ export class SparqlEndpointFetcher {
   public static CONTENTTYPE_TURTLE: string = 'text/turtle';
 
   public readonly fetchCb?: (input?: Request | string, init?: RequestInit) => Promise<Response>;
-  public readonly sparqlParsers: { [contentType: string]: ISparqlResultsParser };
+  public readonly sparqlParsers: {[contentType: string]: ISparqlResultsParser};
   public readonly sparqlJsonParser: SparqlJsonParser;
   public readonly sparqlXmlParser: SparqlXmlParser;
 
@@ -86,9 +86,8 @@ export class SparqlEndpointFetcher {
       for (const update of parsedQuery.updates) {
         if ('type' in update && !management.includes(update.type)) {
           management.push(update.type);
-        }
-        if ('updateType' in update && !insertDelete.includes(update.updateType)) {
-          insertDelete.push(update.updateType);
+        } else if ('updateType' in update && !insertDelete.includes(update.updateType)) {
+          insertDelete.push(update.updateType)
         }
       }
 
@@ -212,7 +211,7 @@ export class SparqlEndpointFetcher {
       throw new Error('Invalid SPARQL endpoint (' + simpleUrl + ') response: ' + httpResponse.statusText);
     }
 
-    return [contentType, responseStream];
+    return [ contentType, responseStream ];
   }
 }
 
