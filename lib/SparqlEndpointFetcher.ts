@@ -1,9 +1,9 @@
 import "cross-fetch/polyfill";
 import * as RDF from "rdf-js";
-import {Parser as SparqlParser} from "sparqljs";
-import {ISettings, SparqlJsonParser} from "sparqljson-parse";
-import {SparqlXmlParser} from "sparqlxml-parse";
-import {Readable} from "stream";
+import { Parser as SparqlParser } from "sparqljs";
+import { ISettings, SparqlJsonParser } from "sparqljson-parse";
+import { SparqlXmlParser } from "sparqlxml-parse";
+import { Readable } from "stream";
 
 // tslint:disable:no-var-requires
 const n3 = require('n3');
@@ -23,7 +23,7 @@ export class SparqlEndpointFetcher {
   public static CONTENTTYPE_TURTLE: string = 'text/turtle';
 
   public readonly fetchCb?: (input?: Request | string, init?: RequestInit) => Promise<Response>;
-  public readonly sparqlParsers: {[contentType: string]: ISparqlResultsParser};
+  public readonly sparqlParsers: { [contentType: string]: ISparqlResultsParser };
   public readonly sparqlJsonParser: SparqlJsonParser;
   public readonly sparqlXmlParser: SparqlXmlParser;
 
@@ -61,6 +61,46 @@ export class SparqlEndpointFetcher {
     return parsedQuery.type === 'query'
       ? (parsedQuery.queryType === 'DESCRIBE' ? 'CONSTRUCT' : parsedQuery.queryType) : "UNKNOWN";
   }
+
+  /**
+   * Get the query type of the given update query.
+   *
+   * This will parse the update query and thrown an exception on syntax errors.
+   *
+   * @param {string} query An update query.
+   * @return {'UNKNOWN' | {
+   *  insertDelete: ('insert' | 'delete' | 'deletewhere' | 'insertdelete')[];
+   *  management: ('copy' | 'move' | 'add' | 'load' | 'create' | 'clear' | 'drop')[]
+   * }} The included update operations.
+   */
+  public getUpdateTypes(query: string): 'UNKNOWN' | {
+    insertDelete: ('insert' | 'delete' | 'deletewhere' | 'insertdelete')[];
+    management: ('copy' | 'move' | 'add' | 'load' | 'create' | 'clear' | 'drop')[]
+  } {
+    const parsedQuery = new SparqlParser().parse(query);
+
+    if (parsedQuery.type === 'update') {
+      const insertDelete: ('insert' | 'delete' | 'deletewhere' | 'insertdelete')[] = [];
+      const management: ('copy' | 'move' | 'add' | 'load' | 'create' | 'clear' | 'drop')[] = [];
+
+      for (const update of parsedQuery.updates) {
+        if ('type' in update && !management.includes(update.type)) {
+          management.push(update.type);
+        }
+        if ('updateType' in update && !insertDelete.includes(update.updateType)) {
+          insertDelete.push(update.updateType);
+        }
+      }
+
+      return {
+        insertDelete,
+        management
+      }
+
+    } else {
+      return "UNKNOWN"
+    };
+  };
 
   /**
    * Send a SELECT query to the given endpoint URL and return the resulting bindings stream.
@@ -172,7 +212,7 @@ export class SparqlEndpointFetcher {
       throw new Error('Invalid SPARQL endpoint (' + simpleUrl + ') response: ' + httpResponse.statusText);
     }
 
-    return [ contentType, responseStream ];
+    return [contentType, responseStream];
   }
 }
 
