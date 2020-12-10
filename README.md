@@ -109,7 +109,7 @@ triple(namedNode('s3'), namedNode('p3'), namedNode('o3'))
 await fetcher.fetchUpdate('https://dbpedia.org/sparql', 'INSERT DATA { <ex:s> <ex:p> <ex:o> }');
 ```
 
-The `await` fill throw an error if the update has failed.
+The `await` will throw an error if the update has failed.
 
 ### Detect query type
 
