@@ -72,7 +72,7 @@ export class SparqlEndpointFetcher {
    */
   public getUpdateTypes(query: string): 'UNKNOWN' | IUpdateTypes {
     const parsedQuery = new SparqlParser().parse(query);
-    
+
     if (parsedQuery.type === 'update') {
       const operations: IUpdateTypes = {};
 
@@ -219,5 +219,5 @@ export interface ISparqlResultsParser {
 }
 
 export type IUpdateTypes = {
-  [K in ManagementOperation['type'] | InsertDeleteOperation['updateType']]?: Boolean;
+  [K in ManagementOperation['type'] | InsertDeleteOperation['updateType']]?: boolean;
 };
