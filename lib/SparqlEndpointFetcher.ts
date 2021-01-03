@@ -1,6 +1,6 @@
 import "cross-fetch/polyfill";
 import * as RDF from "rdf-js";
-import {Parser as SparqlParser} from "sparqljs";
+import {InsertDeleteOperation, ManagementOperation, Parser as SparqlParser} from "sparqljs";
 import {ISettings, SparqlJsonParser} from "sparqljson-parse";
 import {SparqlXmlParser} from "sparqlxml-parse";
 import {Readable} from "stream";
@@ -68,33 +68,23 @@ export class SparqlEndpointFetcher {
    * This will parse the update query and thrown an exception on syntax errors.
    *
    * @param {string} query An update query.
-   * @return {'UNKNOWN' | {
-   *  insertDelete: ('insert' | 'delete' | 'deletewhere' | 'insertdelete')[];
-   *  management: ('copy' | 'move' | 'add' | 'load' | 'create' | 'clear' | 'drop')[]
-   * }} The included update operations.
+   * @return {'UNKNOWN' | UpdateTypes} The included update operations.
    */
-  public getUpdateTypes(query: string): 'UNKNOWN' | {
-    insertDelete: ('insert' | 'delete' | 'deletewhere' | 'insertdelete')[];
-    management: ('copy' | 'move' | 'add' | 'load' | 'create' | 'clear' | 'drop')[]
-  } {
+  public getUpdateTypes(query: string): 'UNKNOWN' | IUpdateTypes {
     const parsedQuery = new SparqlParser().parse(query);
-
+    
     if (parsedQuery.type === 'update') {
-      const insertDelete: ('insert' | 'delete' | 'deletewhere' | 'insertdelete')[] = [];
-      const management: ('copy' | 'move' | 'add' | 'load' | 'create' | 'clear' | 'drop')[] = [];
+      const operations: IUpdateTypes = {};
 
       for (const update of parsedQuery.updates) {
-        if ('type' in update && !management.includes(update.type)) {
-          management.push(update.type);
-        } else if ('updateType' in update && !insertDelete.includes(update.updateType)) {
-          insertDelete.push(update.updateType)
+        if ('type' in update) {
+          operations[update.type] = true;
+        } else {
+          operations[update.updateType] = true;
         }
       }
 
-      return {
-        insertDelete,
-        management
-      }
+      return operations;
 
     } else {
       return "UNKNOWN"
@@ -227,3 +217,7 @@ export interface ISparqlResultsParser {
   parseResultsStream(sparqlResponseStream: NodeJS.ReadableStream): NodeJS.ReadableStream;
   parseBooleanStream(sparqlResponseStream: NodeJS.ReadableStream): Promise<boolean>;
 }
+
+export type IUpdateTypes = {
+  [K in ManagementOperation['type'] | InsertDeleteOperation['updateType']]?: Boolean;
+};

@@ -100,78 +100,73 @@ describe('SparqlEndpointFetcher', () => {
 
       it('should detect an insertdelete query', () => {
         return expect(fetcher.getUpdateTypes(queryInsert)).toEqual({
-          management: [],
-          insertDelete: [ 'insertdelete' ]
+          insertdelete: true
         });
       });
 
       it('should detect a delete query', () => {
         return expect(fetcher.getUpdateTypes(queryDelete)).toEqual({
-          management: [],
-          insertDelete: [ 'deletewhere' ]
+          deletewhere: true
         });
       });
 
       it('should detect a delete data query', () => {
         return expect(fetcher.getUpdateTypes(updateDeleteData)).toEqual({
-          management: [],
-          insertDelete: [ 'delete' ]
+          delete: true
         });
       });
 
       it('should detect a delete data query for 2 update operations', () => {
         return expect(fetcher.getUpdateTypes(updateDeleteData + ';' + updateDeleteData2)).toEqual({
-          management: [],
-          insertDelete: [ 'delete' ]
+          delete: true
         });
       });
 
       it('should detect an insert data query', () => {
         return expect(fetcher.getUpdateTypes(updateInsertData)).toEqual({
-          management: [],
-          insertDelete: [ 'insert' ]
+          insert: true
         });
       });
 
       it('should detect a combined insert and delete data query', () => {
         return expect(fetcher.getUpdateTypes(updateInsertData + ';' + updateDeleteData)).toEqual({
-          management: [],
-          insertDelete: [ 'insert', 'delete' ]
+          insert: true,
+          delete: true
         });
       });
 
       it('should detect a combined insert and delete data query (2 delete queries)', () => {
         return expect(fetcher.getUpdateTypes(updateInsertData + ';' + updateDeleteData + ';' + updateDeleteData)).toEqual({
-          management: [],
-          insertDelete: [ 'insert', 'delete' ]
+          insert: true,
+          delete: true
         });
       });
 
       it('should detect a move operation', () => {
         return expect(fetcher.getUpdateTypes(updateMove)).toEqual({
-          management: [ 'move' ],
-          insertDelete: []
+          move: true
         });
       });
 
       it('should detect a add operation', () => {
         return expect(fetcher.getUpdateTypes(updateAdd)).toEqual({
-          management: [ 'add' ],
-          insertDelete: []
+          add: true
         });
       });
 
       it('should detect a combined move and add operation', () => {
         return expect(fetcher.getUpdateTypes(updateMove + ';' + updateAdd)).toEqual({
-          management: [ 'move', 'add' ],
-          insertDelete: []
+          move: true,
+          add: true
         });
       });
 
       it('should detect a combined move, add, insert and delete operations', () => {
         return expect(fetcher.getUpdateTypes(updateMove + ';' + updateAdd + ';' + updateInsertData + ';' + updateDeleteData)).toEqual({
-          management: [ 'move', 'add' ],
-          insertDelete: [ 'insert', 'delete' ]
+          move: true,
+          add: true,
+          insert: true,
+          delete: true
         });
       });
 
