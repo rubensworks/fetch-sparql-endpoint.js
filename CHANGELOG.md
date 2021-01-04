@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v1.9.0"></a>
+## [v1.9.0](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v1.8.0...v1.9.0) - 2021-01-04
+
+### Added
+* [Add getUpdateTypes function](https://github.com/rubensworks/fetch-sparql-endpoint.js/commit/d8f6e0b32b96ba4cbc7c495c4fdbbbe92de7729b)
+
 <a name="v1.8.0"></a>
 ## [v1.8.0](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v1.7.0...v1.8.0) - 2020-10-20
 
