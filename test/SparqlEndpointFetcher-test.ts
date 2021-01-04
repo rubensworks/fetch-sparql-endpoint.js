@@ -20,12 +20,20 @@ describe('SparqlEndpointFetcher', () => {
 
   describe('constructed with fetch callback', () => {
 
+    const prefixes = 'PREFIX foaf: <http://xmlns.com/foaf/0.1/> \nPREFIX : <http://example.org/> \n\n'
+    
     const endpoint = 'https://dbpedia.org/sparql';
     const querySelect = 'SELECT * WHERE { ?s ?p ?o }';
     const queryAsk = 'ASK WHERE { ?s ?p ?o }';
     const queryConstruct = 'CONSTRUCT WHERE { ?s ?p ?o }';
     const queryDescribe = 'DESCRIBE <http://ex.org>';
     const queryDelete = 'DELETE WHERE { ?s ?p ?o }';
+    const queryInsert = 'INSERT { ?s ?p ?o } WHERE {}';
+    const updateDeleteData = prefixes + 'DELETE DATA { GRAPH <http://example.org/g1> { :a foaf:knows :b } }';
+    const updateDeleteData2 = prefixes + 'DELETE DATA { GRAPH <http://example.org/g1> { :b foaf:knows :c } }';
+    const updateInsertData = prefixes + 'INSERT DATA { GRAPH <http://example.org/g1> { :Alice foaf:knows :Bob } }';
+    const updateMove = prefixes + 'MOVE DEFAULT TO :g1';
+    const updateAdd = 'ADD SILENT GRAPH <http://www.example.com/g1> TO DEFAULT'
 
     let fetchCb;
     let fetcher;
@@ -57,13 +65,112 @@ describe('SparqlEndpointFetcher', () => {
       });
 
       it('should detect an unknown query', () => {
-        return expect(fetcher.getQueryType('INSERT { ?s ?p ?o } WHERE {}')).toEqual('UNKNOWN');
+        return expect(fetcher.getQueryType(queryInsert)).toEqual('UNKNOWN');
+      });
+
+      it('should detect an unknown query', () => {
+        return expect(fetcher.getQueryType(queryDelete)).toEqual('UNKNOWN');
       });
 
       it('should throw an error on invalid queries', () => {
         return expect(() => fetcher.getQueryType('{{{')).toThrow();
       });
     });
+
+    describe('#getUpdateTypes', () => {
+      it('should detect an unknown update (SELECT)', () => {
+        return expect(fetcher.getUpdateTypes(querySelect)).toEqual('UNKNOWN');
+      });
+
+      it('should detect an unknown update (ASK)', () => {
+        return expect(fetcher.getUpdateTypes(queryAsk)).toEqual('UNKNOWN');
+      });
+
+      it('should detect an unknown update (CONSTRUCT)', () => {
+        return expect(fetcher.getUpdateTypes(queryConstruct)).toEqual('UNKNOWN');
+      });
+
+      it('should detect an unknown update (DESCRIBE)', () => {
+        return expect(fetcher.getUpdateTypes(queryDescribe)).toEqual('UNKNOWN');
+      });
+
+      it('should throw an error on invalid queries', () => {
+        return expect(() => fetcher.getUpdateTypes('{{{')).toThrow();
+      });
+
+      it('should detect an insertdelete query', () => {
+        return expect(fetcher.getUpdateTypes(queryInsert)).toEqual({
+          insertdelete: true
+        });
+      });
+
+      it('should detect a delete query', () => {
+        return expect(fetcher.getUpdateTypes(queryDelete)).toEqual({
+          deletewhere: true
+        });
+      });
+
+      it('should detect a delete data query', () => {
+        return expect(fetcher.getUpdateTypes(updateDeleteData)).toEqual({
+          delete: true
+        });
+      });
+
+      it('should detect a delete data query for 2 update operations', () => {
+        return expect(fetcher.getUpdateTypes(updateDeleteData + ';' + updateDeleteData2)).toEqual({
+          delete: true
+        });
+      });
+
+      it('should detect an insert data query', () => {
+        return expect(fetcher.getUpdateTypes(updateInsertData)).toEqual({
+          insert: true
+        });
+      });
+
+      it('should detect a combined insert and delete data query', () => {
+        return expect(fetcher.getUpdateTypes(updateInsertData + ';' + updateDeleteData)).toEqual({
+          insert: true,
+          delete: true
+        });
+      });
+
+      it('should detect a combined insert and delete data query (2 delete queries)', () => {
+        return expect(fetcher.getUpdateTypes(updateInsertData + ';' + updateDeleteData + ';' + updateDeleteData)).toEqual({
+          insert: true,
+          delete: true
+        });
+      });
+
+      it('should detect a move operation', () => {
+        return expect(fetcher.getUpdateTypes(updateMove)).toEqual({
+          move: true
+        });
+      });
+
+      it('should detect a add operation', () => {
+        return expect(fetcher.getUpdateTypes(updateAdd)).toEqual({
+          add: true
+        });
+      });
+
+      it('should detect a combined move and add operation', () => {
+        return expect(fetcher.getUpdateTypes(updateMove + ';' + updateAdd)).toEqual({
+          move: true,
+          add: true
+        });
+      });
+
+      it('should detect a combined move, add, insert and delete operations', () => {
+        return expect(fetcher.getUpdateTypes(updateMove + ';' + updateAdd + ';' + updateInsertData + ';' + updateDeleteData)).toEqual({
+          move: true,
+          add: true,
+          insert: true,
+          delete: true
+        });
+      });
+
+    })
 
     describe('#fetchRawStream', () => {
       it('should pass the correct URL and HTTP headers', () => {

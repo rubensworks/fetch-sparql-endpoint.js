@@ -1,6 +1,6 @@
 import "cross-fetch/polyfill";
 import * as RDF from "rdf-js";
-import {Parser as SparqlParser} from "sparqljs";
+import {InsertDeleteOperation, ManagementOperation, Parser as SparqlParser} from "sparqljs";
 import {ISettings, SparqlJsonParser} from "sparqljson-parse";
 import {SparqlXmlParser} from "sparqlxml-parse";
 import {Readable} from "stream";
@@ -61,6 +61,35 @@ export class SparqlEndpointFetcher {
     return parsedQuery.type === 'query'
       ? (parsedQuery.queryType === 'DESCRIBE' ? 'CONSTRUCT' : parsedQuery.queryType) : "UNKNOWN";
   }
+
+  /**
+   * Get the query type of the given update query.
+   *
+   * This will parse the update query and thrown an exception on syntax errors.
+   *
+   * @param {string} query An update query.
+   * @return {'UNKNOWN' | UpdateTypes} The included update operations.
+   */
+  public getUpdateTypes(query: string): 'UNKNOWN' | IUpdateTypes {
+    const parsedQuery = new SparqlParser().parse(query);
+
+    if (parsedQuery.type === 'update') {
+      const operations: IUpdateTypes = {};
+
+      for (const update of parsedQuery.updates) {
+        if ('type' in update) {
+          operations[update.type] = true;
+        } else {
+          operations[update.updateType] = true;
+        }
+      }
+
+      return operations;
+
+    } else {
+      return "UNKNOWN"
+    };
+  };
 
   /**
    * Send a SELECT query to the given endpoint URL and return the resulting bindings stream.
@@ -188,3 +217,7 @@ export interface ISparqlResultsParser {
   parseResultsStream(sparqlResponseStream: NodeJS.ReadableStream): NodeJS.ReadableStream;
   parseBooleanStream(sparqlResponseStream: NodeJS.ReadableStream): Promise<boolean>;
 }
+
+export type IUpdateTypes = {
+  [K in ManagementOperation['type'] | InsertDeleteOperation['updateType']]?: boolean;
+};
