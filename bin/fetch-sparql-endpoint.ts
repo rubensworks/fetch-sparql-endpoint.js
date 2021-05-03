@@ -23,6 +23,7 @@ Usage:
 Options:
   -q            evaluate the given SPARQL query string
   -f            evaluate the SPARQL query in the given file
+  -g            send query via HTTP GET instead of POST
   --help        print this help message
 `);
   process.exit(1);
@@ -44,7 +45,9 @@ async function getQuery(): Promise<string> {
 const endpoint = args._[0];
 
 getQuery().then((query) => {
-  const fetcher = new SparqlEndpointFetcher();
+  const fetcher = new SparqlEndpointFetcher({
+    method: args.g ? 'GET' : 'POST',
+  });
   const queryType = fetcher.getQueryType(query);
   switch (queryType) {
   case 'SELECT':

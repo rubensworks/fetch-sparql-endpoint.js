@@ -40,6 +40,7 @@ const myFetcher = new SparqlEndpointFetcher();
 Optionally, you can pass an options object with the following optional entries:
 ```js
 const myFetcher = new SparqlEndpointFetcher({
+  method: 'POST',                   // A custom HTTP method for issuing (non-update) queries, defaults to POST. Update queries are always issued via POST.
   fetch: fetch,                     // A custom fetch-API-supporting function
   dataFactory: DataFactory,         // A custom RDFJS data factory
   prefixVariableQuestionMark: false // If variable names in bindings should be prefixed with '?', defaults to false
@@ -131,9 +132,18 @@ A command-line tool is provided to quickly query any SPARQL endpoint:
 
 Usage:
 ```
-$ fetch-sparql-endpoint https://dbpedia.org/sparql [-q] 'SELECT * WHERE { ?s ?p ?o } LIMIT 100'
-$ fetch-sparql-endpoint https://dbpedia.org/sparql -f query.sparql
-$ cat query.sparql | fetch-sparql-endpoint https://dbpedia.org/sparql
+fetch-sparql-endpoint Sends a query to a SPARQL endpoint
+
+Usage:
+  fetch-sparql-endpoint https://dbpedia.org/sparql [-q] 'SELECT * WHERE { ?s ?p ?o } 100'
+  fetch-sparql-endpoint https://dbpedia.org/sparql -f query.sparql
+  cat query.sparql | fetch-sparql-endpoint https://dbpedia.org/sparql
+
+Options:
+  -q            evaluate the given SPARQL query string
+  -f            evaluate the SPARQL query in the given file
+  -g            send query via HTTP GET instead of POST
+  --help        print this help message
 ```
 
 ## License

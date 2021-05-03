@@ -21,7 +21,7 @@ describe('SparqlEndpointFetcher', () => {
   describe('constructed with fetch callback', () => {
 
     const prefixes = 'PREFIX foaf: <http://xmlns.com/foaf/0.1/> \nPREFIX : <http://example.org/> \n\n'
-    
+
     const endpoint = 'https://dbpedia.org/sparql';
     const querySelect = 'SELECT * WHERE { ?s ?p ?o }';
     const queryAsk = 'ASK WHERE { ?s ?p ?o }';
@@ -179,8 +179,21 @@ describe('SparqlEndpointFetcher', () => {
         fetcherThis.fetchRawStream(endpoint, querySelect, 'myacceptheader');
         const headers: Headers = new Headers();
         headers.append('Accept', 'myacceptheader');
+        headers.append('Content-Type', 'application/x-www-form-urlencoded');
+        const body = new URLSearchParams();
+        body.set('query', querySelect);
         return expect(fetchCbThis).toBeCalledWith(
-          'https://dbpedia.org/sparql?query=SELECT%20*%20WHERE%20%7B%20%3Fs%20%3Fp%20%3Fo%20%7D', { headers });
+          'https://dbpedia.org/sparql', { headers, method: 'POST', body });
+      });
+
+      it('should pass the correct URL and HTTP headers when using HTTP GET', () => {
+        const fetchCbThis = jest.fn(() => Promise.resolve(new Response(streamifyString('dummy'))));
+        const fetcherThis = new SparqlEndpointFetcher({ method: 'GET', fetch: fetchCbThis });
+        fetcherThis.fetchRawStream(endpoint, querySelect, 'myacceptheader');
+        const headers: Headers = new Headers();
+        headers.append('Accept', 'myacceptheader');
+        return expect(fetchCbThis).toBeCalledWith(
+          'https://dbpedia.org/sparql?query=SELECT%20*%20WHERE%20%7B%20%3Fs%20%3Fp%20%3Fo%20%7D', { headers, method: 'GET' });
       });
 
       it('should reject for an invalid server response', async () => {

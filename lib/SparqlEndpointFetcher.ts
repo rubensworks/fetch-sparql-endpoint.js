@@ -22,6 +22,7 @@ export class SparqlEndpointFetcher {
     `${SparqlEndpointFetcher.CONTENTTYPE_SPARQL_JSON};q=1.0,${SparqlEndpointFetcher.CONTENTTYPE_SPARQL_XML};q=0.7`;
   public static CONTENTTYPE_TURTLE: string = 'text/turtle';
 
+  public readonly method: 'POST' | 'GET';
   public readonly fetchCb?: (input?: Request | string, init?: RequestInit) => Promise<Response>;
   public readonly sparqlParsers: {[contentType: string]: ISparqlResultsParser};
   public readonly sparqlJsonParser: SparqlJsonParser;
@@ -29,6 +30,7 @@ export class SparqlEndpointFetcher {
 
   constructor(args?: ISparqlEndpointFetcherArgs) {
     args = args || {};
+    this.method = args.method || 'POST';
     this.fetchCb = args.fetch;
     this.sparqlJsonParser = new SparqlJsonParser(args);
     this.sparqlXmlParser = new SparqlXmlParser(args);
@@ -165,13 +167,19 @@ export class SparqlEndpointFetcher {
    */
   public async fetchRawStream(endpoint: string, query: string, acceptHeader: string)
     : Promise<[string, NodeJS.ReadableStream]> {
-    const url: string = endpoint + '?query=' + encodeURIComponent(query);
+    const url: string = this.method === 'POST' ? endpoint : endpoint + '?query=' + encodeURIComponent(query);
 
     // Initiate request
     const headers: Headers = new Headers();
+    let body: BodyInit | undefined;
     headers.append('Accept', acceptHeader);
+    if (this.method === 'POST') {
+      headers.append('Content-Type', 'application/x-www-form-urlencoded');
+      body = new URLSearchParams();
+      body.set('query', query);
+    }
 
-    return this.handleFetchCall(url, { headers });
+    return this.handleFetchCall(url, { headers, method: this.method, body });
   }
 
   /**
@@ -206,6 +214,14 @@ export class SparqlEndpointFetcher {
 }
 
 export interface ISparqlEndpointFetcherArgs extends ISettings {
+  /**
+   * A custom HTTP method for issuing (non-update) queries, defaults to POST.
+   * Update queries are always issued via POST.
+   */
+  method?: 'POST' | 'GET';
+  /**
+   * A custom fetch function.
+   */
   fetch?: (input?: Request | string, init?: RequestInit) => Promise<Response>;
 }
 
