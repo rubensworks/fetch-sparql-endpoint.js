@@ -1,6 +1,13 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v2.0.0"></a>
+## [v2.0.0](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v1.9.0...v2.0.0) - 2021-05-03
+
+### BREAKING CHANGE
+* [Send queries with HTTP POST by default](https://github.com/rubensworks/fetch-sparql-endpoint.js/commit/6ec3a93774969c075c5d1bf76220b42bbf56ee3d)
+    * No breaking API changes are applicable, so this update can be considered minor for the majority of cases.
+
 <a name="v1.9.0"></a>
 ## [v1.9.0](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v1.8.0...v1.9.0) - 2021-01-04
 
