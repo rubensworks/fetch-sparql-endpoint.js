@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v2.0.1"></a>
+## [v2.0.1](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v2.0.0...v2.0.1) - 2021-05-04
+
+### Fixed
+* [Add missing typings dependencies](https://github.com/rubensworks/fetch-sparql-endpoint.js/commit/38ea588f54ce464a5d646b9956e59d7b2f6199cc)
+
 <a name="v2.0.0"></a>
 ## [v2.0.0](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v1.9.0...v2.0.0) - 2021-05-03
 
