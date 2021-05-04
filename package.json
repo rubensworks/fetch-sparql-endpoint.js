@@ -36,6 +36,8 @@
     "test"
   ],
   "dependencies": {
+    "@types/rdf-js": "*",
+    "@types/sparqljs": "^3.0.1",
     "is-stream": "^2.0.0",
     "cross-fetch": "^3.0.6",
     "minimist": "^1.2.0",
@@ -51,7 +53,6 @@
     "@types/jest": "^26.0.0",
     "@types/minimist": "^1.2.0",
     "@types/n3": "^1.4.4",
-    "@types/sparqljs": "^3.0.1",
     "arrayify-stream": "^1.0.0",
     "coveralls": "^3.0.0",
     "jest": "^26.0.0",
