@@ -35,11 +35,11 @@ describe('SparqlEndpointFetcher', () => {
     const updateMove = prefixes + 'MOVE DEFAULT TO :g1';
     const updateAdd = 'ADD SILENT GRAPH <http://www.example.com/g1> TO DEFAULT'
 
-    let fetchCb;
-    let fetcher;
+    let fetchCb: any;
+    let fetcher: any;
 
     beforeEach(() => {
-      fetchCb = (url) => Promise.resolve(new Response('dummy'));
+      fetchCb = () => Promise.resolve(new Response('dummy'));
       fetcher = new SparqlEndpointFetcher({ fetch: fetchCb });
     });
 
