@@ -152,7 +152,7 @@ export class SparqlEndpointFetcher {
       body: query,
     }
 
-    await this.handleFetchCall(endpoint, init);
+    await this.handleFetchCall(endpoint, init, { killBody: true });
   }
 
   /**
@@ -185,17 +185,28 @@ export class SparqlEndpointFetcher {
   /**
    * Helper function to generalize internal fetch calls.
    *
-   * @param {string}      url   The URL to call.
-   * @param {RequestInit} init  Options to pass along to the fetch call.
+   * @param {string}      url     The URL to call.
+   * @param {RequestInit} init    Options to pass along to the fetch call.
+   * @param {any}         options Other specific fetch options.
    * @return {Promise<[string, NodeJS.ReadableStream]>} The content type and SPARQL endpoint response stream.
    */
-  private async handleFetchCall(url: string, init: RequestInit): Promise<[string, NodeJS.ReadableStream]> {
+  private async handleFetchCall(
+    url: string,
+    init: RequestInit,
+    options: { killBody?: boolean } = {},
+  ): Promise<[string, NodeJS.ReadableStream]> {
     const httpResponse: Response = await (this.fetchCb || fetch)(url, init);
 
-    // Wrap WhatWG readable stream into a Node.js readable stream
-    // If the body already is a Node.js stream (in the case of node-fetch), don't do explicit conversion.
-    const responseStream: NodeJS.ReadableStream = isStream(httpResponse.body)
-      ? httpResponse.body : toNodeReadable(httpResponse.body);
+    let responseStream: NodeJS.ReadableStream | undefined;
+    // Handle response body
+    if (options.killBody) {
+      await httpResponse.body?.cancel();
+    } else {
+      // Wrap WhatWG readable stream into a Node.js readable stream
+      // If the body already is a Node.js stream (in the case of node-fetch), don't do explicit conversion.
+      responseStream = isStream(httpResponse.body)
+        ? httpResponse.body : toNodeReadable(httpResponse.body);
+    }
 
     // Determine the content type and emit it to the stream
     let contentType = httpResponse.headers.get('Content-Type') || '';
@@ -209,7 +220,7 @@ export class SparqlEndpointFetcher {
       throw new Error('Invalid SPARQL endpoint (' + simpleUrl + ') response: ' + httpResponse.statusText);
     }
 
-    return [ contentType, responseStream ];
+    return [ contentType, <any> responseStream ];
   }
 }
 
