@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v2.0.2"></a>
+## [v2.0.2](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v2.0.1...v2.0.2) - 2021-06-19
+
+### Fixed
+* [Fix hanging requests when doing update requests](https://github.com/rubensworks/fetch-sparql-endpoint.js/commit/e5c78979c13ecf78a4a69cd6d828f022ed50b48b)
+
 <a name="v2.0.1"></a>
 ## [v2.0.1](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v2.0.0...v2.0.1) - 2021-05-04
 
