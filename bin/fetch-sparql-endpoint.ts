@@ -59,6 +59,11 @@ getQuery().then((query) => {
   case 'CONSTRUCT':
     queryConstruct(fetcher, query);
     break;
+  case 'UNKNOWN':
+    if (fetcher.getUpdateTypes(query) !== 'UNKNOWN') {
+      update(fetcher, query);
+    }
+    break;
   }
 });
 
@@ -95,6 +100,17 @@ function queryConstruct(fetcher: SparqlEndpointFetcher, query: string) {
       (<any> tripleStream)
         .pipe(new n3.StreamWriter(SparqlEndpointFetcher.CONTENTTYPE_TURTLE))
         .pipe(process.stdout);
+    })
+    .catch((error) => {
+      process.stderr.write(error.message + '\n');
+      process.exit(1);
+    });
+}
+
+function update(fetcher: SparqlEndpointFetcher, query: string) {
+  fetcher.fetchUpdate(endpoint, query)
+    .then(() => {
+      process.stdout.write('OK\n');
     })
     .catch((error) => {
       process.stderr.write(error.message + '\n');

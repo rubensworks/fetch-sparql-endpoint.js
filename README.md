@@ -128,7 +128,7 @@ This method will also throw an error if the query contains a syntax error.
 
 ### Command-line
 
-A command-line tool is provided to quickly query any SPARQL endpoint:
+A command-line tool is provided to quickly query or update any SPARQL endpoint:
 
 Usage:
 ```
