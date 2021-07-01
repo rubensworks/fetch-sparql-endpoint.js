@@ -1,6 +1,6 @@
 # Fetch SPARQL Endpoint
 
-[![Build Status](https://travis-ci.org/rubensworks/fetch-sparql-endpoint.js.svg?branch=master)](https://travis-ci.org/rubensworks/fetch-sparql-endpoint.js)
+[![Build status](https://github.com/rubensworks/fetch-sparql-endpoint.js/workflows/CI/badge.svg)](https://github.com/rubensworks/fetch-sparql-endpoint.js/actions?query=workflow%3ACI)
 [![Coverage Status](https://coveralls.io/repos/github/rubensworks/fetch-sparql-endpoint.js/badge.svg?branch=master)](https://coveralls.io/github/rubensworks/fetch-sparql-endpoint.js?branch=master)
 [![npm version](https://badge.fury.io/js/fetch-sparql-endpoint.svg)](https://www.npmjs.com/package/fetch-sparql-endpoint)
 
