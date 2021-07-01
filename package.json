@@ -38,16 +38,17 @@
   "dependencies": {
     "@types/rdf-js": "*",
     "@types/sparqljs": "^3.0.1",
-    "is-stream": "^2.0.0",
+    "abort-controller": "^3.0.0",
     "cross-fetch": "^3.0.6",
+    "is-stream": "^2.0.0",
     "minimist": "^1.2.0",
     "n3": "^1.6.3",
-    "web-streams-node": "^0.4.0",
     "rdf-string": "^1.5.0",
     "sparqljs": "^3.1.2",
     "sparqljson-parse": "^1.6.0",
     "sparqlxml-parse": "^1.4.0",
-    "stream-to-string": "^1.1.0"
+    "stream-to-string": "^1.1.0",
+    "web-streams-node": "^0.4.0"
   },
   "devDependencies": {
     "@types/jest": "^26.0.0",

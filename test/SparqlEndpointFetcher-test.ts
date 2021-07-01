@@ -281,7 +281,7 @@ describe('SparqlEndpointFetcher', () => {
       it('should use POST and the correct content-type', async () => {
         const cancel: any = jest.fn();
         const fetchCbThis: jest.Mock<Promise<Response>, any[]> = jest.fn(() => Promise.resolve(<Response> {
-          body: { cancel },
+          body: {},
           headers: new Headers(),
           ok: true,
           status: 200,
@@ -289,7 +289,6 @@ describe('SparqlEndpointFetcher', () => {
         }));
         const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
         await expect(fetcherThis.fetchUpdate(endpoint, queryDelete)).resolves.toBeUndefined();
-        expect(cancel).toHaveBeenCalled();
         expect(fetchCbThis.mock.calls[0][0]).toBe(endpoint);
         expect(fetchCbThis.mock.calls[0][1]).toMatchObject({
           method: 'POST',
@@ -301,7 +300,6 @@ describe('SparqlEndpointFetcher', () => {
       });
 
       it('should use POST without response body', async () => {
-        const cancel: any = jest.fn();
         const fetchCbThis: jest.Mock<Promise<Response>, any[]> = jest.fn(() => Promise.resolve(<Response> {
           headers: new Headers(),
           ok: true,

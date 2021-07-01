@@ -1,4 +1,5 @@
 import "cross-fetch/polyfill";
+import { AbortController } from 'abort-controller';
 import * as RDF from "rdf-js";
 import {InsertDeleteOperation, ManagementOperation, Parser as SparqlParser} from "sparqljs";
 import {ISettings, SparqlJsonParser} from "sparqljson-parse";
@@ -144,15 +145,18 @@ export class SparqlEndpointFetcher {
    * @param {string} query        A SPARQL query string.
    */
   public async fetchUpdate(endpoint: string, query: string): Promise<void> {
-    const init = {
+    const abortController = new AbortController();
+    const init: RequestInit = {
       method: 'POST',
       headers: {
         'content-type': 'application/sparql-update',
       },
       body: query,
+      signal: abortController.signal,
     }
 
-    await this.handleFetchCall(endpoint, init, { killBody: true });
+    await this.handleFetchCall(endpoint, init, { ignoreBody: true });
+    abortController.abort();
   }
 
   /**
@@ -193,15 +197,13 @@ export class SparqlEndpointFetcher {
   private async handleFetchCall(
     url: string,
     init: RequestInit,
-    options: { killBody?: boolean } = {},
+    options: { ignoreBody?: boolean } = {},
   ): Promise<[string, NodeJS.ReadableStream]> {
     const httpResponse: Response = await (this.fetchCb || fetch)(url, init);
 
     let responseStream: NodeJS.ReadableStream | undefined;
     // Handle response body
-    if (options.killBody) {
-      await httpResponse.body?.cancel();
-    } else {
+    if (!options.ignoreBody) {
       // Wrap WhatWG readable stream into a Node.js readable stream
       // If the body already is a Node.js stream (in the case of node-fetch), don't do explicit conversion.
       responseStream = isStream(httpResponse.body)
