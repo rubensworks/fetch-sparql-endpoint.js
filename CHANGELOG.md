@@ -1,6 +1,15 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v2.1.0"></a>
+## [v2.1.0](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v2.0.2...v2.1.0) - 2021-07-01
+
+### Added
+* [Support update queries via the CLI](https://github.com/rubensworks/fetch-sparql-endpoint.js/commit/e35539ca30cd01a71c54b73f4ba8b8f93243315f)
+
+### Fixed
+* [Fix request cancellation of update queries, Closes #35](https://github.com/rubensworks/fetch-sparql-endpoint.js/commit/a2275d3103e8b5dbcc607678d776f1f694e1bdd8)
+
 <a name="v2.0.2"></a>
 ## [v2.0.2](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v2.0.1...v2.0.2) - 2021-06-19
 
