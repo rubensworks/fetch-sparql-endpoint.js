@@ -60,3 +60,31 @@ jobs:
         with:
           github-token: ${{ secrets.github_token }}
           parallel-finished: true
+  docker:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        node-version:
+          - 16.x
+    steps:
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Ensure line endings are consistent
+        run: git config --global core.autocrlf input
+      - name: Check out repository
+        uses: actions/checkout@v2
+      - name: Start Docker container
+        run: .github/workflows/start-docker.sh
+      - uses: actions/cache@v2
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-docker-modules-${{ hashFiles('**/yarn.lock') }}
+      - name: Install dependencies
+        run: yarn install
+      - name: Send update query
+        run: .github/workflows/test-docker.sh
+      - name: Stop Docker container
+        run: .github/workflows/stop-docker.sh
