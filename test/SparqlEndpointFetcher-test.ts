@@ -180,6 +180,7 @@ describe('SparqlEndpointFetcher', () => {
         const headers: Headers = new Headers();
         headers.append('Accept', 'myacceptheader');
         headers.append('Content-Type', 'application/x-www-form-urlencoded');
+        headers.append('Content-Length', '43');
         const body = new URLSearchParams();
         body.set('query', querySelect);
         return expect(fetchCbThis).toBeCalledWith(

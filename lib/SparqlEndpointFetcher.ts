@@ -181,6 +181,7 @@ export class SparqlEndpointFetcher {
       headers.append('Content-Type', 'application/x-www-form-urlencoded');
       body = new URLSearchParams();
       body.set('query', query);
+      headers.append('Content-Length', body.toString().length.toString());
     }
 
     return this.handleFetchCall(url, { headers, method: this.method, body });
