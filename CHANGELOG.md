@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v2.1.1"></a>
+## [v2.1.1](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v2.1.0...v2.1.1) - 2021-07-09
+
+### Fixed
+* [Set Content-Length header on requests (#36)](https://github.com/rubensworks/fetch-sparql-endpoint.js/commit/457d543c284baaa7375d360f3516c3d3e1857bfb)
+
 <a name="v2.1.0"></a>
 ## [v2.1.0](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v2.0.2...v2.1.0) - 2021-07-01
 
