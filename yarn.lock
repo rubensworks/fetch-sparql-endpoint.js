@@ -3461,10 +3461,10 @@ sparqljs@^3.1.2:
   dependencies:
     n3 "^1.6.0"
 
-sparqljson-parse@^1.6.0:
-  version "1.6.0"
-  resolved "https://registry.yarnpkg.com/sparqljson-parse/-/sparqljson-parse-1.6.0.tgz#f3a936da973a1b82c8c793a7563cbb63f43738f6"
-  integrity sha512-alIiURVr3AXIGU6fjuh5k6fwINwGKBQu5QnN9TEpoyIRvukKxZLQE07AHsw/Wxhkxico81tPf8nJTx7H1ira5A==
+sparqljson-parse@^1.6.1:
+  version "1.6.1"
+  resolved "https://registry.yarnpkg.com/sparqljson-parse/-/sparqljson-parse-1.6.1.tgz#1221447420e5fdb2ce2f4c60a62061fffc5ca26e"
+  integrity sha512-if7k1sHJNHtep1SFwJjByYvXMzmVa3RWNpUisn5AqXyum4O2AH7sY6uoE8MKUX53zqPAywgT3JjM2lWy/LYLvA==
   dependencies:
     "@types/node" "^13.1.0"
     "@types/rdf-js" "*"

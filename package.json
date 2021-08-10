@@ -45,7 +45,7 @@
     "n3": "^1.6.3",
     "rdf-string": "^1.5.0",
     "sparqljs": "^3.1.2",
-    "sparqljson-parse": "^1.6.0",
+    "sparqljson-parse": "^1.6.1",
     "sparqlxml-parse": "^1.4.0",
     "stream-to-string": "^1.1.0",
     "web-streams-node": "^0.4.0"

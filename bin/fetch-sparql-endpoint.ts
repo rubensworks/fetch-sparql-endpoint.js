@@ -76,6 +76,7 @@ function querySelect(fetcher: SparqlEndpointFetcher, query: string) {
         }
         process.stdout.write(JSON.stringify(bindings) + '\n');
       });
+      bindingsStream.on('error', (error) => process.stderr.write(error.toString()));
     })
     .catch((error) => {
       process.stderr.write(error.message + '\n');
@@ -98,6 +99,7 @@ function queryConstruct(fetcher: SparqlEndpointFetcher, query: string) {
   fetcher.fetchTriples(endpoint, query)
     .then((tripleStream) => {
       (<any> tripleStream)
+        .on('error', (error: Error) => process.stderr.write(error.toString()))
         .pipe(new n3.StreamWriter(SparqlEndpointFetcher.CONTENTTYPE_TURTLE))
         .pipe(process.stdout);
     })
