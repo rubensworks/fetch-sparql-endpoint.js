@@ -1,6 +1,15 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v2.2.0"></a>
+## [v2.2.0](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v2.1.1...v2.2.0) - 2021-08-11
+
+### Added
+* [Print stream error in CLI tool](https://github.com/rubensworks/fetch-sparql-endpoint.js/commit/b74d360e2f74c79ab837327cd183b2dde5f881b5)
+
+### Changed
+* [Migrate to @rdfjs/types](https://github.com/rubensworks/fetch-sparql-endpoint.js/commit/ce292ee0829a56d6463431d8a213674e9806b7fa)
+
 <a name="v2.1.1"></a>
 ## [v2.1.1](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v2.1.0...v2.1.1) - 2021-07-09
 
