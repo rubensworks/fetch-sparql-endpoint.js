@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v2.3.1"></a>
+## [v2.3.1](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v2.3.0...v2.3.1) - 2021-08-27
+
+### Fixed
+* [Fix error on non-empty body on invalid updates](https://github.com/rubensworks/fetch-sparql-endpoint.js/commit/635a283d48e03c6c409d053e44ef77a01e472dc3)
+
 <a name="v2.3.0"></a>
 ## [v2.3.0](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v2.2.0...v2.3.0) - 2021-08-27
 
