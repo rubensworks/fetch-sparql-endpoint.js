@@ -5,6 +5,7 @@ import {InsertDeleteOperation, ManagementOperation, Parser as SparqlParser} from
 import {ISettings, SparqlJsonParser} from "sparqljson-parse";
 import {SparqlXmlParser} from "sparqlxml-parse";
 import {Readable} from "stream";
+import * as stringifyStream from 'stream-to-string';
 
 // tslint:disable:no-var-requires
 const n3 = require('n3');
@@ -220,7 +221,11 @@ export class SparqlEndpointFetcher {
     // Emit an error if the server returned an invalid response
     if (!httpResponse.ok) {
       const simpleUrl = /^[^?]*/u.exec(url)![0];
-      throw new Error('Invalid SPARQL endpoint (' + simpleUrl + ') response: ' + httpResponse.statusText);
+      let bodyString = 'empty response';
+      if (httpResponse.body) {
+        bodyString = await stringifyStream(responseStream);
+      }
+      throw new Error(`Invalid SPARQL endpoint response from ${simpleUrl} (HTTP status ${httpResponse.status}):\n${bodyString}`);
     }
 
     return [ contentType, <any> responseStream ];

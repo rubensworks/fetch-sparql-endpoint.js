@@ -198,10 +198,8 @@ describe('SparqlEndpointFetcher', () => {
       });
 
       it('should reject for an invalid server response', async () => {
-        const readable = new Readable();
-        readable._read = () => { return; };
         const fetchCbThis = () => Promise.resolve(<Response> {
-          body: <ReadableStream> <any> readable,
+          body: streamifyString('this is an invalid response'),
           headers: new Headers(),
           ok: false,
           status: 500,
@@ -209,7 +207,7 @@ describe('SparqlEndpointFetcher', () => {
         });
         const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
         return expect(fetcherThis.fetchRawStream(endpoint, querySelect, 'myacceptheader'))
-          .rejects.toEqual(new Error('Invalid SPARQL endpoint (https://dbpedia.org/sparql) response: Error!'));
+          .rejects.toThrowError(`Invalid SPARQL endpoint response from https://dbpedia.org/sparql (HTTP status 500):\nthis is an invalid response`);
       });
 
       it('should fetch with a node stream', async () => {
@@ -318,6 +316,18 @@ describe('SparqlEndpointFetcher', () => {
           body: queryDelete,
         });
       });
+
+      it('should reject for an invalid server response', async () => {
+        const fetchCbThis = () => Promise.resolve(<Response> {
+          headers: new Headers(),
+          ok: false,
+          status: 500,
+          statusText: 'Error!',
+        });
+        const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
+        return expect(fetcherThis.fetchUpdate(endpoint, queryDelete))
+          .rejects.toThrowError(`Invalid SPARQL endpoint response from https://dbpedia.org/sparql (HTTP status 500):\nempty response`);
+      });
     });
 
     describe('#fetchBindings', () => {
@@ -422,10 +432,8 @@ describe('SparqlEndpointFetcher', () => {
       });
 
       it('should reject on a server error', async () => {
-        const body = <any> new Readable();
-        body._read = () => { return; };
         const fetchCbThis = () => Promise.resolve(<Response> {
-          body,
+          body: streamifyString('this is an invalid response'),
           headers: new Headers({ 'Content-Type': SparqlEndpointFetcher.CONTENTTYPE_SPARQL_JSON }),
           ok: false,
           status: 500,
@@ -433,7 +441,7 @@ describe('SparqlEndpointFetcher', () => {
         });
         const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
         return expect(fetcherThis.fetchBindings(endpoint, querySelect))
-          .rejects.toBeTruthy();
+          .rejects.toThrowError(`Invalid SPARQL endpoint response from https://dbpedia.org/sparql (HTTP status 500):\nthis is an invalid response`);
       });
 
       it('should reject on an invalid content type', async () => {
@@ -542,18 +550,16 @@ describe('SparqlEndpointFetcher', () => {
       });
 
       it('should reject on a server error', async () => {
-        const body = <any> new Readable();
-        body._read = () => { return; };
         const fetchCbThis = () => Promise.resolve(<Response> {
-          body,
+          body: streamifyString('this is an invalid response'),
           headers: new Headers({ 'Content-Type': SparqlEndpointFetcher.CONTENTTYPE_SPARQL_JSON }),
           ok: false,
           status: 500,
           statusText: 'Error!',
         });
         const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
-        return expect(fetcherThis.fetchAsk(endpoint, queryAsk)).rejects
-          .toEqual(new Error('Invalid SPARQL endpoint (https://dbpedia.org/sparql) response: Error!'));
+        return expect(fetcherThis.fetchAsk(endpoint, queryAsk))
+          .rejects.toThrowError(`Invalid SPARQL endpoint response from https://dbpedia.org/sparql (HTTP status 500):\nthis is an invalid response`);
       });
 
       it('should reject on an invalid content type', async () => {
