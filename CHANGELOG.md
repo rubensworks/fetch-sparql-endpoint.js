@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v2.3.0"></a>
+## [v2.3.0](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v2.2.0...v2.3.0) - 2021-08-27
+
+### Changed
+* [Include response body in error on server errors](https://github.com/rubensworks/fetch-sparql-endpoint.js/commit/78047fa66b8fad6d2a1a6f352e0696e91924b0e6)
+
 <a name="v2.2.0"></a>
 ## [v2.2.0](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v2.1.1...v2.2.0) - 2021-08-11
 
