@@ -222,7 +222,7 @@ export class SparqlEndpointFetcher {
     if (!httpResponse.ok) {
       const simpleUrl = /^[^?]*/u.exec(url)![0];
       let bodyString = 'empty response';
-      if (httpResponse.body) {
+      if (responseStream) {
         bodyString = await stringifyStream(responseStream);
       }
       throw new Error(`Invalid SPARQL endpoint response from ${simpleUrl} (HTTP status ${httpResponse.status}):\n${bodyString}`);
