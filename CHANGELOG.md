@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v2.3.2"></a>
+## [v2.3.2](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v2.3.1...v2.3.2) - 2021-09-22
+
+### Fixed
+* [Fix rare stream interruption before end, Closes #40](https://github.com/rubensworks/fetch-sparql-endpoint.js/commit/665781bf003ac299ff3d035a3a3c04d0af8e037b)
+
 <a name="v2.3.1"></a>
 ## [v2.3.1](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v2.3.0...v2.3.1) - 2021-08-27
 
