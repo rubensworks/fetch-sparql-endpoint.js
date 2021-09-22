@@ -52,7 +52,7 @@
     "stream-to-string": "^1.1.0"
   },
   "devDependencies": {
-    "@types/jest": "^26.0.0",
+    "@types/jest": "^27.0.0",
     "@types/minimist": "^1.2.0",
     "@types/n3": "^1.10.3",
     "arrayify-stream": "^1.0.0",
