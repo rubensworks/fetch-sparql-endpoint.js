@@ -1,5 +1,5 @@
 import "cross-fetch/polyfill";
-import { AbortController } from 'abort-controller';
+import AbortController from 'abort-controller';
 import * as RDF from "@rdfjs/types";
 import {InsertDeleteOperation, ManagementOperation, Parser as SparqlParser} from "sparqljs";
 import {ISettings, SparqlJsonParser} from "sparqljson-parse";
