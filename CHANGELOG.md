@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v2.3.3"></a>
+## [v2.3.3](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v2.3.2...v2.3.3) - 2021-11-29
+
+### Fixed
+* [Use default export of 'abort-controller' to fix browser compatibility](https://github.com/rubensworks/fetch-sparql-endpoint.js/commit/40ff61795f04159e939bf8a085f04ffd05fab836)
+
 <a name="v2.3.2"></a>
 ## [v2.3.2](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v2.3.1...v2.3.2) - 2021-09-22
 
