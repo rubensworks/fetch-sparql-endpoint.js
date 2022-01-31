@@ -175,14 +175,18 @@ describe('SparqlEndpointFetcher', () => {
     describe('#fetchRawStream', () => {
       it('should pass the correct URL and HTTP headers', () => {
         const fetchCbThis = jest.fn(() => Promise.resolve(new Response(streamifyString('dummy'))));
-        const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
+        const additionalUrlParams = new URLSearchParams({'infer': 'true', 'sameAs': 'false'});
+        const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis, additionalUrlParams });
         fetcherThis.fetchRawStream(endpoint, querySelect, 'myacceptheader');
         const headers: Headers = new Headers();
         headers.append('Accept', 'myacceptheader');
         headers.append('Content-Type', 'application/x-www-form-urlencoded');
-        headers.append('Content-Length', '43');
+        headers.append('Content-Length', '67');
         const body = new URLSearchParams();
         body.set('query', querySelect);
+        additionalUrlParams.forEach((key: string, value: string) => {
+          body.set(key, String(value));
+        })
         return expect(fetchCbThis).toBeCalledWith(
           'https://dbpedia.org/sparql', { headers, method: 'POST', body });
       });
@@ -195,6 +199,17 @@ describe('SparqlEndpointFetcher', () => {
         headers.append('Accept', 'myacceptheader');
         return expect(fetchCbThis).toBeCalledWith(
           'https://dbpedia.org/sparql?query=SELECT%20*%20WHERE%20%7B%20%3Fs%20%3Fp%20%3Fo%20%7D', { headers, method: 'GET' });
+      });
+
+      it('should pass the correct URL and HTTP headers when using HTTP GET with additional URL parameters', () => {
+        const fetchCbThis = jest.fn(() => Promise.resolve(new Response(streamifyString('dummy'))));
+        const additionalUrlParams = new URLSearchParams({'infer': 'true', 'sameAs': 'false'});
+        const fetcherThis = new SparqlEndpointFetcher({ method: 'GET', fetch: fetchCbThis, additionalUrlParams });
+        fetcherThis.fetchRawStream(endpoint, querySelect, 'myacceptheader');
+        const headers: Headers = new Headers();
+        headers.append('Accept', 'myacceptheader');
+        return expect(fetchCbThis).toBeCalledWith(
+          'https://dbpedia.org/sparql?query=SELECT%20*%20WHERE%20%7B%20%3Fs%20%3Fp%20%3Fo%20%7D&infer=true&sameAs=false', { headers, method: 'GET' });
       });
 
       it('should reject for an invalid server response', async () => {
