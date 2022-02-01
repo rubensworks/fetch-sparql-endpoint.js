@@ -175,6 +175,20 @@ describe('SparqlEndpointFetcher', () => {
     describe('#fetchRawStream', () => {
       it('should pass the correct URL and HTTP headers', () => {
         const fetchCbThis = jest.fn(() => Promise.resolve(new Response(streamifyString('dummy'))));
+        const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
+        fetcherThis.fetchRawStream(endpoint, querySelect, 'myacceptheader');
+        const headers: Headers = new Headers();
+        headers.append('Accept', 'myacceptheader');
+        headers.append('Content-Type', 'application/x-www-form-urlencoded');
+        headers.append('Content-Length', '43');
+        const body = new URLSearchParams();
+        body.set('query', querySelect);
+        return expect(fetchCbThis).toBeCalledWith(
+          'https://dbpedia.org/sparql', { headers, method: 'POST', body });
+      });
+
+      it('should pass the correct URL and HTTP headers with additional URL parameters', () => {
+        const fetchCbThis = jest.fn(() => Promise.resolve(new Response(streamifyString('dummy'))));
         const additionalUrlParams = new URLSearchParams({'infer': 'true', 'sameAs': 'false'});
         const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis, additionalUrlParams });
         fetcherThis.fetchRawStream(endpoint, querySelect, 'myacceptheader');
