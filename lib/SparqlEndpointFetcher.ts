@@ -185,7 +185,7 @@ export class SparqlEndpointFetcher {
       body = new URLSearchParams();
       body.set('query', query);
       this.additionalUrlParams.forEach((key: string, value: string) => {
-        body.set(key, String(value));
+        body.set(key, value);
       })
       headers.append('Content-Length', body.toString().length.toString());
     } else if (this.additionalUrlParams.toString() !== '') {
