@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v2.4.0"></a>
+## [v2.4.0](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v2.3.3...v2.4.0) - 2022-02-01
+
+### Added
+* [Allow custom URL parameters to be passed](https://github.com/rubensworks/fetch-sparql-endpoint.js/commit/12064c3cf6ae57d9fbf11675269ae9693fbb7409)
+
 <a name="v2.3.3"></a>
 ## [v2.3.3](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v2.3.2...v2.3.3) - 2021-11-29
 
