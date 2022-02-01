@@ -25,6 +25,7 @@ export class SparqlEndpointFetcher {
   public static CONTENTTYPE_TURTLE: string = 'text/turtle';
 
   public readonly method: 'POST' | 'GET';
+  public readonly additionalUrlParams: URLSearchParams;
   public readonly fetchCb?: (input?: Request | string, init?: RequestInit) => Promise<Response>;
   public readonly sparqlParsers: {[contentType: string]: ISparqlResultsParser};
   public readonly sparqlJsonParser: SparqlJsonParser;
@@ -33,6 +34,7 @@ export class SparqlEndpointFetcher {
   constructor(args?: ISparqlEndpointFetcherArgs) {
     args = args || {};
     this.method = args.method || 'POST';
+    this.additionalUrlParams = args.additionalUrlParams || new URLSearchParams();
     this.fetchCb = args.fetch;
     this.sparqlJsonParser = new SparqlJsonParser(args);
     this.sparqlXmlParser = new SparqlXmlParser(args);
@@ -172,17 +174,22 @@ export class SparqlEndpointFetcher {
    */
   public async fetchRawStream(endpoint: string, query: string, acceptHeader: string)
     : Promise<[string, NodeJS.ReadableStream]> {
-    const url: string = this.method === 'POST' ? endpoint : endpoint + '?query=' + encodeURIComponent(query);
+    let url: string = this.method === 'POST' ? endpoint : endpoint + '?query=' + encodeURIComponent(query);
 
     // Initiate request
     const headers: Headers = new Headers();
-    let body: BodyInit | undefined;
+    let body: URLSearchParams | undefined;
     headers.append('Accept', acceptHeader);
     if (this.method === 'POST') {
       headers.append('Content-Type', 'application/x-www-form-urlencoded');
       body = new URLSearchParams();
       body.set('query', query);
+      this.additionalUrlParams.forEach((key: string, value: string) => {
+        body.set(key, value);
+      })
       headers.append('Content-Length', body.toString().length.toString());
+    } else if (this.additionalUrlParams.toString() !== '') {
+      url += `&${this.additionalUrlParams.toString()}`;
     }
 
     return this.handleFetchCall(url, { headers, method: this.method, body });
@@ -238,6 +245,7 @@ export interface ISparqlEndpointFetcherArgs extends ISettings {
    * Update queries are always issued via POST.
    */
   method?: 'POST' | 'GET';
+  additionalUrlParams?: URLSearchParams;
   /**
    * A custom fetch function.
    */
