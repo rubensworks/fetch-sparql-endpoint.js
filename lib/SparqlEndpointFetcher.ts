@@ -25,7 +25,7 @@ export class SparqlEndpointFetcher {
   public static CONTENTTYPE_TURTLE: string = 'text/turtle';
 
   public readonly method: 'POST' | 'GET';
-  public readonly additionalUrlParams?: URLSearchParams;
+  public readonly additionalUrlParams: URLSearchParams;
   public readonly fetchCb?: (input?: Request | string, init?: RequestInit) => Promise<Response>;
   public readonly sparqlParsers: {[contentType: string]: ISparqlResultsParser};
   public readonly sparqlJsonParser: SparqlJsonParser;
