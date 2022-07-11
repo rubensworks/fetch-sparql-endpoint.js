@@ -1,11 +1,10 @@
 import {DataFactory} from "rdf-data-factory";
 import "jest-rdf";
-import {Readable} from "stream";
 import {SparqlEndpointFetcher} from "../lib/SparqlEndpointFetcher";
+import arrayifyStream from 'arrayify-stream';
 
 const stringifyStream = require('stream-to-string');
 const streamifyString = require('streamify-string');
-const arrayifyStream = require('arrayify-stream');
 const DF = new DataFactory();
 
 // tslint:disable:no-trailing-whitespace
