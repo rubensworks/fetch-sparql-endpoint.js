@@ -101,5 +101,6 @@
     "validate": "npm ls",
     "prepare": "npm run build",
     "version": "manual-git-changelog onversion"
-  }
+  },
+  "sideEffects": false
 }
