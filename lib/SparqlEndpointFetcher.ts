@@ -155,7 +155,7 @@ export class SparqlEndpointFetcher {
         'content-type': 'application/sparql-update',
       },
       body: query,
-      signal: abortController.signal,
+      signal: abortController.signal as NonNullable<RequestInit["signal"]>,
     }
 
     await this.handleFetchCall(endpoint, init, { ignoreBody: true });
