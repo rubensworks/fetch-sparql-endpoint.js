@@ -1,6 +1,15 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v2.4.1"></a>
+## [v2.4.1](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v2.4.0...v2.4.1) - 2022-07-13
+
+### Fixed
+* [Fix key-value in additional params being reversed](https://github.com/rubensworks/fetch-sparql-endpoint.js/commit/d219ffd06846a244300c90d06ce01956a37eb056)
+
+### Added
+* [Enable tree shaking in package.json](https://github.com/rubensworks/fetch-sparql-endpoint.js/commit/8f26d1a9588209c84e78359663535dee625c20a0)
+
 <a name="v2.4.0"></a>
 ## [v2.4.0](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v2.3.3...v2.4.0) - 2022-02-01
 
