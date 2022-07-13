@@ -197,7 +197,7 @@ describe('SparqlEndpointFetcher', () => {
         headers.append('Content-Length', '67');
         const body = new URLSearchParams();
         body.set('query', querySelect);
-        additionalUrlParams.forEach((key: string, value: string) => {
+        additionalUrlParams.forEach((value: string, key: string) => {
           body.set(key, String(value));
         })
         return expect(fetchCbThis).toBeCalledWith(
