@@ -1,6 +1,14 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v3.0.0"></a>
+## [v3.0.0](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v2.4.1...v3.0.0) - 2022-07-14
+
+This release has been marked as a major change due to the transition from Node's internal stream API to readable-stream. Most users should experience not breakages with this change.
+
+### Changed
+* [Move away from Node.js built-ins](https://github.com/rubensworks/fetch-sparql-endpoint.js/commit/bcb9c2559a8e3571eb4123a9f36875cf03e5a4d0)
+
 <a name="v2.4.1"></a>
 ## [v2.4.1](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v2.4.0...v2.4.1) - 2022-07-13
 
