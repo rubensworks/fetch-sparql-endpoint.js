@@ -3321,10 +3321,10 @@ sparqljs@^3.1.2:
   dependencies:
     rdf-data-factory "^1.0.4"
 
-sparqljson-parse@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/sparqljson-parse/-/sparqljson-parse-2.0.0.tgz#a42b626625ce3e00d891708a9e6f09348541ef00"
-  integrity sha512-VGtTEQu/25qZXpPkjGh4aZLz+VX6kivYi6fcuYK0QmaLliuU0nFvACSy/pexsoB6aFHHVtxxRVEvU0de3isYaQ==
+sparqljson-parse@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/sparqljson-parse/-/sparqljson-parse-2.1.0.tgz#202a956b07b362a15a605d9aedd8478d947d03fe"
+  integrity sha512-JKyoDNDR9xrJwR6x6N41UWfER6kfeirE9BRBHdSFSfQF3eF3pxpuUTcJ6QGwHQ4wC/JsQdG/4OGmzkuk1B+8gg==
   dependencies:
     "@rdfjs/types" "*"
     "@types/readable-stream" "^2.3.13"

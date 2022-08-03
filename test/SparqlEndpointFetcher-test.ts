@@ -444,7 +444,7 @@ describe('SparqlEndpointFetcher', () => {
           .toEqual([]);
       });
 
-      it('should parse no results', async () => {
+      it('should reject no results', async () => {
         const fetchCbThis = () => Promise.resolve(<Response> {
           body: streamifyString(`{
   "head": { "vars": [ "p" ] }
@@ -455,8 +455,8 @@ describe('SparqlEndpointFetcher', () => {
           statusText: 'Ok!',
         });
         const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
-        return expect(await arrayifyStream(await fetcherThis.fetchBindings(endpoint, querySelect)))
-          .toEqual([]);
+        return expect(arrayifyStream(await fetcherThis.fetchBindings(endpoint, querySelect)))
+          .rejects.toThrow('No valid SPARQL query results were found.');
       });
 
       it('should reject on a server error', async () => {
