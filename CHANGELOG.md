@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v3.1.0"></a>
+## [v3.1.0](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v3.0.0...v3.1.0) - 2022-08-03
+
+### Changed
+* [Bump to sparqljson-parse 2.1.0](https://github.com/rubensworks/fetch-sparql-endpoint.js/commit/4599e5e9033daf7d0f9c0849db54ae7f4c08282f)
+
 <a name="v3.0.0"></a>
 ## [v3.0.0](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v2.4.1...v3.0.0) - 2022-07-14
 
