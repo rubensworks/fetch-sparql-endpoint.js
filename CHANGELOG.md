@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v3.1.1"></a>
+## [v3.1.1](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v3.1.0...v3.1.1) - 2022-11-09
+
+### Fixed
+* [Include source map files in packed files](https://github.com/rubensworks/fetch-sparql-endpoint.js/commit/60b68627ae504de93eadf2fbbd6c0ea96a8fbc44)
+
 <a name="v3.1.0"></a>
 ## [v3.1.0](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v3.0.0...v3.1.0) - 2022-08-03
 
