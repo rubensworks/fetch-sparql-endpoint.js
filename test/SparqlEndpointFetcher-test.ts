@@ -1,219 +1,189 @@
-import { DataFactory } from "rdf-data-factory";
+import {DataFactory} from "rdf-data-factory";
 import "jest-rdf";
-import { SparqlEndpointFetcher } from "../lib/SparqlEndpointFetcher";
-import arrayifyStream from "arrayify-stream";
+import {SparqlEndpointFetcher} from "../lib/SparqlEndpointFetcher";
+import arrayifyStream from 'arrayify-stream';
 
-const stringifyStream = require("stream-to-string");
-const streamifyString = require("streamify-string");
+const stringifyStream = require('stream-to-string');
+const streamifyString = require('streamify-string');
 const DF = new DataFactory();
 
 // tslint:disable:no-trailing-whitespace
 
-describe("SparqlEndpointFetcher", () => {
-  describe("constructed without fetch callback", () => {
-    it("should have an undefined fetch function", async () => {
+describe('SparqlEndpointFetcher', () => {
+
+  describe('constructed without fetch callback', () => {
+    it('should have an undefined fetch function', async () => {
       return expect(new SparqlEndpointFetcher().fetchCb).toBeUndefined();
     });
   });
 
-  describe("constructed with fetch callback", () => {
-    const prefixes =
-      "PREFIX foaf: <http://xmlns.com/foaf/0.1/> \nPREFIX : <http://example.org/> \n\n";
+  describe('constructed with fetch callback', () => {
 
-    const endpoint = "https://dbpedia.org/sparql";
-    const querySelect = "SELECT * WHERE { ?s ?p ?o }";
-    const queryAsk = "ASK WHERE { ?s ?p ?o }";
-    const queryConstruct = "CONSTRUCT WHERE { ?s ?p ?o }";
-    const queryDescribe = "DESCRIBE <http://ex.org>";
-    const queryDelete = "DELETE WHERE { ?s ?p ?o }";
-    const queryInsert = "INSERT { ?s ?p ?o } WHERE {}";
-    const updateDeleteData =
-      prefixes +
-      "DELETE DATA { GRAPH <http://example.org/g1> { :a foaf:knows :b } }";
-    const updateDeleteData2 =
-      prefixes +
-      "DELETE DATA { GRAPH <http://example.org/g1> { :b foaf:knows :c } }";
-    const updateInsertData =
-      prefixes +
-      "INSERT DATA { GRAPH <http://example.org/g1> { :Alice foaf:knows :Bob } }";
-    const updateMove = prefixes + "MOVE DEFAULT TO :g1";
-    const updateAdd = "ADD SILENT GRAPH <http://www.example.com/g1> TO DEFAULT";
+    const prefixes = 'PREFIX foaf: <http://xmlns.com/foaf/0.1/> \nPREFIX : <http://example.org/> \n\n'
+
+    const endpoint = 'https://dbpedia.org/sparql';
+    const querySelect = 'SELECT * WHERE { ?s ?p ?o }';
+    const queryAsk = 'ASK WHERE { ?s ?p ?o }';
+    const queryConstruct = 'CONSTRUCT WHERE { ?s ?p ?o }';
+    const queryDescribe = 'DESCRIBE <http://ex.org>';
+    const queryDelete = 'DELETE WHERE { ?s ?p ?o }';
+    const queryInsert = 'INSERT { ?s ?p ?o } WHERE {}';
+    const updateDeleteData = prefixes + 'DELETE DATA { GRAPH <http://example.org/g1> { :a foaf:knows :b } }';
+    const updateDeleteData2 = prefixes + 'DELETE DATA { GRAPH <http://example.org/g1> { :b foaf:knows :c } }';
+    const updateInsertData = prefixes + 'INSERT DATA { GRAPH <http://example.org/g1> { :Alice foaf:knows :Bob } }';
+    const updateMove = prefixes + 'MOVE DEFAULT TO :g1';
+    const updateAdd = 'ADD SILENT GRAPH <http://www.example.com/g1> TO DEFAULT'
 
     let fetchCb: any;
     let fetcher: any;
 
     beforeEach(() => {
-      fetchCb = () => Promise.resolve(new Response("dummy"));
+      fetchCb = () => Promise.resolve(new Response('dummy'));
       fetcher = new SparqlEndpointFetcher({ fetch: fetchCb });
     });
 
-    it("should have the default fetch function", async () => {
+    it('should have the default fetch function', async () => {
       return expect(fetcher.fetchCb).toBe(fetchCb);
     });
 
-    describe("#getQueryType", () => {
-      it("should detect a select query", () => {
-        return expect(fetcher.getQueryType(querySelect)).toEqual("SELECT");
+    describe('#getQueryType', () => {
+      it('should detect a select query', () => {
+        return expect(fetcher.getQueryType(querySelect)).toEqual('SELECT');
       });
 
-      it("should detect an ask query", () => {
-        return expect(fetcher.getQueryType(queryAsk)).toEqual("ASK");
+      it('should detect an ask query', () => {
+        return expect(fetcher.getQueryType(queryAsk)).toEqual('ASK');
       });
 
-      it("should detect a construct query", () => {
-        return expect(fetcher.getQueryType(queryConstruct)).toEqual(
-          "CONSTRUCT"
-        );
+      it('should detect a construct query', () => {
+        return expect(fetcher.getQueryType(queryConstruct)).toEqual('CONSTRUCT');
       });
 
-      it("should detect a describe query as a construct query", () => {
-        return expect(fetcher.getQueryType(queryDescribe)).toEqual("CONSTRUCT");
+      it('should detect a describe query as a construct query', () => {
+        return expect(fetcher.getQueryType(queryDescribe)).toEqual('CONSTRUCT');
       });
 
-      it("should detect an unknown query", () => {
-        return expect(fetcher.getQueryType(queryInsert)).toEqual("UNKNOWN");
+      it('should detect an unknown query', () => {
+        return expect(fetcher.getQueryType(queryInsert)).toEqual('UNKNOWN');
       });
 
-      it("should detect an unknown query", () => {
-        return expect(fetcher.getQueryType(queryDelete)).toEqual("UNKNOWN");
+      it('should detect an unknown query', () => {
+        return expect(fetcher.getQueryType(queryDelete)).toEqual('UNKNOWN');
       });
 
-      it("should throw an error on invalid queries", () => {
-        return expect(() => fetcher.getQueryType("{{{")).toThrow();
+      it('should throw an error on invalid queries', () => {
+        return expect(() => fetcher.getQueryType('{{{')).toThrow();
       });
     });
 
-    describe("#getUpdateTypes", () => {
-      it("should detect an unknown update (SELECT)", () => {
-        return expect(fetcher.getUpdateTypes(querySelect)).toEqual("UNKNOWN");
+    describe('#getUpdateTypes', () => {
+      it('should detect an unknown update (SELECT)', () => {
+        return expect(fetcher.getUpdateTypes(querySelect)).toEqual('UNKNOWN');
       });
 
-      it("should detect an unknown update (ASK)", () => {
-        return expect(fetcher.getUpdateTypes(queryAsk)).toEqual("UNKNOWN");
+      it('should detect an unknown update (ASK)', () => {
+        return expect(fetcher.getUpdateTypes(queryAsk)).toEqual('UNKNOWN');
       });
 
-      it("should detect an unknown update (CONSTRUCT)", () => {
-        return expect(fetcher.getUpdateTypes(queryConstruct)).toEqual(
-          "UNKNOWN"
-        );
+      it('should detect an unknown update (CONSTRUCT)', () => {
+        return expect(fetcher.getUpdateTypes(queryConstruct)).toEqual('UNKNOWN');
       });
 
-      it("should detect an unknown update (DESCRIBE)", () => {
-        return expect(fetcher.getUpdateTypes(queryDescribe)).toEqual("UNKNOWN");
+      it('should detect an unknown update (DESCRIBE)', () => {
+        return expect(fetcher.getUpdateTypes(queryDescribe)).toEqual('UNKNOWN');
       });
 
-      it("should throw an error on invalid queries", () => {
-        return expect(() => fetcher.getUpdateTypes("{{{")).toThrow();
+      it('should throw an error on invalid queries', () => {
+        return expect(() => fetcher.getUpdateTypes('{{{')).toThrow();
       });
 
-      it("should detect an insertdelete query", () => {
+      it('should detect an insertdelete query', () => {
         return expect(fetcher.getUpdateTypes(queryInsert)).toEqual({
-          insertdelete: true,
+          insertdelete: true
         });
       });
 
-      it("should detect a delete query", () => {
+      it('should detect a delete query', () => {
         return expect(fetcher.getUpdateTypes(queryDelete)).toEqual({
-          deletewhere: true,
+          deletewhere: true
         });
       });
 
-      it("should detect a delete data query", () => {
+      it('should detect a delete data query', () => {
         return expect(fetcher.getUpdateTypes(updateDeleteData)).toEqual({
-          delete: true,
+          delete: true
         });
       });
 
-      it("should detect a delete data query for 2 update operations", () => {
-        return expect(
-          fetcher.getUpdateTypes(updateDeleteData + ";" + updateDeleteData2)
-        ).toEqual({
-          delete: true,
+      it('should detect a delete data query for 2 update operations', () => {
+        return expect(fetcher.getUpdateTypes(updateDeleteData + ';' + updateDeleteData2)).toEqual({
+          delete: true
         });
       });
 
-      it("should detect an insert data query", () => {
+      it('should detect an insert data query', () => {
         return expect(fetcher.getUpdateTypes(updateInsertData)).toEqual({
-          insert: true,
+          insert: true
         });
       });
 
-      it("should detect a combined insert and delete data query", () => {
-        return expect(
-          fetcher.getUpdateTypes(updateInsertData + ";" + updateDeleteData)
-        ).toEqual({
+      it('should detect a combined insert and delete data query', () => {
+        return expect(fetcher.getUpdateTypes(updateInsertData + ';' + updateDeleteData)).toEqual({
           insert: true,
-          delete: true,
+          delete: true
         });
       });
 
-      it("should detect a combined insert and delete data query (2 delete queries)", () => {
-        return expect(
-          fetcher.getUpdateTypes(
-            updateInsertData + ";" + updateDeleteData + ";" + updateDeleteData
-          )
-        ).toEqual({
+      it('should detect a combined insert and delete data query (2 delete queries)', () => {
+        return expect(fetcher.getUpdateTypes(updateInsertData + ';' + updateDeleteData + ';' + updateDeleteData)).toEqual({
           insert: true,
-          delete: true,
+          delete: true
         });
       });
 
-      it("should detect a move operation", () => {
+      it('should detect a move operation', () => {
         return expect(fetcher.getUpdateTypes(updateMove)).toEqual({
-          move: true,
+          move: true
         });
       });
 
-      it("should detect a add operation", () => {
+      it('should detect a add operation', () => {
         return expect(fetcher.getUpdateTypes(updateAdd)).toEqual({
-          add: true,
+          add: true
         });
       });
 
-      it("should detect a combined move and add operation", () => {
-        return expect(
-          fetcher.getUpdateTypes(updateMove + ";" + updateAdd)
-        ).toEqual({
+      it('should detect a combined move and add operation', () => {
+        return expect(fetcher.getUpdateTypes(updateMove + ';' + updateAdd)).toEqual({
           move: true,
-          add: true,
+          add: true
         });
       });
 
-      it("should detect a combined move, add, insert and delete operations", () => {
-        return expect(
-          fetcher.getUpdateTypes(
-            updateMove +
-              ";" +
-              updateAdd +
-              ";" +
-              updateInsertData +
-              ";" +
-              updateDeleteData
-          )
-        ).toEqual({
+      it('should detect a combined move, add, insert and delete operations', () => {
+        return expect(fetcher.getUpdateTypes(updateMove + ';' + updateAdd + ';' + updateInsertData + ';' + updateDeleteData)).toEqual({
           move: true,
           add: true,
           insert: true,
-          delete: true,
+          delete: true
         });
       });
-    });
 
-    describe("#fetchRawStream", () => {
-      it("should pass the correct URL and HTTP headers", () => {
-        const fetchCbThis = jest.fn(() =>
-          Promise.resolve(new Response(streamifyString("dummy")))
-        );
+    })
+
+    describe('#fetchRawStream', () => {
+      it('should pass the correct URL and HTTP headers', () => {
+        const fetchCbThis = jest.fn(() => Promise.resolve(new Response(streamifyString('dummy'))));
         const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
-        fetcherThis.fetchRawStream(endpoint, querySelect, "myacceptheader");
+        fetcherThis.fetchRawStream(endpoint, querySelect, 'myacceptheader');
         const headers: Headers = new Headers();
-        headers.append("Accept", "myacceptheader");
-        headers.append("Content-Type", "application/x-www-form-urlencoded");
-        headers.append("Content-Length", "43");
+        headers.append('Accept', 'myacceptheader');
+        headers.append('Content-Type', 'application/x-www-form-urlencoded');
+        headers.append('Content-Length', '43');
         const body = new URLSearchParams();
-        body.set("query", querySelect);
+        body.set('query', querySelect);
         return expect(fetchCbThis).toBeCalledWith(
-          'https://dbpedia.org/sparql', expect.objectContaining({ headers, method: 'POST', body }));
+          'https://dbpedia.org/sparql', { headers, method: 'POST', body });
       });
 
       it('should pass the correct URL and HTTP headers with additional URL parameters', () => {
@@ -222,51 +192,37 @@ describe("SparqlEndpointFetcher", () => {
         const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis, additionalUrlParams });
         fetcherThis.fetchRawStream(endpoint, querySelect, 'myacceptheader');
         const headers: Headers = new Headers();
-        headers.append("Accept", "myacceptheader");
-        headers.append("Content-Type", "application/x-www-form-urlencoded");
-        headers.append("Content-Length", "67");
+        headers.append('Accept', 'myacceptheader');
+        headers.append('Content-Type', 'application/x-www-form-urlencoded');
+        headers.append('Content-Length', '67');
         const body = new URLSearchParams();
-        body.set("query", querySelect);
+        body.set('query', querySelect);
         additionalUrlParams.forEach((value: string, key: string) => {
           body.set(key, String(value));
-        });
+        })
         return expect(fetchCbThis).toBeCalledWith(
-          'https://dbpedia.org/sparql', expect.objectContaining({ headers, method: 'POST', body }));
+          'https://dbpedia.org/sparql', { headers, method: 'POST', body });
       });
 
-      it("should pass the correct URL and HTTP headers when using HTTP GET", () => {
-        const fetchCbThis = jest.fn(() =>
-          Promise.resolve(new Response(streamifyString("dummy")))
-        );
-        const fetcherThis = new SparqlEndpointFetcher({
-          method: "GET",
-          fetch: fetchCbThis,
-        });
-        fetcherThis.fetchRawStream(endpoint, querySelect, "myacceptheader");
+      it('should pass the correct URL and HTTP headers when using HTTP GET', () => {
+        const fetchCbThis = jest.fn(() => Promise.resolve(new Response(streamifyString('dummy'))));
+        const fetcherThis = new SparqlEndpointFetcher({ method: 'GET', fetch: fetchCbThis });
+        fetcherThis.fetchRawStream(endpoint, querySelect, 'myacceptheader');
         const headers: Headers = new Headers();
-        headers.append("Accept", "myacceptheader");
+        headers.append('Accept', 'myacceptheader');
         return expect(fetchCbThis).toBeCalledWith(
-          'https://dbpedia.org/sparql?query=SELECT%20*%20WHERE%20%7B%20%3Fs%20%3Fp%20%3Fo%20%7D', expect.objectContaining({ headers, method: 'GET' }));
+          'https://dbpedia.org/sparql?query=SELECT%20*%20WHERE%20%7B%20%3Fs%20%3Fp%20%3Fo%20%7D', { headers, method: 'GET' });
       });
 
-      it("should pass the correct URL and HTTP headers when using HTTP GET with additional URL parameters", () => {
-        const fetchCbThis = jest.fn(() =>
-          Promise.resolve(new Response(streamifyString("dummy")))
-        );
-        const additionalUrlParams = new URLSearchParams({
-          infer: "true",
-          sameAs: "false",
-        });
-        const fetcherThis = new SparqlEndpointFetcher({
-          method: "GET",
-          fetch: fetchCbThis,
-          additionalUrlParams,
-        });
-        fetcherThis.fetchRawStream(endpoint, querySelect, "myacceptheader");
+      it('should pass the correct URL and HTTP headers when using HTTP GET with additional URL parameters', () => {
+        const fetchCbThis = jest.fn(() => Promise.resolve(new Response(streamifyString('dummy'))));
+        const additionalUrlParams = new URLSearchParams({'infer': 'true', 'sameAs': 'false'});
+        const fetcherThis = new SparqlEndpointFetcher({ method: 'GET', fetch: fetchCbThis, additionalUrlParams });
+        fetcherThis.fetchRawStream(endpoint, querySelect, 'myacceptheader');
         const headers: Headers = new Headers();
-        headers.append("Accept", "myacceptheader");
+        headers.append('Accept', 'myacceptheader');
         return expect(fetchCbThis).toBeCalledWith(
-          'https://dbpedia.org/sparql?query=SELECT%20*%20WHERE%20%7B%20%3Fs%20%3Fp%20%3Fo%20%7D&infer=true&sameAs=false', expect.objectContaining({ headers, method: 'GET' }));
+          'https://dbpedia.org/sparql?query=SELECT%20*%20WHERE%20%7B%20%3Fs%20%3Fp%20%3Fo%20%7D&infer=true&sameAs=false', { headers, method: 'GET' });
       });
 
       it('should reject for an invalid server response', async () => {
@@ -278,196 +234,134 @@ describe("SparqlEndpointFetcher", () => {
           statusText: 'Error!',
         });
         const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
-        return expect(
-          fetcherThis.fetchRawStream(endpoint, querySelect, "myacceptheader")
-        ).rejects.toThrowError(
-          `Invalid SPARQL endpoint response from https://dbpedia.org/sparql (HTTP status 500):\nthis is an invalid response`
-        );
+        return expect(fetcherThis.fetchRawStream(endpoint, querySelect, 'myacceptheader'))
+          .rejects.toThrowError(`Invalid SPARQL endpoint response from https://dbpedia.org/sparql (HTTP status 500):\nthis is an invalid response`);
       });
 
-      it("should fetch with a node stream", async () => {
-        const fetchCbThis = () =>
-          Promise.resolve(<Response>{
-            body: streamifyString(`abc`),
-            headers: new Headers(),
-            ok: true,
-            status: 200,
-            statusText: "Ok!",
-          });
+      it('should fetch with a node stream', async () => {
+        const fetchCbThis = () => Promise.resolve(<Response> {
+          body: streamifyString(`abc`),
+          headers: new Headers(),
+          ok: true,
+          status: 200,
+          statusText: 'Ok!',
+        });
         const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
-        return expect(
-          await stringifyStream(
-            (
-              await fetcherThis.fetchRawStream(
-                endpoint,
-                querySelect,
-                "myacceptheader"
-              )
-            )[1]
-          )
-        ).toEqual(`abc`);
+        return expect(await stringifyStream((
+          await fetcherThis.fetchRawStream(endpoint, querySelect, 'myacceptheader'))[1])).toEqual(`abc`);
       });
 
-      it("should fetch with a web stream", async () => {
-        const fetchCbThis = () =>
-          Promise.resolve(<Response>{
-            body: require("web-streams-node").toWebReadableStream(
-              streamifyString(`abc`)
-            ),
-            headers: new Headers(),
-            ok: true,
-            status: 200,
-            statusText: "Ok!",
-          });
+      it('should fetch with a web stream', async () => {
+        const fetchCbThis = () => Promise.resolve(<Response> {
+          body: require('web-streams-node').toWebReadableStream(streamifyString(`abc`)),
+          headers: new Headers(),
+          ok: true,
+          status: 200,
+          statusText: 'Ok!',
+        });
         const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
-        return expect(
-          await stringifyStream(
-            (
-              await fetcherThis.fetchRawStream(
-                endpoint,
-                querySelect,
-                "myacceptheader"
-              )
-            )[1]
-          )
-        ).toEqual(`abc`);
+        return expect(await stringifyStream((
+          await fetcherThis.fetchRawStream(endpoint, querySelect, 'myacceptheader'))[1])).toEqual(`abc`);
       });
 
-      it("should fetch and get a dummy content type when none is provided", async () => {
-        const fetchCbThis = () =>
-          Promise.resolve(<Response>{
-            body: streamifyString(`abc`),
-            headers: new Headers(),
-            ok: true,
-            status: 200,
-            statusText: "Ok!",
-          });
+      it('should fetch and get a dummy content type when none is provided', async () => {
+        const fetchCbThis = () => Promise.resolve(<Response> {
+          body: streamifyString(`abc`),
+          headers: new Headers(),
+          ok: true,
+          status: 200,
+          statusText: 'Ok!',
+        });
         const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
-        return expect(
-          (
-            await fetcherThis.fetchRawStream(
-              endpoint,
-              querySelect,
-              "myacceptheader"
-            )
-          )[0]
-        ).toEqual("");
+        return expect((await fetcherThis.fetchRawStream(endpoint, querySelect, 'myacceptheader'))[0])
+          .toEqual('');
       });
 
-      it("should fetch and get the content type", async () => {
-        const fetchCbThis = () =>
-          Promise.resolve(<Response>{
-            body: streamifyString(`abc`),
-            headers: new Headers({ "Content-Type": "abc" }),
-            ok: true,
-            status: 200,
-            statusText: "Ok!",
-          });
+      it('should fetch and get the content type', async () => {
+        const fetchCbThis = () => Promise.resolve(<Response> {
+          body: streamifyString(`abc`),
+          headers: new Headers({ 'Content-Type': 'abc' }),
+          ok: true,
+          status: 200,
+          statusText: 'Ok!',
+        });
         const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
-        return expect(
-          (
-            await fetcherThis.fetchRawStream(
-              endpoint,
-              querySelect,
-              "myacceptheader"
-            )
-          )[0]
-        ).toEqual("abc");
+        return expect((await fetcherThis.fetchRawStream(endpoint, querySelect, 'myacceptheader'))[0])
+          .toEqual('abc');
       });
 
-      it("should fetch and get the content type that has a suffix", async () => {
-        const fetchCbThis = () =>
-          Promise.resolve(<Response>{
-            body: streamifyString(`abc`),
-            headers: new Headers({ "Content-Type": "abc; bla" }),
-            ok: true,
-            status: 200,
-            statusText: "Ok!",
-          });
+      it('should fetch and get the content type that has a suffix', async () => {
+        const fetchCbThis = () => Promise.resolve(<Response> {
+          body: streamifyString(`abc`),
+          headers: new Headers({ 'Content-Type': 'abc; bla' }),
+          ok: true,
+          status: 200,
+          statusText: 'Ok!',
+        });
         const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
-        return expect(
-          (
-            await fetcherThis.fetchRawStream(
-              endpoint,
-              querySelect,
-              "myacceptheader"
-            )
-          )[0]
-        ).toEqual("abc");
+        return expect((await fetcherThis.fetchRawStream(endpoint, querySelect, 'myacceptheader'))[0])
+          .toEqual('abc');
       });
     });
 
-    describe("#fetchUpdate", () => {
-      it("should use POST and the correct content-type", async () => {
+    describe('#fetchUpdate', () => {
+      it('should use POST and the correct content-type', async () => {
         const cancel: any = jest.fn();
-        const fetchCbThis: jest.Mock<Promise<Response>, any[]> = jest.fn(() =>
-          Promise.resolve(<Response>{
-            body: {},
-            headers: new Headers(),
-            ok: true,
-            status: 200,
-            statusText: "Ok!",
-          })
-        );
+        const fetchCbThis: jest.Mock<Promise<Response>, any[]> = jest.fn(() => Promise.resolve(<Response> {
+          body: {},
+          headers: new Headers(),
+          ok: true,
+          status: 200,
+          statusText: 'Ok!',
+        }));
         const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
-        await expect(
-          fetcherThis.fetchUpdate(endpoint, queryDelete)
-        ).resolves.toBeUndefined();
+        await expect(fetcherThis.fetchUpdate(endpoint, queryDelete)).resolves.toBeUndefined();
         expect(fetchCbThis.mock.calls[0][0]).toBe(endpoint);
         expect(fetchCbThis.mock.calls[0][1]).toMatchObject({
-          method: "POST",
+          method: 'POST',
           headers: {
-            "content-type": "application/sparql-update",
+            'content-type': 'application/sparql-update',
           },
           body: queryDelete,
         });
       });
 
-      it("should use POST without response body", async () => {
-        const fetchCbThis: jest.Mock<Promise<Response>, any[]> = jest.fn(() =>
-          Promise.resolve(<Response>{
-            headers: new Headers(),
-            ok: true,
-            status: 200,
-            statusText: "Ok!",
-          })
-        );
+      it('should use POST without response body', async () => {
+        const fetchCbThis: jest.Mock<Promise<Response>, any[]> = jest.fn(() => Promise.resolve(<Response> {
+          headers: new Headers(),
+          ok: true,
+          status: 200,
+          statusText: 'Ok!',
+        }));
         const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
-        await expect(
-          fetcherThis.fetchUpdate(endpoint, queryDelete)
-        ).resolves.toBeUndefined();
+        await expect(fetcherThis.fetchUpdate(endpoint, queryDelete)).resolves.toBeUndefined();
         expect(fetchCbThis.mock.calls[0][0]).toBe(endpoint);
         expect(fetchCbThis.mock.calls[0][1]).toMatchObject({
-          method: "POST",
+          method: 'POST',
           headers: {
-            "content-type": "application/sparql-update",
+            'content-type': 'application/sparql-update',
           },
           body: queryDelete,
         });
       });
 
-      it("should reject for an invalid server response", async () => {
-        const fetchCbThis = () =>
-          Promise.resolve(<Response>{
-            headers: new Headers(),
-            ok: false,
-            status: 500,
-            statusText: "Error!",
-          });
+      it('should reject for an invalid server response', async () => {
+        const fetchCbThis = () => Promise.resolve(<Response> {
+          headers: new Headers(),
+          ok: false,
+          status: 500,
+          statusText: 'Error!',
+        });
         const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
-        return expect(
-          fetcherThis.fetchUpdate(endpoint, queryDelete)
-        ).rejects.toThrowError(
-          `Invalid SPARQL endpoint response from https://dbpedia.org/sparql (HTTP status 500):\nempty response`
-        );
+        return expect(fetcherThis.fetchUpdate(endpoint, queryDelete))
+          .rejects.toThrowError(`Invalid SPARQL endpoint response from https://dbpedia.org/sparql (HTTP status 500):\nempty response`);
       });
     });
 
-    describe("#fetchBindings", () => {
-      it("should parse bindings", async () => {
-        const fetchCbThis = () =>
-          Promise.resolve(<Response>{
-            body: streamifyString(`{
+    describe('#fetchBindings', () => {
+      it('should parse bindings', async () => {
+        const fetchCbThis = () => Promise.resolve(<Response> {
+          body: streamifyString(`{
   "head": { "vars": [ "p" ] },
   "results": {
     "bindings": [
@@ -483,155 +377,117 @@ describe("SparqlEndpointFetcher", () => {
     ]
   }
 }`),
-            headers: new Headers({
-              "Content-Type": SparqlEndpointFetcher.CONTENTTYPE_SPARQL_JSON,
-            }),
-            ok: true,
-            status: 200,
-            statusText: "Ok!",
-          });
+          headers: new Headers({ 'Content-Type': SparqlEndpointFetcher.CONTENTTYPE_SPARQL_JSON }),
+          ok: true,
+          status: 200,
+          statusText: 'Ok!',
+        });
         const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
-        return expect(
-          await arrayifyStream(
-            await fetcherThis.fetchBindings(endpoint, querySelect)
-          )
-        ).toEqual([
-          { p: DF.namedNode("p1") },
-          { p: DF.namedNode("p2") },
-          { p: DF.namedNode("p3") },
-        ]);
+        return expect(await arrayifyStream(await fetcherThis.fetchBindings(endpoint, querySelect)))
+          .toEqual([
+            { p: DF.namedNode('p1') },
+            { p: DF.namedNode('p2') },
+            { p: DF.namedNode('p3') },
+          ]);
       });
 
-      it("should parse empty JSON bindings", async () => {
-        const fetchCbThis = () =>
-          Promise.resolve(<Response>{
-            body: streamifyString(`{
+      it('should parse empty JSON bindings', async () => {
+        const fetchCbThis = () => Promise.resolve(<Response> {
+          body: streamifyString(`{
   "head": { "vars": [ "p" ] },
   "results": {
     "bindings": []
   }
 }`),
-            headers: new Headers({
-              "Content-Type": SparqlEndpointFetcher.CONTENTTYPE_SPARQL_JSON,
-            }),
-            ok: true,
-            status: 200,
-            statusText: "Ok!",
-          });
+          headers: new Headers({ 'Content-Type': SparqlEndpointFetcher.CONTENTTYPE_SPARQL_JSON }),
+          ok: true,
+          status: 200,
+          statusText: 'Ok!',
+        });
         const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
-        return expect(
-          await arrayifyStream(
-            await fetcherThis.fetchBindings(endpoint, querySelect)
-          )
-        ).toEqual([]);
+        return expect(await arrayifyStream(await fetcherThis.fetchBindings(endpoint, querySelect)))
+          .toEqual([]);
       });
 
-      it("should parse empty XML bindings", async () => {
-        const fetchCbThis = () =>
-          Promise.resolve(<Response>{
-            body: streamifyString(`<?xml version="1.0"?>
+      it('should parse empty XML bindings', async () => {
+        const fetchCbThis = () => Promise.resolve(<Response> {
+          body: streamifyString(`<?xml version="1.0"?>
 <sparql xmlns="http://www.w3.org/2005/sparql-results#">
   <head>
   </head>
   <results>
   </results>
 </sparql>`),
-            headers: new Headers({
-              "Content-Type": SparqlEndpointFetcher.CONTENTTYPE_SPARQL_XML,
-            }),
-            ok: true,
-            status: 200,
-            statusText: "Ok!",
-          });
+          headers: new Headers({ 'Content-Type': SparqlEndpointFetcher.CONTENTTYPE_SPARQL_XML }),
+          ok: true,
+          status: 200,
+          statusText: 'Ok!',
+        });
         const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
-        return expect(
-          await arrayifyStream(
-            await fetcherThis.fetchBindings(endpoint, querySelect)
-          )
-        ).toEqual([]);
+        return expect(await arrayifyStream(await fetcherThis.fetchBindings(endpoint, querySelect)))
+          .toEqual([]);
       });
 
-      it("should parse no bindings", async () => {
-        const fetchCbThis = () =>
-          Promise.resolve(<Response>{
-            body: streamifyString(`{
+      it('should parse no bindings', async () => {
+        const fetchCbThis = () => Promise.resolve(<Response> {
+          body: streamifyString(`{
   "head": { "vars": [ "p" ] },
   "results": {}
 }`),
-            headers: new Headers({
-              "Content-Type": SparqlEndpointFetcher.CONTENTTYPE_SPARQL_JSON,
-            }),
-            ok: true,
-            status: 200,
-            statusText: "Ok!",
-          });
+          headers: new Headers({ 'Content-Type': SparqlEndpointFetcher.CONTENTTYPE_SPARQL_JSON }),
+          ok: true,
+          status: 200,
+          statusText: 'Ok!',
+        });
         const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
-        return expect(
-          await arrayifyStream(
-            await fetcherThis.fetchBindings(endpoint, querySelect)
-          )
-        ).toEqual([]);
+        return expect(await arrayifyStream(await fetcherThis.fetchBindings(endpoint, querySelect)))
+          .toEqual([]);
       });
 
-      it("should reject no results", async () => {
-        const fetchCbThis = () =>
-          Promise.resolve(<Response>{
-            body: streamifyString(`{
+      it('should reject no results', async () => {
+        const fetchCbThis = () => Promise.resolve(<Response> {
+          body: streamifyString(`{
   "head": { "vars": [ "p" ] }
 }`),
-            headers: new Headers({
-              "Content-Type": SparqlEndpointFetcher.CONTENTTYPE_SPARQL_JSON,
-            }),
-            ok: true,
-            status: 200,
-            statusText: "Ok!",
-          });
+          headers: new Headers({ 'Content-Type': SparqlEndpointFetcher.CONTENTTYPE_SPARQL_JSON }),
+          ok: true,
+          status: 200,
+          statusText: 'Ok!',
+        });
         const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
-        return expect(
-          arrayifyStream(await fetcherThis.fetchBindings(endpoint, querySelect))
-        ).rejects.toThrow("No valid SPARQL query results were found.");
+        return expect(arrayifyStream(await fetcherThis.fetchBindings(endpoint, querySelect)))
+          .rejects.toThrow('No valid SPARQL query results were found.');
       });
 
-      it("should reject on a server error", async () => {
-        const fetchCbThis = () =>
-          Promise.resolve(<Response>{
-            body: streamifyString("this is an invalid response"),
-            headers: new Headers({
-              "Content-Type": SparqlEndpointFetcher.CONTENTTYPE_SPARQL_JSON,
-            }),
-            ok: false,
-            status: 500,
-            statusText: "Error!",
-          });
+      it('should reject on a server error', async () => {
+        const fetchCbThis = () => Promise.resolve(<Response> {
+          body: streamifyString('this is an invalid response'),
+          headers: new Headers({ 'Content-Type': SparqlEndpointFetcher.CONTENTTYPE_SPARQL_JSON }),
+          ok: false,
+          status: 500,
+          statusText: 'Error!',
+        });
         const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
-        return expect(
-          fetcherThis.fetchBindings(endpoint, querySelect)
-        ).rejects.toThrowError(
-          `Invalid SPARQL endpoint response from https://dbpedia.org/sparql (HTTP status 500):\nthis is an invalid response`
-        );
+        return expect(fetcherThis.fetchBindings(endpoint, querySelect))
+          .rejects.toThrowError(`Invalid SPARQL endpoint response from https://dbpedia.org/sparql (HTTP status 500):\nthis is an invalid response`);
       });
 
-      it("should reject on an invalid content type", async () => {
-        const fetchCbThis = () =>
-          Promise.resolve(<Response>{
-            body: streamifyString(""),
-            headers: new Headers({ "Content-Type": "bla" }),
-            ok: true,
-            status: 200,
-            statusText: "Error!",
-          });
+      it('should reject on an invalid content type', async () => {
+        const fetchCbThis = () => Promise.resolve(<Response> {
+          body: streamifyString(''),
+          headers: new Headers({ 'Content-Type': 'bla' }),
+          ok: true,
+          status: 200,
+          statusText: 'Error!',
+        });
         const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
-        return expect(
-          fetcherThis.fetchBindings(endpoint, querySelect)
-        ).rejects.toEqual(
-          new Error("Unknown SPARQL results content type: bla")
-        );
+        return expect(fetcherThis.fetchBindings(endpoint, querySelect)).rejects
+          .toEqual(new Error('Unknown SPARQL results content type: bla'));
       });
 
-      it("should emit the variables event", async () => {
-        const fetchCbThis = () =>
-          Promise.resolve(<Response>{
-            body: streamifyString(`{
+      it('should emit the variables event', async () => {
+        const fetchCbThis = () => Promise.resolve(<Response> {
+          body: streamifyString(`{
   "head": { "vars": [ "p" ] },
   "results": {
     "bindings": [
@@ -647,166 +503,126 @@ describe("SparqlEndpointFetcher", () => {
     ]
   }
 }`),
-            headers: new Headers({
-              "Content-Type": SparqlEndpointFetcher.CONTENTTYPE_SPARQL_JSON,
-            }),
-            ok: true,
-            status: 200,
-            statusText: "Ok!",
-          });
+          headers: new Headers({ 'Content-Type': SparqlEndpointFetcher.CONTENTTYPE_SPARQL_JSON }),
+          ok: true,
+          status: 200,
+          statusText: 'Ok!',
+        });
         const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
         const results = await fetcherThis.fetchBindings(endpoint, querySelect);
-        const p = new Promise((resolve) => results.on("variables", resolve));
+        const p = new Promise((resolve) => results.on('variables', resolve));
         await arrayifyStream(results);
-        expect(await p).toEqual([DF.variable("p")]);
+        expect(await p).toEqual([DF.variable('p')]);
       });
     });
 
-    describe("#fetchAsk", () => {
-      it("should parse true", async () => {
-        const fetchCbThis = () =>
-          Promise.resolve(<Response>{
-            body: streamifyString(`{
+    describe('#fetchAsk', () => {
+      it('should parse true', async () => {
+        const fetchCbThis = () => Promise.resolve(<Response> {
+          body: streamifyString(`{
   "head": { },
   "boolean": true
 }`),
-            headers: new Headers({
-              "Content-Type": SparqlEndpointFetcher.CONTENTTYPE_SPARQL_JSON,
-            }),
-            ok: true,
-            status: 200,
-            statusText: "Ok!",
-          });
+          headers: new Headers({ 'Content-Type': SparqlEndpointFetcher.CONTENTTYPE_SPARQL_JSON }),
+          ok: true,
+          status: 200,
+          statusText: 'Ok!',
+        });
         const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
-        return expect(await fetcherThis.fetchAsk(endpoint, queryAsk)).toEqual(
-          true
-        );
+        return expect(await fetcherThis.fetchAsk(endpoint, queryAsk)).toEqual(true);
       });
 
-      it("should parse false in JSON", async () => {
-        const fetchCbThis = () =>
-          Promise.resolve(<Response>{
-            body: streamifyString(`{
+      it('should parse false in JSON', async () => {
+        const fetchCbThis = () => Promise.resolve(<Response> {
+          body: streamifyString(`{
   "head": { },
   "boolean": false
 }`),
-            headers: new Headers({
-              "Content-Type": SparqlEndpointFetcher.CONTENTTYPE_SPARQL_JSON,
-            }),
-            ok: true,
-            status: 200,
-            statusText: "Ok!",
-          });
+          headers: new Headers({ 'Content-Type': SparqlEndpointFetcher.CONTENTTYPE_SPARQL_JSON }),
+          ok: true,
+          status: 200,
+          statusText: 'Ok!',
+        });
         const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
-        return expect(await fetcherThis.fetchAsk(endpoint, queryAsk)).toEqual(
-          false
-        );
+        return expect(await fetcherThis.fetchAsk(endpoint, queryAsk)).toEqual(false);
       });
 
-      it("should parse false in XML", async () => {
-        const fetchCbThis = () =>
-          Promise.resolve(<Response>{
-            body: streamifyString(`<?xml version="1.0"?>
+      it('should parse false in XML', async () => {
+        const fetchCbThis = () => Promise.resolve(<Response> {
+          body: streamifyString(`<?xml version="1.0"?>
 <sparql xmlns="http://www.w3.org/2005/sparql-results#">
   <boolean>false</boolean>
 </sparql>`),
-            headers: new Headers({
-              "Content-Type": SparqlEndpointFetcher.CONTENTTYPE_SPARQL_XML,
-            }),
-            ok: true,
-            status: 200,
-            statusText: "Ok!",
-          });
+          headers: new Headers({ 'Content-Type': SparqlEndpointFetcher.CONTENTTYPE_SPARQL_XML }),
+          ok: true,
+          status: 200,
+          statusText: 'Ok!',
+        });
         const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
-        return expect(await fetcherThis.fetchAsk(endpoint, queryAsk)).toEqual(
-          false
-        );
+        return expect(await fetcherThis.fetchAsk(endpoint, queryAsk)).toEqual(false);
       });
 
-      it("should reject on an invalid response", async () => {
-        const fetchCbThis = () =>
-          Promise.resolve(<Response>{
-            body: streamifyString(`{
+      it('should reject on an invalid response', async () => {
+        const fetchCbThis = () => Promise.resolve(<Response> {
+          body: streamifyString(`{
   "head": { }
 }`),
-            headers: new Headers({
-              "Content-Type": SparqlEndpointFetcher.CONTENTTYPE_SPARQL_JSON,
-            }),
-            ok: true,
-            status: 200,
-            statusText: "Ok!",
-          });
+          headers: new Headers({ 'Content-Type': SparqlEndpointFetcher.CONTENTTYPE_SPARQL_JSON }),
+          ok: true,
+          status: 200,
+          statusText: 'Ok!',
+        });
         const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
-        return expect(fetcherThis.fetchAsk(endpoint, queryAsk)).rejects.toEqual(
-          new Error("No valid ASK response was found.")
-        );
+        return expect(fetcherThis.fetchAsk(endpoint, queryAsk)).rejects
+          .toEqual(new Error('No valid ASK response was found.'));
       });
 
-      it("should reject on a server error", async () => {
-        const fetchCbThis = () =>
-          Promise.resolve(<Response>{
-            body: streamifyString("this is an invalid response"),
-            headers: new Headers({
-              "Content-Type": SparqlEndpointFetcher.CONTENTTYPE_SPARQL_JSON,
-            }),
-            ok: false,
-            status: 500,
-            statusText: "Error!",
-          });
+      it('should reject on a server error', async () => {
+        const fetchCbThis = () => Promise.resolve(<Response> {
+          body: streamifyString('this is an invalid response'),
+          headers: new Headers({ 'Content-Type': SparqlEndpointFetcher.CONTENTTYPE_SPARQL_JSON }),
+          ok: false,
+          status: 500,
+          statusText: 'Error!',
+        });
         const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
-        return expect(
-          fetcherThis.fetchAsk(endpoint, queryAsk)
-        ).rejects.toThrowError(
-          `Invalid SPARQL endpoint response from https://dbpedia.org/sparql (HTTP status 500):\nthis is an invalid response`
-        );
+        return expect(fetcherThis.fetchAsk(endpoint, queryAsk))
+          .rejects.toThrowError(`Invalid SPARQL endpoint response from https://dbpedia.org/sparql (HTTP status 500):\nthis is an invalid response`);
       });
 
-      it("should reject on an invalid content type", async () => {
-        const fetchCbThis = () =>
-          Promise.resolve(<Response>{
-            body: streamifyString(""),
-            headers: new Headers({ "Content-Type": "bla" }),
-            ok: true,
-            status: 200,
-            statusText: "Error!",
-          });
+      it('should reject on an invalid content type', async () => {
+        const fetchCbThis = () => Promise.resolve(<Response> {
+          body: streamifyString(''),
+          headers: new Headers({ 'Content-Type': 'bla' }),
+          ok: true,
+          status: 200,
+          statusText: 'Error!',
+        });
         const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
-        return expect(fetcherThis.fetchAsk(endpoint, queryAsk)).rejects.toEqual(
-          new Error("Unknown SPARQL results content type: bla")
-        );
+        return expect(fetcherThis.fetchAsk(endpoint, queryAsk)).rejects
+          .toEqual(new Error('Unknown SPARQL results content type: bla'));
       });
     });
 
-    describe("#fetchTriples", () => {
-      it("should parse triples", async () => {
-        const fetchCbThis = () =>
-          Promise.resolve(<Response>{
-            body: streamifyString(`
+    describe('#fetchTriples', () => {
+      it('should parse triples', async () => {
+        const fetchCbThis = () => Promise.resolve(<Response> {
+          body: streamifyString(`
 <http://ex.org/s> <http://ex.org/p> <http://ex.org/o1>, <http://ex.org/o2>.
 `),
-            headers: new Headers(),
-            ok: true,
-            status: 200,
-            statusText: "Ok!",
-          });
+          headers: new Headers(),
+          ok: true,
+          status: 200,
+          statusText: 'Ok!',
+        });
         const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
-        return expect(
-          await arrayifyStream(
-            await fetcherThis.fetchTriples(endpoint, queryConstruct)
-          )
-        ).toEqualRdfQuadArray([
-          DF.quad(
-            DF.namedNode("http://ex.org/s"),
-            DF.namedNode("http://ex.org/p"),
-            DF.namedNode("http://ex.org/o1")
-          ),
-          DF.quad(
-            DF.namedNode("http://ex.org/s"),
-            DF.namedNode("http://ex.org/p"),
-            DF.namedNode("http://ex.org/o2")
-          ),
-        ]);
+        return expect(await arrayifyStream(await fetcherThis.fetchTriples(endpoint, queryConstruct)))
+          .toEqualRdfQuadArray([
+            DF.quad(DF.namedNode('http://ex.org/s'), DF.namedNode('http://ex.org/p'), DF.namedNode('http://ex.org/o1')),
+            DF.quad(DF.namedNode('http://ex.org/s'), DF.namedNode('http://ex.org/p'), DF.namedNode('http://ex.org/o2')),
+          ]);
       });
     });
   });
+
 });

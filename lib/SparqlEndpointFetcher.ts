@@ -1,52 +1,40 @@
 import "cross-fetch/polyfill";
-import AbortController from "abort-controller";
+import AbortController from 'abort-controller';
 import * as RDF from "@rdfjs/types";
-import {
-  InsertDeleteOperation,
-  ManagementOperation,
-  Parser as SparqlParser,
-} from "sparqljs";
-import { ISettings, SparqlJsonParser } from "sparqljson-parse";
-import { SparqlXmlParser } from "sparqlxml-parse";
-import { Readable } from "stream";
-import * as stringifyStream from "stream-to-string";
-import { ReadableWebToNodeStream } from "readable-web-to-node-stream";
+import {InsertDeleteOperation, ManagementOperation, Parser as SparqlParser} from "sparqljs";
+import {ISettings, SparqlJsonParser} from "sparqljson-parse";
+import {SparqlXmlParser} from "sparqlxml-parse";
+import {Readable} from "stream";
+import * as stringifyStream from 'stream-to-string';
+import { ReadableWebToNodeStream } from 'readable-web-to-node-stream';
 
 // tslint:disable:no-var-requires
-const n3 = require("n3");
-const isStream = require("is-stream");
+const n3 = require('n3');
+const isStream = require('is-stream');
 
 /**
  * A SparqlEndpointFetcher can send queries to SPARQL endpoints,
  * and retrieve and parse the results.
  */
 export class SparqlEndpointFetcher {
-  public static CONTENTTYPE_SPARQL_JSON: string =
-    "application/sparql-results+json";
-  public static CONTENTTYPE_SPARQL_XML: string =
-    "application/sparql-results+xml";
-  public static CONTENTTYPE_SPARQL: string = `${SparqlEndpointFetcher.CONTENTTYPE_SPARQL_JSON};q=1.0,${SparqlEndpointFetcher.CONTENTTYPE_SPARQL_XML};q=0.7`;
-  public static CONTENTTYPE_TURTLE: string = "text/turtle";
 
-  public readonly method: "POST" | "GET";
+  public static CONTENTTYPE_SPARQL_JSON: string = 'application/sparql-results+json';
+  public static CONTENTTYPE_SPARQL_XML: string = 'application/sparql-results+xml';
+  public static CONTENTTYPE_SPARQL: string =
+    `${SparqlEndpointFetcher.CONTENTTYPE_SPARQL_JSON};q=1.0,${SparqlEndpointFetcher.CONTENTTYPE_SPARQL_XML};q=0.7`;
+  public static CONTENTTYPE_TURTLE: string = 'text/turtle';
+
+  public readonly method: 'POST' | 'GET';
   public readonly additionalUrlParams: URLSearchParams;
-  public readonly fetchCb?: (
-    input?: Request | string,
-    init?: RequestInit
-  ) => Promise<Response>;
-  public readonly sparqlParsers: {
-    [contentType: string]: ISparqlResultsParser;
-  };
+  public readonly fetchCb?: (input?: Request | string, init?: RequestInit) => Promise<Response>;
+  public readonly sparqlParsers: {[contentType: string]: ISparqlResultsParser};
   public readonly sparqlJsonParser: SparqlJsonParser;
   public readonly sparqlXmlParser: SparqlXmlParser;
-  public readonly timeout: number;
-  public readonly timeoutDefault: number = 5000;
 
   constructor(args?: ISparqlEndpointFetcherArgs) {
     args = args || {};
-    this.method = args.method || "POST";
-    this.additionalUrlParams =
-      args.additionalUrlParams || new URLSearchParams();
+    this.method = args.method || 'POST';
+    this.additionalUrlParams = args.additionalUrlParams || new URLSearchParams();
     this.fetchCb = args.fetch;
     this.sparqlJsonParser = new SparqlJsonParser(args);
     this.sparqlXmlParser = new SparqlXmlParser(args);
@@ -64,7 +52,6 @@ export class SparqlEndpointFetcher {
           this.sparqlXmlParser.parseXmlResultsStream(sparqlResponseStream),
       },
     };
-    this.timeout = args.timeout || this.timeoutDefault;
   }
 
   /**
@@ -75,15 +62,10 @@ export class SparqlEndpointFetcher {
    * @param {string} query A query.
    * @return {"SELECT" | "ASK" | "CONSTRUCT" | "UNKNOWN"} The query type.
    */
-  public getQueryType(
-    query: string
-  ): "SELECT" | "ASK" | "CONSTRUCT" | "UNKNOWN" {
+  public getQueryType(query: string): "SELECT" | "ASK" | "CONSTRUCT" | "UNKNOWN" {
     const parsedQuery = new SparqlParser().parse(query);
-    return parsedQuery.type === "query"
-      ? parsedQuery.queryType === "DESCRIBE"
-        ? "CONSTRUCT"
-        : parsedQuery.queryType
-      : "UNKNOWN";
+    return parsedQuery.type === 'query'
+      ? (parsedQuery.queryType === 'DESCRIBE' ? 'CONSTRUCT' : parsedQuery.queryType) : "UNKNOWN";
   }
 
   /**
@@ -94,14 +76,14 @@ export class SparqlEndpointFetcher {
    * @param {string} query An update query.
    * @return {'UNKNOWN' | UpdateTypes} The included update operations.
    */
-  public getUpdateTypes(query: string): "UNKNOWN" | IUpdateTypes {
+  public getUpdateTypes(query: string): 'UNKNOWN' | IUpdateTypes {
     const parsedQuery = new SparqlParser().parse(query);
 
-    if (parsedQuery.type === "update") {
+    if (parsedQuery.type === 'update') {
       const operations: IUpdateTypes = {};
 
       for (const update of parsedQuery.updates) {
-        if ("type" in update) {
+        if ('type' in update) {
           operations[update.type] = true;
         } else {
           operations[update.updateType] = true;
@@ -109,10 +91,11 @@ export class SparqlEndpointFetcher {
       }
 
       return operations;
+
     } else {
-      return "UNKNOWN";
-    }
-  }
+      return "UNKNOWN"
+    };
+  };
 
   /**
    * Send a SELECT query to the given endpoint URL and return the resulting bindings stream.
@@ -121,19 +104,12 @@ export class SparqlEndpointFetcher {
    * @param {string} query    A SPARQL query string.
    * @return {Promise<NodeJS.ReadableStream>} A stream of {@link IBindings}.
    */
-  public async fetchBindings(
-    endpoint: string,
-    query: string
-  ): Promise<NodeJS.ReadableStream> {
-    const [contentType, responseStream]: [string, NodeJS.ReadableStream] =
-      await this.fetchRawStream(
-        endpoint,
-        query,
-        SparqlEndpointFetcher.CONTENTTYPE_SPARQL
-      );
+  public async fetchBindings(endpoint: string, query: string): Promise<NodeJS.ReadableStream> {
+    const [contentType, responseStream]: [string, NodeJS.ReadableStream] = await this
+      .fetchRawStream(endpoint, query, SparqlEndpointFetcher.CONTENTTYPE_SPARQL);
     const parser: ISparqlResultsParser = this.sparqlParsers[contentType];
     if (!parser) {
-      throw new Error("Unknown SPARQL results content type: " + contentType);
+      throw new Error('Unknown SPARQL results content type: ' + contentType);
     }
     return parser.parseResultsStream(responseStream);
   }
@@ -145,15 +121,11 @@ export class SparqlEndpointFetcher {
    * @return {Promise<boolean>} A boolean resolving to the answer.
    */
   public async fetchAsk(endpoint: string, query: string): Promise<boolean> {
-    const [contentType, responseStream]: [string, NodeJS.ReadableStream] =
-      await this.fetchRawStream(
-        endpoint,
-        query,
-        SparqlEndpointFetcher.CONTENTTYPE_SPARQL
-      );
+    const [contentType, responseStream]: [string, NodeJS.ReadableStream] = await this
+      .fetchRawStream(endpoint, query, SparqlEndpointFetcher.CONTENTTYPE_SPARQL);
     const parser: ISparqlResultsParser = this.sparqlParsers[contentType];
     if (!parser) {
-      throw new Error("Unknown SPARQL results content type: " + contentType);
+      throw new Error('Unknown SPARQL results content type: ' + contentType);
     }
     return parser.parseBooleanStream(responseStream);
   }
@@ -164,20 +136,9 @@ export class SparqlEndpointFetcher {
    * @param {string} query    A SPARQL query string.
    * @return {Promise<Stream>} A stream of triples.
    */
-  public async fetchTriples(
-    endpoint: string,
-    query: string
-  ): Promise<Readable & RDF.Stream> {
-    const rawStream = (
-      await this.fetchRawStream(
-        endpoint,
-        query,
-        SparqlEndpointFetcher.CONTENTTYPE_TURTLE
-      )
-    )[1];
-    return rawStream.pipe(
-      new n3.StreamParser({ format: SparqlEndpointFetcher.CONTENTTYPE_TURTLE })
-    );
+  public async fetchTriples(endpoint: string, query: string): Promise<Readable & RDF.Stream> {
+    const rawStream = (await this.fetchRawStream(endpoint, query, SparqlEndpointFetcher.CONTENTTYPE_TURTLE))[1];
+    return rawStream.pipe(new n3.StreamParser({ format: SparqlEndpointFetcher.CONTENTTYPE_TURTLE }));
   }
 
   /**
@@ -189,13 +150,13 @@ export class SparqlEndpointFetcher {
   public async fetchUpdate(endpoint: string, query: string): Promise<void> {
     const abortController = new AbortController();
     const init: RequestInit = {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "content-type": "application/sparql-update",
+        'content-type': 'application/sparql-update',
       },
       body: query,
       signal: abortController.signal as NonNullable<RequestInit["signal"]>,
-    };
+    }
 
     await this.handleFetchCall(endpoint, init, { ignoreBody: true });
     abortController.abort();
@@ -211,29 +172,23 @@ export class SparqlEndpointFetcher {
    * @param {string} acceptHeader The HTTP accept to use.
    * @return {Promise<[string, NodeJS.ReadableStream]>} The content type and SPARQL endpoint response stream.
    */
-  public async fetchRawStream(
-    endpoint: string,
-    query: string,
-    acceptHeader: string
-  ): Promise<[string, NodeJS.ReadableStream]> {
-    let url: string =
-      this.method === "POST"
-        ? endpoint
-        : endpoint + "?query=" + encodeURIComponent(query);
+  public async fetchRawStream(endpoint: string, query: string, acceptHeader: string)
+    : Promise<[string, NodeJS.ReadableStream]> {
+    let url: string = this.method === 'POST' ? endpoint : endpoint + '?query=' + encodeURIComponent(query);
 
     // Initiate request
     const headers: Headers = new Headers();
     let body: URLSearchParams | undefined;
-    headers.append("Accept", acceptHeader);
-    if (this.method === "POST") {
-      headers.append("Content-Type", "application/x-www-form-urlencoded");
+    headers.append('Accept', acceptHeader);
+    if (this.method === 'POST') {
+      headers.append('Content-Type', 'application/x-www-form-urlencoded');
       body = new URLSearchParams();
-      body.set("query", query);
+      body.set('query', query);
       this.additionalUrlParams.forEach((value: string, key: string) => {
         body.set(key, value);
-      });
-      headers.append("Content-Length", body.toString().length.toString());
-    } else if (this.additionalUrlParams.toString() !== "") {
+      })
+      headers.append('Content-Length', body.toString().length.toString());
+    } else if (this.additionalUrlParams.toString() !== '') {
       url += `&${this.additionalUrlParams.toString()}`;
     }
 
@@ -251,15 +206,9 @@ export class SparqlEndpointFetcher {
   private async handleFetchCall(
     url: string,
     init: RequestInit,
-    options: { ignoreBody?: boolean } = {}
+    options: { ignoreBody?: boolean } = {},
   ): Promise<[string, NodeJS.ReadableStream]> {
-    const controller = new AbortController();
-    const id = setTimeout(() => controller.abort(), this.timeout);
-    init.signal = <AbortSignal>controller.signal;
-
     const httpResponse: Response = await (this.fetchCb || fetch)(url, init);
-
-    clearTimeout(id);
 
     let responseStream: NodeJS.ReadableStream | undefined;
     // Handle response body
@@ -267,31 +216,26 @@ export class SparqlEndpointFetcher {
       // Wrap WhatWG readable stream into a Node.js readable stream
       // If the body already is a Node.js stream (in the case of node-fetch), don't do explicit conversion.
       responseStream = isStream(httpResponse.body)
-        ? <NodeJS.ReadableStream>(<any>httpResponse.body)
-        : <NodeJS.ReadableStream>(
-            (<any>new ReadableWebToNodeStream(httpResponse.body))
-          );
+        ? <NodeJS.ReadableStream> <any> httpResponse.body : <NodeJS.ReadableStream> <any> new ReadableWebToNodeStream(httpResponse.body);
     }
 
     // Determine the content type and emit it to the stream
-    let contentType = httpResponse.headers.get("Content-Type") || "";
-    if (contentType.indexOf(";") > 0) {
-      contentType = contentType.substr(0, contentType.indexOf(";"));
+    let contentType = httpResponse.headers.get('Content-Type') || '';
+    if (contentType.indexOf(';') > 0) {
+      contentType = contentType.substr(0, contentType.indexOf(';'));
     }
 
     // Emit an error if the server returned an invalid response
     if (!httpResponse.ok) {
       const simpleUrl = /^[^?]*/u.exec(url)![0];
-      let bodyString = "empty response";
+      let bodyString = 'empty response';
       if (responseStream) {
         bodyString = await stringifyStream(responseStream);
       }
-      throw new Error(
-        `Invalid SPARQL endpoint response from ${simpleUrl} (HTTP status ${httpResponse.status}):\n${bodyString}`
-      );
+      throw new Error(`Invalid SPARQL endpoint response from ${simpleUrl} (HTTP status ${httpResponse.status}):\n${bodyString}`);
     }
 
-    return [contentType, <any>responseStream];
+    return [ contentType, <any> responseStream ];
   }
 }
 
@@ -300,9 +244,8 @@ export interface ISparqlEndpointFetcherArgs extends ISettings {
    * A custom HTTP method for issuing (non-update) queries, defaults to POST.
    * Update queries are always issued via POST.
    */
-  method?: "POST" | "GET";
+  method?: 'POST' | 'GET';
   additionalUrlParams?: URLSearchParams;
-  timeout?: number;
   /**
    * A custom fetch function.
    */
@@ -314,16 +257,10 @@ export interface IBindings {
 }
 
 export interface ISparqlResultsParser {
-  parseResultsStream(
-    sparqlResponseStream: NodeJS.ReadableStream
-  ): NodeJS.ReadableStream;
-  parseBooleanStream(
-    sparqlResponseStream: NodeJS.ReadableStream
-  ): Promise<boolean>;
+  parseResultsStream(sparqlResponseStream: NodeJS.ReadableStream): NodeJS.ReadableStream;
+  parseBooleanStream(sparqlResponseStream: NodeJS.ReadableStream): Promise<boolean>;
 }
 
 export type IUpdateTypes = {
-  [K in
-    | ManagementOperation["type"]
-    | InsertDeleteOperation["updateType"]]?: boolean;
+  [K in ManagementOperation['type'] | InsertDeleteOperation['updateType']]?: boolean;
 };
