@@ -627,22 +627,19 @@ describe('SparqlEndpointFetcher', () => {
     describe('#timeout', () => {
       beforeAll(() => jest.useFakeTimers());
       afterAll(() => jest.useRealTimers());
-      it("should handle timeout", async () => {
-        const fetchCbThis = jest.fn(() => Promise.resolve(new Response(streamifyString('dummy'))));
 
-        const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
+      it("should handle timeout", async () => {
+        const fetcherThis = new SparqlEndpointFetcher({ });
+
+        const result = fetcherThis.fetchRawStream(
+          endpoint,
+          querySelect,
+          "myacceptheader"
+        )
 
         jest.runAllTimers();
 
-        return expect(
-          (
-            await fetcherThis.fetchRawStream(
-              endpoint,
-              querySelect,
-              "myacceptheader"
-            )
-          )[0]
-        ).toEqual("");
+        await expect(result).rejects.toThrow("The operation was aborted.");
       });
     })
   });
