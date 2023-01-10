@@ -31,7 +31,6 @@ export class SparqlEndpointFetcher {
   public readonly sparqlJsonParser: SparqlJsonParser;
   public readonly sparqlXmlParser: SparqlXmlParser;
   public readonly timeout: number;
-  public readonly defaultTimeout: number = 5000;
 
   constructor(args?: ISparqlEndpointFetcherArgs) {
     args = args || {};
@@ -54,7 +53,7 @@ export class SparqlEndpointFetcher {
           this.sparqlXmlParser.parseXmlResultsStream(sparqlResponseStream),
       },
     };
-    this.timeout = args.timeout || this.defaultTimeout;
+    this.timeout = args.timeout || 5000;
   }
 
   /**
