@@ -213,28 +213,14 @@ describe("SparqlEndpointFetcher", () => {
         const body = new URLSearchParams();
         body.set("query", querySelect);
         return expect(fetchCbThis).toBeCalledWith(
-          "https://dbpedia.org/sparql",
-          expect.objectContaining({
-            headers,
-            method: "POST",
-            body,
-          })
-        );
+          'https://dbpedia.org/sparql', expect.objectContaining({ headers, method: 'POST', body }));
       });
 
-      it("should pass the correct URL and HTTP headers with additional URL parameters", () => {
-        const fetchCbThis = jest.fn(() =>
-          Promise.resolve(new Response(streamifyString("dummy")))
-        );
-        const additionalUrlParams = new URLSearchParams({
-          infer: "true",
-          sameAs: "false",
-        });
-        const fetcherThis = new SparqlEndpointFetcher({
-          fetch: fetchCbThis,
-          additionalUrlParams,
-        });
-        fetcherThis.fetchRawStream(endpoint, querySelect, "myacceptheader");
+      it('should pass the correct URL and HTTP headers with additional URL parameters', () => {
+        const fetchCbThis = jest.fn(() => Promise.resolve(new Response(streamifyString('dummy'))));
+        const additionalUrlParams = new URLSearchParams({'infer': 'true', 'sameAs': 'false'});
+        const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis, additionalUrlParams });
+        fetcherThis.fetchRawStream(endpoint, querySelect, 'myacceptheader');
         const headers: Headers = new Headers();
         headers.append("Accept", "myacceptheader");
         headers.append("Content-Type", "application/x-www-form-urlencoded");
@@ -245,9 +231,7 @@ describe("SparqlEndpointFetcher", () => {
           body.set(key, String(value));
         });
         return expect(fetchCbThis).toBeCalledWith(
-          "https://dbpedia.org/sparql",
-          expect.objectContaining({ headers, method: "POST", body })
-        );
+          'https://dbpedia.org/sparql', expect.objectContaining({ headers, method: 'POST', body }));
       });
 
       it("should pass the correct URL and HTTP headers when using HTTP GET", () => {
@@ -262,9 +246,7 @@ describe("SparqlEndpointFetcher", () => {
         const headers: Headers = new Headers();
         headers.append("Accept", "myacceptheader");
         return expect(fetchCbThis).toBeCalledWith(
-          "https://dbpedia.org/sparql?query=SELECT%20*%20WHERE%20%7B%20%3Fs%20%3Fp%20%3Fo%20%7D",
-          expect.objectContaining({ headers, method: "GET" })
-        );
+          'https://dbpedia.org/sparql?query=SELECT%20*%20WHERE%20%7B%20%3Fs%20%3Fp%20%3Fo%20%7D', expect.objectContaining({ headers, method: 'GET' }));
       });
 
       it("should pass the correct URL and HTTP headers when using HTTP GET with additional URL parameters", () => {
@@ -284,20 +266,17 @@ describe("SparqlEndpointFetcher", () => {
         const headers: Headers = new Headers();
         headers.append("Accept", "myacceptheader");
         return expect(fetchCbThis).toBeCalledWith(
-          "https://dbpedia.org/sparql?query=SELECT%20*%20WHERE%20%7B%20%3Fs%20%3Fp%20%3Fo%20%7D&infer=true&sameAs=false",
-          expect.objectContaining({ headers, method: "GET" })
-        );
+          'https://dbpedia.org/sparql?query=SELECT%20*%20WHERE%20%7B%20%3Fs%20%3Fp%20%3Fo%20%7D&infer=true&sameAs=false', expect.objectContaining({ headers, method: 'GET' }));
       });
 
-      it("should reject for an invalid server response", async () => {
-        const fetchCbThis = () =>
-          Promise.resolve(<Response>{
-            body: streamifyString("this is an invalid response"),
-            headers: new Headers(),
-            ok: false,
-            status: 500,
-            statusText: "Error!",
-          });
+      it('should reject for an invalid server response', async () => {
+        const fetchCbThis = () => Promise.resolve(<Response> {
+          body: streamifyString('this is an invalid response'),
+          headers: new Headers(),
+          ok: false,
+          status: 500,
+          statusText: 'Error!',
+        });
         const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
         return expect(
           fetcherThis.fetchRawStream(endpoint, querySelect, "myacceptheader")
