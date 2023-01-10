@@ -30,6 +30,8 @@ export class SparqlEndpointFetcher {
   public readonly sparqlParsers: {[contentType: string]: ISparqlResultsParser};
   public readonly sparqlJsonParser: SparqlJsonParser;
   public readonly sparqlXmlParser: SparqlXmlParser;
+  public readonly timeout: number;
+  public readonly defaultTimeout: number = 5000;
 
   constructor(args?: ISparqlEndpointFetcherArgs) {
     args = args || {};
@@ -52,6 +54,7 @@ export class SparqlEndpointFetcher {
           this.sparqlXmlParser.parseXmlResultsStream(sparqlResponseStream),
       },
     };
+    this.timeout = args.timeout || this.defaultTimeout;
   }
 
   /**
@@ -246,6 +249,7 @@ export interface ISparqlEndpointFetcherArgs extends ISettings {
    */
   method?: 'POST' | 'GET';
   additionalUrlParams?: URLSearchParams;
+  timeout?: number;
   /**
    * A custom fetch function.
    */
