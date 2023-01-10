@@ -253,9 +253,9 @@ export class SparqlEndpointFetcher {
     init: RequestInit,
     options: { ignoreBody?: boolean } = {}
   ): Promise<[string, NodeJS.ReadableStream]> {
-    let controller = new AbortController();
-    let id = setTimeout(() => controller.abort(), this.timeout);
-    init.signal = controller.signal;
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), this.timeout);
+    init.signal = <AbortSignal>controller.signal;
 
     const httpResponse: Response = await (this.fetchCb || fetch)(url, init);
 
