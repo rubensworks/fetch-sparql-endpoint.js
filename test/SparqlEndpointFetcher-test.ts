@@ -623,6 +623,27 @@ describe('SparqlEndpointFetcher', () => {
           ]);
       });
     });
-  });
 
+    describe('#timeout', () => {
+      beforeAll(() => jest.useFakeTimers());
+      afterAll(() => jest.useRealTimers());
+      it("should handle timeout", async () => {
+        const fetchCbThis = jest.fn(() => Promise.resolve(new Response(streamifyString('dummy'))));
+
+        const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
+
+        jest.runAllTimers();
+
+        return expect(
+          (
+            await fetcherThis.fetchRawStream(
+              endpoint,
+              querySelect,
+              "myacceptheader"
+            )
+          )[0]
+        ).toEqual("");
+      });
+    })
+  });
 });
