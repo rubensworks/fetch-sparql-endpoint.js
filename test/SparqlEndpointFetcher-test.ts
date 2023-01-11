@@ -183,7 +183,7 @@ describe('SparqlEndpointFetcher', () => {
         const body = new URLSearchParams();
         body.set('query', querySelect);
         return expect(fetchCbThis).toBeCalledWith(
-          'https://dbpedia.org/sparql', { headers, method: 'POST', body });
+          'https://dbpedia.org/sparql', expect.objectContaining({ headers, method: 'POST', body }));
       });
 
       it('should pass the correct URL and HTTP headers with additional URL parameters', () => {
@@ -201,7 +201,7 @@ describe('SparqlEndpointFetcher', () => {
           body.set(key, String(value));
         })
         return expect(fetchCbThis).toBeCalledWith(
-          'https://dbpedia.org/sparql', { headers, method: 'POST', body });
+          'https://dbpedia.org/sparql', expect.objectContaining({ headers, method: 'POST', body }));
       });
 
       it('should pass the correct URL and HTTP headers when using HTTP GET', () => {
@@ -211,7 +211,7 @@ describe('SparqlEndpointFetcher', () => {
         const headers: Headers = new Headers();
         headers.append('Accept', 'myacceptheader');
         return expect(fetchCbThis).toBeCalledWith(
-          'https://dbpedia.org/sparql?query=SELECT%20*%20WHERE%20%7B%20%3Fs%20%3Fp%20%3Fo%20%7D', { headers, method: 'GET' });
+          'https://dbpedia.org/sparql?query=SELECT%20*%20WHERE%20%7B%20%3Fs%20%3Fp%20%3Fo%20%7D', expect.objectContaining({ headers, method: 'GET' }));
       });
 
       it('should pass the correct URL and HTTP headers when using HTTP GET with additional URL parameters', () => {
@@ -222,7 +222,7 @@ describe('SparqlEndpointFetcher', () => {
         const headers: Headers = new Headers();
         headers.append('Accept', 'myacceptheader');
         return expect(fetchCbThis).toBeCalledWith(
-          'https://dbpedia.org/sparql?query=SELECT%20*%20WHERE%20%7B%20%3Fs%20%3Fp%20%3Fo%20%7D&infer=true&sameAs=false', { headers, method: 'GET' });
+          'https://dbpedia.org/sparql?query=SELECT%20*%20WHERE%20%7B%20%3Fs%20%3Fp%20%3Fo%20%7D&infer=true&sameAs=false', expect.objectContaining({ headers, method: 'GET' }));
       });
 
       it('should reject for an invalid server response', async () => {
@@ -623,6 +623,24 @@ describe('SparqlEndpointFetcher', () => {
           ]);
       });
     });
-  });
 
+    describe('#timeout', () => {
+      beforeAll(() => jest.useFakeTimers());
+      afterAll(() => jest.useRealTimers());
+
+      it("should handle timeout", async () => {
+        const fetcherThis = new SparqlEndpointFetcher({ });
+
+        const result = fetcherThis.fetchRawStream(
+          endpoint,
+          querySelect,
+          "myacceptheader"
+        )
+
+        jest.runAllTimers();
+
+        await expect(result).rejects.toThrow();
+      });
+    })
+  });
 });

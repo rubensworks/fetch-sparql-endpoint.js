@@ -30,6 +30,7 @@ export class SparqlEndpointFetcher {
   public readonly sparqlParsers: {[contentType: string]: ISparqlResultsParser};
   public readonly sparqlJsonParser: SparqlJsonParser;
   public readonly sparqlXmlParser: SparqlXmlParser;
+  public readonly timeout: number;
 
   constructor(args?: ISparqlEndpointFetcherArgs) {
     args = args || {};
@@ -52,6 +53,7 @@ export class SparqlEndpointFetcher {
           this.sparqlXmlParser.parseXmlResultsStream(sparqlResponseStream),
       },
     };
+    this.timeout = args.timeout || 5000;
   }
 
   /**
@@ -208,7 +210,12 @@ export class SparqlEndpointFetcher {
     init: RequestInit,
     options: { ignoreBody?: boolean } = {},
   ): Promise<[string, NodeJS.ReadableStream]> {
+    const controller = new AbortController();
+    init.signal = <AbortSignal>controller.signal;
+
+    const id = setTimeout(() => controller.abort(), this.timeout);
     const httpResponse: Response = await (this.fetchCb || fetch)(url, init);
+    clearTimeout(id);
 
     let responseStream: NodeJS.ReadableStream | undefined;
     // Handle response body
@@ -246,6 +253,7 @@ export interface ISparqlEndpointFetcherArgs extends ISettings {
    */
   method?: 'POST' | 'GET';
   additionalUrlParams?: URLSearchParams;
+  timeout?: number;
   /**
    * A custom fetch function.
    */
