@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v3.2.0"></a>
+## [v3.2.0](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v3.1.1...v3.2.0) - 2023-01-11
+
+### Added
+* [Add timeout option](https://github.com/rubensworks/fetch-sparql-endpoint.js/commit/f2cbb2daa5e9ce16cdf36a4536a4c2d35ec122cc)
+
 <a name="v3.1.1"></a>
 ## [v3.1.1](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v3.1.0...v3.1.1) - 2022-11-09
 
