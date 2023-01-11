@@ -44,7 +44,8 @@ const myFetcher = new SparqlEndpointFetcher({
   additionalUrlParams: new URLSearchParams({'infer': 'true', 'sameAs': 'false'});  // A set of additional parameters that well be added to fetchAsk, fetchBindings & fetchTriples requests
   fetch: fetch,                             // A custom fetch-API-supporting function
   dataFactory: DataFactory,                 // A custom RDFJS data factory
-  prefixVariableQuestionMark: false         // If variable names in bindings should be prefixed with '?', defaults to false
+  prefixVariableQuestionMark: false,        // If variable names in bindings should be prefixed with '?', defaults to false
+  timeout: 5000                             // Timeout for setting up server connection (Once a connection has been made, and the response is being parsed, the timeout does not apply anymore).
 });
 ```
 
