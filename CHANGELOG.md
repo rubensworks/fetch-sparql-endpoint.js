@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v3.2.1"></a>
+## [v3.2.1](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v3.2.0...v3.2.1) - 2023-02-09
+
+### Fixed
+* [Fix timeout set to 5 seconds by default](https://github.com/rubensworks/fetch-sparql-endpoint.js/commit/1b087d798060cdc8035146b130fca23be6c32117)
+
 <a name="v3.2.0"></a>
 ## [v3.2.0](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v3.1.1...v3.2.0) - 2023-01-11
 
