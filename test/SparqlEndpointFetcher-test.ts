@@ -624,12 +624,12 @@ describe('SparqlEndpointFetcher', () => {
       });
     });
 
-    describe('#timeout', () => {
+    describe('with a timeout', () => {
       beforeAll(() => jest.useFakeTimers());
       afterAll(() => jest.useRealTimers());
 
-      it("should handle timeout", async () => {
-        const fetcherThis = new SparqlEndpointFetcher({ });
+      it("should handle the timeout", async () => {
+        const fetcherThis = new SparqlEndpointFetcher({ timeout: 5_000 });
 
         const result = fetcherThis.fetchRawStream(
           endpoint,

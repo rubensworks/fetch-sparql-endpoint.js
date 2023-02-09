@@ -53,7 +53,7 @@ export class SparqlEndpointFetcher {
           this.sparqlXmlParser.parseXmlResultsStream(sparqlResponseStream),
       },
     };
-    this.timeout = args.timeout || 5000;
+    this.timeout = args.timeout;
   }
 
   /**
@@ -210,12 +210,14 @@ export class SparqlEndpointFetcher {
     init: RequestInit,
     options: { ignoreBody?: boolean } = {},
   ): Promise<[string, NodeJS.ReadableStream]> {
-    const controller = new AbortController();
-    init.signal = <AbortSignal>controller.signal;
-
-    const id = setTimeout(() => controller.abort(), this.timeout);
+    let timeoutId;
+    if (this.timeout) {
+      const controller = new AbortController();
+      init.signal = <AbortSignal>controller.signal;
+      timeoutId = setTimeout(() => controller.abort(), this.timeout);
+    }
     const httpResponse: Response = await (this.fetchCb || fetch)(url, init);
-    clearTimeout(id);
+    clearTimeout(timeoutId);
 
     let responseStream: NodeJS.ReadableStream | undefined;
     // Handle response body
