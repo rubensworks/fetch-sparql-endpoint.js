@@ -3349,9 +3349,9 @@ sparqljson-parse@^2.1.0:
     readable-stream "^4.0.0"
 
 sparqlxml-parse@^2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/sparqlxml-parse/-/sparqlxml-parse-2.0.0.tgz#670ed1d5c3c97306636cd27c4b4583b405d0f659"
-  integrity sha512-EUsIM/N47IuYxGDO0xBE8sYp7hnXrZI3K+bawPQVjTY4Kfnznnh/muggtPSMmyFKN+YjJbnhfPxHyJx/MXbfuw==
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/sparqlxml-parse/-/sparqlxml-parse-2.1.0.tgz#8486ac5c25efb3386eb4dea6a7af855d2b66c3d4"
+  integrity sha512-JAQ526Bz07FQ6dbPMwVQBaOP55bc91Jnp/KCTPoTQa7JQcmxjKwaSMhlKNAQ+ChEzRt76tWhQkmutwPzd4YRmQ==
   dependencies:
     "@rdfjs/types" "*"
     "@types/readable-stream" "^2.3.13"
