@@ -26,6 +26,7 @@ export class SparqlEndpointFetcher {
 
   public readonly method: 'POST' | 'GET';
   public readonly additionalUrlParams: URLSearchParams;
+  public readonly defaultHeaders: Headers;
   public readonly fetchCb?: (input?: Request | string, init?: RequestInit) => Promise<Response>;
   public readonly sparqlParsers: {[contentType: string]: ISparqlResultsParser};
   public readonly sparqlJsonParser: SparqlJsonParser;
@@ -36,6 +37,7 @@ export class SparqlEndpointFetcher {
     args = args || {};
     this.method = args.method || 'POST';
     this.additionalUrlParams = args.additionalUrlParams || new URLSearchParams();
+    this.defaultHeaders = args.defaultHeaders || new Headers()
     this.fetchCb = args.fetch;
     this.sparqlJsonParser = new SparqlJsonParser(args);
     this.sparqlXmlParser = new SparqlXmlParser(args);
@@ -154,6 +156,7 @@ export class SparqlEndpointFetcher {
     const init: RequestInit = {
       method: 'POST',
       headers: {
+        ...this.defaultHeaders,
         'content-type': 'application/sparql-update',
       },
       body: query,
@@ -179,7 +182,7 @@ export class SparqlEndpointFetcher {
     let url: string = this.method === 'POST' ? endpoint : endpoint + '?query=' + encodeURIComponent(query);
 
     // Initiate request
-    const headers: Headers = new Headers();
+    const headers: Headers = new Headers(this.defaultHeaders);
     let body: URLSearchParams | undefined;
     headers.append('Accept', acceptHeader);
     if (this.method === 'POST') {
@@ -256,6 +259,7 @@ export interface ISparqlEndpointFetcherArgs extends ISettings {
   method?: 'POST' | 'GET';
   additionalUrlParams?: URLSearchParams;
   timeout?: number;
+  defaultHeaders?: Headers;
   /**
    * A custom fetch function.
    */
