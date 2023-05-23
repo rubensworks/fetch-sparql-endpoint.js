@@ -42,6 +42,7 @@ Optionally, you can pass an options object with the following optional entries:
 const myFetcher = new SparqlEndpointFetcher({
   method: 'POST',                           // A custom HTTP method for issuing (non-update) queries, defaults to POST. Update queries are always issued via POST.
   additionalUrlParams: new URLSearchParams({'infer': 'true', 'sameAs': 'false'});  // A set of additional parameters that well be added to fetchAsk, fetchBindings & fetchTriples requests
+  defaultHeaders: new Headers(),            // Optional default headers that will be included in each request
   fetch: fetch,                             // A custom fetch-API-supporting function
   dataFactory: DataFactory,                 // A custom RDFJS data factory
   prefixVariableQuestionMark: false,        // If variable names in bindings should be prefixed with '?', defaults to false
