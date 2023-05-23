@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v3.3.0"></a>
+## [v3.3.0](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v3.2.1...v3.3.0) - 2023-05-23
+
+### Added
+* [Allow default headers to be passed, Closes #53](https://github.com/rubensworks/fetch-sparql-endpoint.js/commit/38437b1c6b6c5748941aa837f5e1952a17685564)
+
 <a name="v3.2.1"></a>
 ## [v3.2.1](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v3.2.0...v3.2.1) - 2023-02-09
 
