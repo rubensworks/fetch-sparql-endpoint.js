@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v3.3.2"></a>
+## [v3.3.2](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v3.3.1...v3.3.2) - 2023-06-05
+
+### Fixed
+* [Fix invalid symbols ending up in raw headers init objects](https://github.com/rubensworks/fetch-sparql-endpoint.js/commit/2ffc98f8e07840cd2ffad08fb574d03f8415f2fb)
+
 <a name="v3.3.1"></a>
 ## [v3.3.1](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v3.3.0...v3.3.1) - 2023-06-05
 
