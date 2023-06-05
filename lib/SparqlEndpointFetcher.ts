@@ -153,10 +153,14 @@ export class SparqlEndpointFetcher {
    */
   public async fetchUpdate(endpoint: string, query: string): Promise<void> {
     const abortController = new AbortController();
+    const defaultHeadersRaw: Record<string, string> = {};
+    this.defaultHeaders.forEach((value, key) => {
+      defaultHeadersRaw[key] = value;
+    });
     const init: RequestInit = {
       method: 'POST',
       headers: {
-        ...this.defaultHeaders,
+        ...defaultHeadersRaw,
         'content-type': 'application/sparql-update',
       },
       body: query,
