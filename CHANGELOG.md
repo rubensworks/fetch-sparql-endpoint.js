@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v3.3.1"></a>
+## [v3.3.1](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v3.3.0...v3.3.1) - 2023-06-05
+
+### Changed
+* [Migrate to @rubensworks/saxes](https://github.com/rubensworks/fetch-sparql-endpoint.js/commit/e70b7186a814c803a9fd916aeeedf030dd1e9e93)
+
 <a name="v3.3.0"></a>
 ## [v3.3.0](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v3.2.1...v3.3.0) - 2023-05-23
 
