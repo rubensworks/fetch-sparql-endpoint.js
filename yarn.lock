@@ -558,6 +558,13 @@
   dependencies:
     "@types/node" "*"
 
+"@rubensworks/saxes@^6.0.1":
+  version "6.0.1"
+  resolved "https://registry.yarnpkg.com/@rubensworks/saxes/-/saxes-6.0.1.tgz#2f394548493a415c522d2bfd4f12fad67c9a6317"
+  integrity sha512-UW4OTIsOtJ5KSXo2Tchi4lhZqu+tlHrOAs4nNti7CrtB53kAZl3/hyrTi6HkMihxdbDM6m2Zc3swc/ZewEe1xw==
+  dependencies:
+    xmlchars "^2.2.0"
+
 "@sinclair/typebox@^0.23.3":
   version "0.23.5"
   resolved "https://registry.yarnpkg.com/@sinclair/typebox/-/typebox-0.23.5.tgz#93f7b9f4e3285a7a9ade7557d9a8d36809cbc47d"
@@ -3222,13 +3229,6 @@ safer-buffer@^2.0.2, safer-buffer@^2.1.0, safer-buffer@~2.1.0:
   resolved "https://registry.yarnpkg.com/safer-buffer/-/safer-buffer-2.1.2.tgz#44fa161b0187b9549dd84bb91802f9bd8385cd6a"
   integrity sha512-YZo3K82SD7Riyi0E1EQPojLz7kpepnSQI9IyPbHHg1XXXevb5dJI7tpyN2ADxGcQbHG7vcyRHk0cbwqcQriUtg==
 
-saxes@^6.0.0:
-  version "6.0.0"
-  resolved "https://registry.yarnpkg.com/saxes/-/saxes-6.0.0.tgz#fe5b4a4768df4f14a201b1ba6a65c1f3d9988cc5"
-  integrity sha512-xAg7SOnEhrm5zI3puOOKyy1OMcMlIJZYNJY7xLBwSze0UjhPLnWfj2GF2EpT0jmzaJKIWKHLsaSSajf35bcYnA==
-  dependencies:
-    xmlchars "^2.2.0"
-
 schema-utils@^3.1.0, schema-utils@^3.1.1:
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/schema-utils/-/schema-utils-3.1.1.tgz#bc74c4b6b6995c1d88f76a8b77bea7219e0c8281"
@@ -3348,17 +3348,17 @@ sparqljson-parse@^2.1.0:
     rdf-data-factory "^1.1.0"
     readable-stream "^4.0.0"
 
-sparqlxml-parse@^2.0.0:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/sparqlxml-parse/-/sparqlxml-parse-2.1.0.tgz#8486ac5c25efb3386eb4dea6a7af855d2b66c3d4"
-  integrity sha512-JAQ526Bz07FQ6dbPMwVQBaOP55bc91Jnp/KCTPoTQa7JQcmxjKwaSMhlKNAQ+ChEzRt76tWhQkmutwPzd4YRmQ==
+sparqlxml-parse@^2.1.1:
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/sparqlxml-parse/-/sparqlxml-parse-2.1.1.tgz#594a3bf8893bb29062cf1be4b0809937741b22f4"
+  integrity sha512-71sltShF6gDAzuKWEHNeij7r0Mv5VqRrvJing6W4WHJ12GRe6+t1IRTv6MeqxYN3XJmKevs7B3HCBUo7wceeJQ==
   dependencies:
     "@rdfjs/types" "*"
+    "@rubensworks/saxes" "^6.0.1"
     "@types/readable-stream" "^2.3.13"
     buffer "^6.0.3"
     rdf-data-factory "^1.1.0"
     readable-stream "^4.0.0"
-    saxes "^6.0.0"
 
 spawn-sync@^1.0.15:
   version "1.0.15"
