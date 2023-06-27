@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v3.3.3"></a>
+## [v3.3.3](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v3.3.2...v3.3.3) - 2023-06-27
+
+### Fixed
+* [Bump to sparqljson that can parse quoted triples](https://github.com/rubensworks/fetch-sparql-endpoint.js/commit/397936e8002c1639fa0e6c759963f37ebd9b9a95)
+
 <a name="v3.3.2"></a>
 ## [v3.3.2](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v3.3.1...v3.3.2) - 2023-06-05
 
