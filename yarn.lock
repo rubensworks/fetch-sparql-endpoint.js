@@ -284,6 +284,13 @@
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
+"@bergos/jsonparse@^1.4.1":
+  version "1.4.1"
+  resolved "https://registry.yarnpkg.com/@bergos/jsonparse/-/jsonparse-1.4.1.tgz#560e7125f65d0ad6b96dfe1c0d5da3115b9f8c59"
+  integrity sha512-vXIT0nzZGX/+yMD5bx2VhTzc92H55tPoehh1BW/FZHOndWGFddrH3MAfdx39FRc7irABirW6EQaGxIJYV6CGuA==
+  dependencies:
+    buffer "^6.0.3"
+
 "@discoveryjs/json-ext@^0.5.0":
   version "0.5.7"
   resolved "https://registry.yarnpkg.com/@discoveryjs/json-ext/-/json-ext-0.5.7.tgz#1d572bfbbe14b7704e0ba0f39b74815b84870d70"
@@ -2433,11 +2440,6 @@ json5@^2.2.1:
   resolved "https://registry.yarnpkg.com/json5/-/json5-2.2.1.tgz#655d50ed1e6f95ad1a3caababd2b0efda10b395c"
   integrity sha512-1hqLFMSrGHRHxav9q9gNjJ5EXznIxGVO09xQRrwplcS8qs28pZ8s8hupZAmqDwZUmVZ2Qb2jnyPOWcDH8m8dlA==
 
-jsonparse@^1.3.1:
-  version "1.3.1"
-  resolved "https://registry.yarnpkg.com/jsonparse/-/jsonparse-1.3.1.tgz#3f4dae4a91fac315f71062f8521cc239f1366280"
-  integrity sha512-POQXvpdL69+CluYsillJ7SUhKvytYjW9vG/GKpnf+xP8UWgYEM/RaMzHHofbALDiKbbP1W8UEYmgGl39WkPZsg==
-
 jsprim@^1.2.2:
   version "1.4.2"
   resolved "https://registry.yarnpkg.com/jsprim/-/jsprim-1.4.2.tgz#712c65533a15c878ba59e9ed5f0e26d5b77c5feb"
@@ -3336,15 +3338,14 @@ sparqljs@^3.1.2:
   dependencies:
     rdf-data-factory "^1.1.1"
 
-sparqljson-parse@^2.1.0:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/sparqljson-parse/-/sparqljson-parse-2.1.0.tgz#202a956b07b362a15a605d9aedd8478d947d03fe"
-  integrity sha512-JKyoDNDR9xrJwR6x6N41UWfER6kfeirE9BRBHdSFSfQF3eF3pxpuUTcJ6QGwHQ4wC/JsQdG/4OGmzkuk1B+8gg==
+sparqljson-parse@^2.2.0:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/sparqljson-parse/-/sparqljson-parse-2.2.0.tgz#58c788e896f7d2c0d3079452d8812943049d4a7e"
+  integrity sha512-2TfvNvUsaJyWfCrq3ExdDdbF9LBLzIUCricg+D1YCYbbmyTzscgCtRk4KcIyJF178DtfCt4BkKzbKl8IXMHp8w==
   dependencies:
+    "@bergos/jsonparse" "^1.4.1"
     "@rdfjs/types" "*"
     "@types/readable-stream" "^2.3.13"
-    buffer "^6.0.3"
-    jsonparse "^1.3.1"
     rdf-data-factory "^1.1.0"
     readable-stream "^4.0.0"
 

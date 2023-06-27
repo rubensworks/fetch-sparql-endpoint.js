@@ -463,21 +463,6 @@ describe('SparqlEndpointFetcher', () => {
           .toEqual([]);
       });
 
-      it('should reject no results', async () => {
-        const fetchCbThis = () => Promise.resolve(<Response> {
-          body: streamifyString(`{
-  "head": { "vars": [ "p" ] }
-}`),
-          headers: new Headers({ 'Content-Type': SparqlEndpointFetcher.CONTENTTYPE_SPARQL_JSON }),
-          ok: true,
-          status: 200,
-          statusText: 'Ok!',
-        });
-        const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
-        return expect(arrayifyStream(await fetcherThis.fetchBindings(endpoint, querySelect)))
-          .rejects.toThrow('No valid SPARQL query results were found.');
-      });
-
       it('should reject on a server error', async () => {
         const fetchCbThis = () => Promise.resolve(<Response> {
           body: streamifyString('this is an invalid response'),
