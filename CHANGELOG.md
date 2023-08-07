@@ -1,6 +1,13 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v4.0.0"></a>
+## [v4.0.0](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v3.3.3...v4.0.0) - 2023-08-07
+
+### Changed
+* [Make fetch input argument required](https://github.com/rubensworks/fetch-sparql-endpoint.js/commit/830d1dfbd53f618bfb408e28f2e5f57b5185c5a7)
+    Strictly, this is a breaking change. But in practise, nothing significant changes.
+
 <a name="v3.3.3"></a>
 ## [v3.3.3](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v3.3.2...v3.3.3) - 2023-06-27
 
