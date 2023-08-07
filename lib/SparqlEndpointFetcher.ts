@@ -27,7 +27,7 @@ export class SparqlEndpointFetcher {
   public readonly method: 'POST' | 'GET';
   public readonly additionalUrlParams: URLSearchParams;
   public readonly defaultHeaders: Headers;
-  public readonly fetchCb?: (input?: Request | string, init?: RequestInit) => Promise<Response>;
+  public readonly fetchCb?: (input: Request | string, init?: RequestInit) => Promise<Response>;
   public readonly sparqlParsers: {[contentType: string]: ISparqlResultsParser};
   public readonly sparqlJsonParser: SparqlJsonParser;
   public readonly sparqlXmlParser: SparqlXmlParser;
@@ -267,7 +267,7 @@ export interface ISparqlEndpointFetcherArgs extends ISettings {
   /**
    * A custom fetch function.
    */
-  fetch?: (input?: Request | string, init?: RequestInit) => Promise<Response>;
+  fetch?: (input: Request | string, init?: RequestInit) => Promise<Response>;
 }
 
 export interface IBindings {
