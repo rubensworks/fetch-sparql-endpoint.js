@@ -32,6 +32,7 @@ export class SparqlEndpointFetcher {
   public readonly sparqlJsonParser: SparqlJsonParser;
   public readonly sparqlXmlParser: SparqlXmlParser;
   public readonly timeout: number;
+  public readonly sparqlStar: boolean;
 
   constructor(args?: ISparqlEndpointFetcherArgs) {
     args = args || {};
@@ -56,6 +57,7 @@ export class SparqlEndpointFetcher {
       },
     };
     this.timeout = args.timeout;
+    this.sparqlStar = args.sparqlStar || true;
   }
 
   /**
@@ -81,7 +83,7 @@ export class SparqlEndpointFetcher {
    * @return {'UNKNOWN' | UpdateTypes} The included update operations.
    */
   public getUpdateTypes(query: string): 'UNKNOWN' | IUpdateTypes {
-    const parsedQuery = new SparqlParser().parse(query);
+    const parsedQuery = new SparqlParser({sparqlStar: this.sparqlStar}).parse(query);
 
     if (parsedQuery.type === 'update') {
       const operations: IUpdateTypes = {};
@@ -264,6 +266,7 @@ export interface ISparqlEndpointFetcherArgs extends ISettings {
   additionalUrlParams?: URLSearchParams;
   timeout?: number;
   defaultHeaders?: Headers;
+  sparqlStar?: boolean;
   /**
    * A custom fetch function.
    */

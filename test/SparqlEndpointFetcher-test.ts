@@ -28,6 +28,7 @@ describe('SparqlEndpointFetcher', () => {
     const queryDescribe = 'DESCRIBE <http://ex.org>';
     const queryDelete = 'DELETE WHERE { ?s ?p ?o }';
     const queryInsert = 'INSERT { ?s ?p ?o } WHERE {}';
+    const queryInsertStar = 'INSERT { << ?si ?pi ?oi >> ?p ?o } WHERE {}';
     const updateDeleteData = prefixes + 'DELETE DATA { GRAPH <http://example.org/g1> { :a foaf:knows :b } }';
     const updateDeleteData2 = prefixes + 'DELETE DATA { GRAPH <http://example.org/g1> { :b foaf:knows :c } }';
     const updateInsertData = prefixes + 'INSERT DATA { GRAPH <http://example.org/g1> { :Alice foaf:knows :Bob } }';
@@ -99,6 +100,12 @@ describe('SparqlEndpointFetcher', () => {
 
       it('should detect an insertdelete query', () => {
         return expect(fetcher.getUpdateTypes(queryInsert)).toEqual({
+          insertdelete: true
+        });
+      });
+
+      it('should detect an insertdelete query on star', () => {
+        return expect(fetcher.getUpdateTypes(queryInsertStar)).toEqual({
           insertdelete: true
         });
       });
