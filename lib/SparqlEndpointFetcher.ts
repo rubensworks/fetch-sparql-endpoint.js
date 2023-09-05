@@ -67,7 +67,7 @@ export class SparqlEndpointFetcher {
    * @return {"SELECT" | "ASK" | "CONSTRUCT" | "UNKNOWN"} The query type.
    */
   public getQueryType(query: string): "SELECT" | "ASK" | "CONSTRUCT" | "UNKNOWN" {
-    const parsedQuery = new SparqlParser().parse(query);
+    const parsedQuery = new SparqlParser({sparqlStar: true}).parse(query);
     return parsedQuery.type === 'query'
       ? (parsedQuery.queryType === 'DESCRIBE' ? 'CONSTRUCT' : parsedQuery.queryType) : "UNKNOWN";
   }

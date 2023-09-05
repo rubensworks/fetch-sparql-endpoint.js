@@ -76,6 +76,10 @@ describe('SparqlEndpointFetcher', () => {
         return expect(fetcher.getQueryType(queryDelete)).toEqual('UNKNOWN');
       });
 
+      it('should detect an unknown query', () => {
+        return expect(fetcher.getQueryType(queryDeleteStar)).toEqual('UNKNOWN');
+      });
+
       it('should throw an error on invalid queries', () => {
         return expect(() => fetcher.getQueryType('{{{')).toThrow();
       });
