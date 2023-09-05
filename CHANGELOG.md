@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v4.1.0"></a>
+## [v4.1.0](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v4.0.0...v4.1.0) - 2023-09-05
+
+### Added
+* [Enable SPARQL* support for queries (#68)](https://github.com/rubensworks/fetch-sparql-endpoint.js/commit/facef06abf09d377655b9ea3c090c65036c1c7e4)
+
 <a name="v4.0.0"></a>
 ## [v4.0.0](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v3.3.3...v4.0.0) - 2023-08-07
 
