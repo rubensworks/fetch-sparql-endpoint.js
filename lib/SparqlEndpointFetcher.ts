@@ -1,5 +1,4 @@
 import "cross-fetch/polyfill";
-import AbortController from 'abort-controller';
 import * as RDF from "@rdfjs/types";
 import {InsertDeleteOperation, ManagementOperation, Parser as SparqlParser} from "sparqljs";
 import {ISettings, SparqlJsonParser} from "sparqljson-parse";
@@ -152,6 +151,7 @@ export class SparqlEndpointFetcher {
    * @param {string} query        A SPARQL query string.
    */
   public async fetchUpdate(endpoint: string, query: string): Promise<void> {
+    const AbortController: any = globalThis.AbortController || await import('abort-controller');
     const abortController = new AbortController();
     const defaultHeadersRaw: Record<string, string> = {};
     this.defaultHeaders.forEach((value, key) => {
