@@ -40,7 +40,7 @@
   ],
   "dependencies": {
     "@rdfjs/types": "*",
-    "@types/readable-stream": "^2.3.11",
+    "@types/readable-stream": "^4.0.0",
     "@types/sparqljs": "^3.1.3",
     "abort-controller": "^3.0.0",
     "cross-fetch": "^3.0.6",
