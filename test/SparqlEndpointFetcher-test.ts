@@ -321,7 +321,7 @@ describe('SparqlEndpointFetcher', () => {
 
       it('should fetch with a web stream', async () => {
         const fetchCbThis = () => Promise.resolve(<Response> {
-          body: require('web-streams-node').toWebReadableStream(streamifyString(`abc`)),
+          body: require('readable-stream-node-to-web')(streamifyString(`abc`)),
           headers: new Headers(),
           ok: true,
           status: 200,
