@@ -9,6 +9,10 @@ const DF = new DataFactory();
 
 // tslint:disable:no-trailing-whitespace
 
+if (!globalThis.ReadableStream) {
+  globalThis.ReadableStream = require('web-streams-ponyfill').ReadableStream;
+}
+
 describe('SparqlEndpointFetcher', () => {
 
   describe('constructed without fetch callback', () => {
