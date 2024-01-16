@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v4.1.1"></a>
+## [v4.1.1](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v4.1.0...v4.1.1) - 2024-01-16
+
+### Fixed
+* [Migrate to @smessie/readable-web-to-node-stream](https://github.com/rubensworks/fetch-sparql-endpoint.js/commit/aa2e0527cb25d3a963b1a426840a5040449be8b0)
+
 <a name="v4.1.0"></a>
 ## [v4.1.0](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v4.0.0...v4.1.0) - 2023-09-05
 
