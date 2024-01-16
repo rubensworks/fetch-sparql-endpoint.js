@@ -5,7 +5,7 @@ import {ISettings, SparqlJsonParser} from "sparqljson-parse";
 import {SparqlXmlParser} from "sparqlxml-parse";
 import {Readable} from "stream";
 import * as stringifyStream from 'stream-to-string';
-import { ReadableWebToNodeStream } from 'readable-web-to-node-stream';
+import { ReadableWebToNodeStream } from '@smessie/readable-web-to-node-stream';
 
 // tslint:disable:no-var-requires
 const n3 = require('n3');
