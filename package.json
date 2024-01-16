@@ -48,7 +48,7 @@
     "minimist": "^1.2.0",
     "n3": "^1.6.3",
     "rdf-string": "^1.6.0",
-    "readable-web-to-node-stream": "^3.0.2",
+    "@smessie/readable-web-to-node-stream": "^3.0.3",
     "sparqljs": "^3.1.2",
     "sparqljson-parse": "^2.2.0",
     "sparqlxml-parse": "^2.1.1",
