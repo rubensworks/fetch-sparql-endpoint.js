@@ -328,7 +328,7 @@ describe('SparqlEndpointFetcher', () => {
         });
         const fetcherThis = new SparqlEndpointFetcher({ fetch: customFetchThis });
         await expect(fetcherThis.fetchRawStream(endpoint, querySelect, 'myacceptheader')).resolves.toEqual([
-          undefined,
+          '',
           streamifyString('abc'),
         ]);
       });
@@ -343,7 +343,7 @@ describe('SparqlEndpointFetcher', () => {
         });
         const fetcherThis = new SparqlEndpointFetcher({ fetch: customFetchThis });
         const [ contentType, rawStream ] = await fetcherThis.fetchRawStream(endpoint, querySelect, 'myacceptheader');
-        expect(contentType).toBeUndefined();
+        expect(contentType).toEqual('');
         expect(rawStream).toBeInstanceOf(ReadableWebToNodeStream);
       });
 
@@ -372,7 +372,7 @@ describe('SparqlEndpointFetcher', () => {
         });
         const fetcherThis = new SparqlEndpointFetcher({ fetch: customFetchThis });
         await expect(fetcherThis.fetchRawStream(endpoint, querySelect, 'myacceptheader')).resolves.toEqual([
-          undefined,
+          '',
           streamifyString('abc'),
         ]);
       });

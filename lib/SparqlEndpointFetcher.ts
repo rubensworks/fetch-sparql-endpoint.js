@@ -108,11 +108,11 @@ export class SparqlEndpointFetcher {
       query,
       SparqlEndpointFetcher.CONTENTTYPE_SPARQL,
     );
-    const parser: ISparqlResultsParser | undefined = this.sparqlParsers[contentType!];
+    const parser: ISparqlResultsParser | undefined = this.sparqlParsers[contentType];
     if (!parser) {
       throw new Error(`Unknown SPARQL results content type: ${contentType}`);
     }
-    return parser.parseResultsStream(responseStream!);
+    return parser.parseResultsStream(responseStream);
   }
 
   /**
@@ -127,11 +127,11 @@ export class SparqlEndpointFetcher {
       query,
       SparqlEndpointFetcher.CONTENTTYPE_SPARQL,
     );
-    const parser: ISparqlResultsParser | undefined = this.sparqlParsers[contentType!];
+    const parser: ISparqlResultsParser | undefined = this.sparqlParsers[contentType];
     if (!parser) {
       throw new Error(`Unknown SPARQL results content type: ${contentType}`);
     }
-    return parser.parseBooleanStream(responseStream!);
+    return parser.parseBooleanStream(responseStream);
   }
 
   /**
@@ -146,7 +146,7 @@ export class SparqlEndpointFetcher {
       query,
       SparqlEndpointFetcher.CONTENTTYPE_TURTLE,
     );
-    return responseStream!.pipe(new StreamParser({ format: contentType }));
+    return responseStream.pipe(new StreamParser({ format: contentType }));
   }
 
   /**
@@ -185,13 +185,13 @@ export class SparqlEndpointFetcher {
    * @param {string} endpoint     A SPARQL endpoint URL. (without the `?query=` suffix).
    * @param {string} query        A SPARQL query string.
    * @param {string} acceptHeader The HTTP accept to use.
-   * @return The content type and SPARQL endpoint response stream.
+   * @return {Promise<[string, NodeJS.ReadableStream]>} The content type and SPARQL endpoint response stream.
    */
   public async fetchRawStream(
     endpoint: string,
     query: string,
     acceptHeader: string,
-  ): Promise<[ string | undefined, NodeJS.ReadableStream | undefined ]> {
+  ): Promise<[ string, NodeJS.ReadableStream ]> {
     let url: string = this.method === 'POST' ? endpoint : `${endpoint}?query=${encodeURIComponent(query)}`;
 
     // Initiate request
@@ -220,13 +220,13 @@ export class SparqlEndpointFetcher {
    * @param {string}      url     The URL to call.
    * @param {RequestInit} init    Options to pass along to the fetch call.
    * @param {any}         options Other specific fetch options.
-   * @return The content type and SPARQL endpoint response stream.
+   * @return {Promise<[string, NodeJS.ReadableStream]>} The content type and SPARQL endpoint response stream.
    */
   private async handleFetchCall(
     url: string,
     init: RequestInit,
     options?: { ignoreBody: boolean },
-  ): Promise<[string | undefined, NodeJS.ReadableStream | undefined]> {
+  ): Promise<[ string, NodeJS.ReadableStream ]> {
     let timeout: NodeJS.Timeout | undefined;
     let responseStream: NodeJS.ReadableStream | undefined;
 
@@ -250,16 +250,16 @@ export class SparqlEndpointFetcher {
     }
 
     // Emit an error if the server returned an invalid response
-    if (!httpResponse.ok || (responseStream === undefined && !options?.ignoreBody)) {
+    if (!httpResponse.ok || (!responseStream && !options?.ignoreBody)) {
       const simpleUrl = url.split('?').at(0);
       const bodyString = responseStream ? await stringifyStream(responseStream) : 'empty response';
       throw new Error(`Invalid SPARQL endpoint response from ${simpleUrl} (HTTP status ${httpResponse.status}):\n${bodyString}`);
     }
 
     // Determine the content type
-    const contentType = httpResponse.headers.get('Content-Type')?.split(';').at(0);
+    const contentType = httpResponse.headers.get('Content-Type')?.split(';').at(0) ?? '';
 
-    return [ contentType, responseStream ];
+    return [ contentType, responseStream! ];
   }
 }
 
@@ -268,7 +268,7 @@ export interface ISparqlEndpointFetcherArgs extends ISparqlJsonParserArgs, ISpar
    * A custom HTTP method for issuing (non-update) queries, defaults to POST.
    * Update queries are always issued via POST.
    */
-  method?: 'GET' | 'POST';
+  method?: 'POST' | 'GET';
   additionalUrlParams?: URLSearchParams;
   timeout?: number;
   defaultHeaders?: Headers;
