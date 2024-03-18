@@ -1,1 +1,1 @@
-export * from "./lib/SparqlEndpointFetcher";
+export * from './lib/SparqlEndpointFetcher';
