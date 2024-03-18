@@ -9,8 +9,6 @@ import { type ISettings as ISparqlJsonParserArgs, SparqlJsonParser } from 'sparq
 import { type ISettings as ISparqlXmlParserArgs, SparqlXmlParser } from 'sparqlxml-parse';
 import * as stringifyStream from 'stream-to-string';
 
-type Fetch = (input: Request | string, init?: RequestInit) => Promise<Response>;
-
 /**
  * A SparqlEndpointFetcher can send queries to SPARQL endpoints,
  * and retrieve and parse the results.
@@ -25,7 +23,7 @@ export class SparqlEndpointFetcher {
   protected readonly timeout?: number;
   protected readonly additionalUrlParams: URLSearchParams;
   protected readonly defaultHeaders: Headers;
-  public readonly fetchCb?: Fetch;
+  public readonly fetchCb?: (input: Request | string, init?: RequestInit) => Promise<Response>;
 
   protected readonly sparqlParsers: Record<string, ISparqlResultsParser>;
   protected readonly sparqlJsonParser: SparqlJsonParser;
@@ -275,7 +273,7 @@ export interface ISparqlEndpointFetcherArgs extends ISparqlJsonParserArgs, ISpar
   /**
    * A custom fetch function.
    */
-  fetch?: Fetch;
+  fetch?: (input: Request | string, init?: RequestInit) => Promise<Response>;
 }
 
 export interface ISparqlResultsParser {
