@@ -1,52 +1,56 @@
 name: CI
-on: [push, pull_request]
+
+on:
+  - push
+  - pull_request
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
 
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/cache@v3
+      - uses: actions/checkout@v4
+      - uses: actions/cache@v4
         with:
           path: '**/node_modules'
           key: ${{ runner.os }}-lint-modules-${{ hashFiles('**/yarn.lock') }}
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
-          node-version: 18.x
-      - run: yarn install
+          node-version: 20.x
+      - run: corepack enable
+      - run: yarn install --frozen-lockfile
       - run: yarn run lint
 
   test:
+    needs: lint
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest]
+        os:
+          - ubuntu-latest
         node-version:
-          - 14.x
           - 16.x
           - 18.x
           - 20.x
     steps:
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-      - name: Ensure line endings are consistent
-        run: git config --global core.autocrlf input
-      - name: Check out repository
-        uses: actions/checkout@v3
-      - uses: actions/cache@v3
+      - run: git config --global core.autocrlf input
+      - uses: actions/checkout@v4
+      - uses: actions/cache@v4
         with:
           path: '**/node_modules'
           key: ${{ runner.os }}-test-modules-${{ hashFiles('**/yarn.lock') }}
-      - name: Install dependencies
-        run: yarn install
-      - name: Build project
-        run: yarn run build
-      - name: Run tests
-        run: yarn run test
-      - name: Submit coverage results
-        uses: coverallsapp/github-action@master
+      - run: corepack enable
+      - run: yarn install --frozen-lockfile
+      - run: yarn run build
+      - run: yarn run test
+      - uses: coverallsapp/github-action@master
         with:
           github-token: ${{ secrets.github_token }}
           flag-name: run-${{ matrix.node-version }}
@@ -61,45 +65,45 @@ jobs:
         with:
           github-token: ${{ secrets.github_token }}
           parallel-finished: true
+
   docker:
+    needs: test
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest]
+        os:
+          - ubuntu-latest
         node-version:
-          - 16.x
+          - 20.x
     steps:
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-      - name: Ensure line endings are consistent
-        run: git config --global core.autocrlf input
-      - name: Check out repository
-        uses: actions/checkout@v3
-      - name: Start Docker container
-        run: .github/workflows/start-docker.sh
-      - uses: actions/cache@v3
+      - run: git config --global core.autocrlf input
+      - uses: actions/checkout@v4
+      - run: .github/workflows/start-docker.sh
+      - uses: actions/cache@v4
         with:
           path: '**/node_modules'
           key: ${{ runner.os }}-docker-modules-${{ hashFiles('**/yarn.lock') }}
-      - name: Install dependencies
-        run: yarn install
-      - name: Send update query
-        run: .github/workflows/test-docker.sh
-      - name: Stop Docker container
-        run: .github/workflows/stop-docker.sh
+      - run: corepack enable
+      - run: yarn install --frozen-lockfile
+      - run: yarn build
+      - run: .github/workflows/test-docker.sh
+      - run: .github/workflows/stop-docker.sh
 
   webpack:
+    needs: test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/cache@v3
+      - uses: actions/checkout@v4
+      - uses: actions/cache@v4
         with:
           path: '**/node_modules'
           key: ${{ runner.os }}-webpack-modules-${{ hashFiles('**/yarn.lock') }}
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
-          node-version: 18.x
-      - run: yarn install
+          node-version: 20.x
+      - run: corepack enable
+      - run: yarn install --frozen-lockfile
       - run: npx webpack
