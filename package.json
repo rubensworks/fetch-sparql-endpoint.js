@@ -2,7 +2,7 @@
   "name": "fetch-sparql-endpoint",
   "version": "4.1.1",
   "description": "A simple, lightweight module to send queries to SPARQL endpoints and retrieve their results in a streaming fashion.",
-  "packageManager": "yarn@4.1.1",
+  "packageManager": "yarn@1.22.22",
   "keywords": [
     "sparql",
     "query",
@@ -98,7 +98,6 @@
     "lint:fix": "eslint . --ext .ts --fix",
     "build": "tsc",
     "validate": "yarn list",
-    "prepare": "yarn run build",
     "version": "manual-git-changelog onversion"
   },
   "sideEffects": false

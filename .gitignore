@@ -1,6 +1,5 @@
 node_modules
 .idea
-.yarn
 lerna-debug.log
 yarn-error.log
 **/lib/**/*.js
