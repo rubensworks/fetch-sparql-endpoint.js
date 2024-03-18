@@ -25,7 +25,7 @@ export class SparqlEndpointFetcher {
   protected readonly timeout?: number;
   protected readonly additionalUrlParams: URLSearchParams;
   protected readonly defaultHeaders: Headers;
-  public readonly customFetch?: Fetch;
+  public readonly fetchCb?: Fetch;
 
   protected readonly sparqlParsers: Record<string, ISparqlResultsParser>;
   protected readonly sparqlJsonParser: SparqlJsonParser;
@@ -36,7 +36,7 @@ export class SparqlEndpointFetcher {
     this.timeout = args?.timeout;
     this.additionalUrlParams = args?.additionalUrlParams || new URLSearchParams();
     this.defaultHeaders = args?.defaultHeaders || new Headers();
-    this.customFetch = args?.fetch;
+    this.fetchCb = args?.fetch;
     this.sparqlJsonParser = new SparqlJsonParser(args);
     this.sparqlXmlParser = new SparqlXmlParser(args);
     this.sparqlParsers = {
@@ -236,7 +236,7 @@ export class SparqlEndpointFetcher {
       timeout = setTimeout(() => controller.abort(), this.timeout);
     }
 
-    const httpResponse: Response = await (this.customFetch || fetch)(url, init);
+    const httpResponse: Response = await (this.fetchCb || fetch)(url, init);
 
     clearTimeout(timeout);
 
