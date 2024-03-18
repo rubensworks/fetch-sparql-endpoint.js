@@ -318,6 +318,16 @@ describe('SparqlEndpointFetcher', () => {
           .toEqual(new Error('Invalid SPARQL endpoint response from https://dbpedia.org/sparql (HTTP status 500):\nthis is an invalid response'));
       });
 
+      it('should reject when request takes longer than timeout', async() => {
+        const fetchCbThis = (request: Request | string, init?: RequestInit) =>
+          new Promise<Response>((resolve, reject) => {
+            init!.signal!.addEventListener('abort', () => reject(new Error('Timeout')));
+          });
+        const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis, timeout: 1_000 });
+        const result = fetcherThis.fetchRawStream(endpoint, querySelect, 'myacceptheader');
+        await expect(result).rejects.toEqual(new Error('Timeout'));
+      });
+
       it('should fetch with a node stream', async() => {
         const fetchCbThis = () => Promise.resolve(<Response> {
           body: streamifyString(`abc`),
