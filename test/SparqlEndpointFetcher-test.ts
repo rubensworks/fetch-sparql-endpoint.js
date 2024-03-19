@@ -9,6 +9,11 @@ const streamifyString = require('streamify-string');
 
 const DF = new DataFactory();
 
+if (!globalThis.ReadableStream) {
+  // TODO: Remove this workaround and ponyfill when Node 16 support is dropped
+  globalThis.ReadableStream = require('web-streams-ponyfill').ReadableStream;
+}
+
 describe('SparqlEndpointFetcher', () => {
   describe('constructed without fetch callback', () => {
     it('should have an undefined fetch function', async() => {
