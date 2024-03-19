@@ -203,11 +203,11 @@ export class SparqlEndpointFetcher {
       headers.append('Content-Type', 'application/x-www-form-urlencoded');
       body = new URLSearchParams();
       body.set('query', query);
-      // TODO: Remove the below forEach when dropping Node 16 support
-      // eslint-disable-next-line unicorn/no-array-for-each
-      this.additionalUrlParams.forEach((value, key) => body!.set(key, value));
+      for (const [ key, value ] of this.additionalUrlParams.entries()) {
+        body.set(key, value);
+      }
       headers.append('Content-Length', body.toString().length.toString());
-    } else if (this.additionalUrlParams.size > 0) {
+    } else if (this.additionalUrlParams.toString().length > 0) {
       url += `&${this.additionalUrlParams.toString()}`;
     }
 
