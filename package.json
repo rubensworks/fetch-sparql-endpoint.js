@@ -40,6 +40,7 @@
   "dependencies": {
     "@rdfjs/types": "*",
     "@smessie/readable-web-to-node-stream": "^3.0.3",
+    "@types/n3": "^1.0.0",
     "@types/readable-stream": "^4.0.0",
     "@types/sparqljs": "^3.0.0",
     "cross-fetch": "^4.0.0",
@@ -55,7 +56,6 @@
   "devDependencies": {
     "@rubensworks/eslint-config": "^2.0.0",
     "@types/jest": "^29.0.0",
-    "@types/n3": "^1.0.0",
     "arrayify-stream": "^2.0.0",
     "coveralls": "^3.0.0",
     "eslint": "^8.48.0",
