@@ -8,17 +8,14 @@ import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import { SparqlEndpointFetcher, type IBindings } from '..';
 
-async function getQuery(stdin: boolean, query?: string, file?: string): Promise<string> {
-  if (stdin) {
-    return streamToString(process.stdin);
-  }
+async function getQuery(query?: string, file?: string): Promise<string> {
   if (query) {
     return query;
   }
   if (file) {
     readFileSync(file, { encoding: 'utf-8' });
   }
-  throw new Error('No query proviced');
+  return streamToString(process.stdin);
 }
 
 function querySelect(endpoint: string, fetcher: SparqlEndpointFetcher, query: string): Promise<void> {
@@ -69,49 +66,42 @@ function update(endpoint: string, fetcher: SparqlEndpointFetcher, query: string)
 async function run(argv: string[]): Promise<void> {
   const args = await yargs(hideBin(argv))
     .example(
-      '$0 --endpoint https://dbpedia.org/sparql --query \'SELECT * WHERE { ?s ?p ?o } LIMIT 100\'',
+      '$0 https://dbpedia.org/sparql --query \'SELECT * WHERE { ?s ?p ?o } LIMIT 100\'',
       'Fetch 100 triples from the DBPedia SPARQL endpoint',
     )
     .example(
-      '$0 --endpoint https://dbpedia.org/sparql --file query.rq',
+      '$0 https://dbpedia.org/sparql --file query.rq',
       'Run the SPARQL query from query.rq against the DBPedia SPARQL endpoint',
     )
     .example(
-      'cat query.rq | $0 --endpoint https://dbpedia.org/sparql --stdin',
+      'cat query.rq | $0 https://dbpedia.org/sparql',
       'Run the SPARQL query from query.rq against the DBPedia SPARQL endpoint',
     )
+    .positional('endpoint', { type: 'string', describe: 'Send the query to this SPARQL endpoint', demandOption: true })
     .options({
-      endpoint: { type: 'string', describe: 'Send the query to this SPARQL endpoint' },
-      query: { type: 'string', describe: 'Evaluate the given SPARQL query string' },
-      file: { type: 'string', describe: 'Evaluate the SPARQL query in the given file' },
-      stdin: { type: 'boolean', describe: 'Read the query from stdin', default: false },
-      get: { type: 'boolean', describe: 'Send query via HTTP GET instead of POST', default: false },
-    })
-    .demandOption('endpoint')
-    .check((arg) => {
-      if ([ arg.query !== undefined, arg.file !== undefined, arg.stdin ].filter(Boolean).length !== 1) {
-        throw new Error('Exactly one of query, file, stdin required');
-      }
-      return true;
+      query: { alias: 'q', type: 'string', describe: 'Evaluate the given SPARQL query string' },
+      file: { alias: 'f', type: 'string', describe: 'Evaluate the SPARQL query in the given file' },
+      get: { alias: 'g', type: 'boolean', describe: 'Send query via HTTP GET instead of POST', default: false },
     })
     .help()
     .parse();
-  const queryString = await getQuery(args.stdin, args.query, args.file);
+  const endpoint = <string>args._[0];
+  const queryString = await getQuery(args.query, args.file);
   const fetcher = new SparqlEndpointFetcher({ method: args.get ? 'GET' : 'POST' });
   const queryType = fetcher.getQueryType(queryString);
   switch (queryType) {
     case 'SELECT':
-      await querySelect(args.endpoint, fetcher, queryString);
+      await querySelect(endpoint, fetcher, queryString);
       break;
     case 'ASK':
-      await queryAsk(args.endpoint, fetcher, queryString);
+      await queryAsk(endpoint, fetcher, queryString);
       break;
     case 'CONSTRUCT':
-      await queryConstruct(args.endpoint, fetcher, queryString);
+      await queryConstruct(endpoint, fetcher, queryString);
       break;
     case 'UNKNOWN':
       if (fetcher.getUpdateTypes(queryString) !== 'UNKNOWN') {
-        await update(args.endpoint, fetcher, queryString);
+        await update(endpoint, fetcher, queryString);
       }
       break;
   }
