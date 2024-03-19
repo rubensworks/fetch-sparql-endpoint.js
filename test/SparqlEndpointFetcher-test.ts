@@ -751,7 +751,7 @@ describe('SparqlEndpointFetcher', () => {
 
         jest.runAllTimers();
 
-        await expect(result).rejects.toThrow('This operation was aborted');
+        await expect(result).rejects.toThrow('abort');
       });
     });
   });
