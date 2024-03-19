@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 
-import { readFileSync } from 'fs';
+import { readFileSync } from 'node:fs';
 import { StreamWriter } from 'n3';
 import { termToString } from 'rdf-string';
 import * as streamToString from 'stream-to-string';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
-import { SparqlEndpointFetcher } from '..';
+import { SparqlEndpointFetcher, type IBindings } from '..';
 
 async function getQuery(stdin: boolean, query?: string, file?: string): Promise<string> {
   if (stdin) {
@@ -24,11 +24,11 @@ async function getQuery(stdin: boolean, query?: string, file?: string): Promise<
 function querySelect(endpoint: string, fetcher: SparqlEndpointFetcher, query: string): Promise<void> {
   return new Promise((resolve, reject) => {
     fetcher.fetchBindings(endpoint, query).then(bindingsStream => bindingsStream
-      .on('data', bindings => {
-        for (const variable of Object.keys(bindings)) {
-          bindings[variable] = termToString(bindings[variable]);
-        }
-        process.stdout.write(`${JSON.stringify(bindings)}\n`);
+      .on('data', (bindings: IBindings) => {
+        process.stdout.write(`${JSON.stringify(Object.fromEntries(Object.entries(bindings).map(([ key, value ]) => [
+          key,
+          termToString(value),
+        ])))}\n`);
       })
       .on('error', reject)
       .on('end', resolve)).catch(reject);
@@ -38,7 +38,7 @@ function querySelect(endpoint: string, fetcher: SparqlEndpointFetcher, query: st
 function queryAsk(endpoint: string, fetcher: SparqlEndpointFetcher, query: string): Promise<void> {
   return new Promise((resolve, reject) => {
     fetcher.fetchAsk(endpoint, query)
-      .then(answer => {
+      .then((answer) => {
         process.stdout.write(`${answer}\n`);
         resolve();
       })
@@ -88,8 +88,8 @@ async function run(argv: string[]): Promise<void> {
       get: { type: 'boolean', describe: 'Send query via HTTP GET instead of POST', default: false },
     })
     .demandOption('endpoint')
-    .check(arg => {
-      if ([ arg.query !== undefined, arg.file !== undefined, arg.stdin ].filter(ar => ar).length !== 1) {
+    .check((arg) => {
+      if ([ arg.query !== undefined, arg.file !== undefined, arg.stdin ].filter(Boolean).length !== 1) {
         throw new Error('Exactly one of query, file, stdin required');
       }
       return true;

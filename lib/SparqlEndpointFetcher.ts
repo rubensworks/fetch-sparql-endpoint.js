@@ -1,5 +1,5 @@
 import 'cross-fetch/polyfill';
-import type { Readable } from 'stream';
+import type { Readable } from 'node:stream';
 import type * as RDF from '@rdfjs/types';
 import { ReadableWebToNodeStream } from '@smessie/readable-web-to-node-stream';
 import * as isStream from 'is-stream';
@@ -30,10 +30,10 @@ export class SparqlEndpointFetcher {
   protected readonly sparqlXmlParser: SparqlXmlParser;
 
   public constructor(args?: ISparqlEndpointFetcherArgs) {
-    this.method = args?.method || 'POST';
+    this.method = args?.method ?? 'POST';
     this.timeout = args?.timeout;
-    this.additionalUrlParams = args?.additionalUrlParams || new URLSearchParams();
-    this.defaultHeaders = args?.defaultHeaders || new Headers();
+    this.additionalUrlParams = args?.additionalUrlParams ?? new URLSearchParams();
+    this.defaultHeaders = args?.defaultHeaders ?? new Headers();
     this.fetchCb = args?.fetch;
     this.sparqlJsonParser = new SparqlJsonParser(args);
     this.sparqlXmlParser = new SparqlXmlParser(args);
@@ -157,6 +157,8 @@ export class SparqlEndpointFetcher {
     const abortController = new AbortController();
     const defaultHeadersRaw: Record<string, string> = {};
 
+    // Headers object does not have other means to iterate it according to the typings
+    // eslint-disable-next-line unicorn/no-array-for-each
     this.defaultHeaders.forEach((value, key) => {
       defaultHeadersRaw[key] = value;
     });
@@ -234,7 +236,7 @@ export class SparqlEndpointFetcher {
       timeout = setTimeout(() => controller.abort(), this.timeout);
     }
 
-    const httpResponse: Response = await (this.fetchCb || fetch)(url, init);
+    const httpResponse: Response = await (this.fetchCb ?? fetch)(url, init);
 
     clearTimeout(timeout);
 
@@ -280,6 +282,8 @@ export interface ISparqlResultsParser {
   parseResultsStream: (sparqlResponseStream: NodeJS.ReadableStream) => NodeJS.ReadableStream;
   parseBooleanStream: (sparqlResponseStream: NodeJS.ReadableStream) => Promise<boolean>;
 }
+
+export type IBindings = Record<string, RDF.Term>;
 
 export type IUpdateTypes = {
   [K in ManagementOperation['type'] | InsertDeleteOperation['updateType']]?: boolean;

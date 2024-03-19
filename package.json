@@ -1,8 +1,15 @@
 {
   "name": "fetch-sparql-endpoint",
   "version": "4.1.1",
-  "description": "A simple, lightweight module to send queries to SPARQL endpoints and retrieve their results in a streaming fashion.",
   "packageManager": "yarn@1.22.22",
+  "description": "A simple, lightweight module to send queries to SPARQL endpoints and retrieve their results in a streaming fashion.",
+  "author": "Ruben Taelman <rubensworks@gmail.com>",
+  "license": "MIT",
+  "homepage": "https://github.com/rubensworks/fetch-sparql-endpoint.js#readme",
+  "repository": "git@github.com:rubensworks/fetch-sparql-endpoint.js.git",
+  "bugs": {
+    "url": "https://github.com/rubensworks/fetch-sparql-endpoint.js/issues"
+  },
   "keywords": [
     "sparql",
     "query",
@@ -11,31 +18,30 @@
     "rdfjs",
     "streaming"
   ],
+  "sideEffects": false,
   "main": "index.js",
   "typings": "index",
-  "repository": "git@github.com:rubensworks/fetch-sparql-endpoint.js.git",
-  "author": "Ruben Taelman <rubensworks@gmail.com>",
-  "bugs": {
-    "url": "https://github.com/rubensworks/fetch-sparql-endpoint.js/issues"
-  },
-  "homepage": "https://github.com/rubensworks/fetch-sparql-endpoint.js#readme",
-  "license": "MIT",
   "bin": "bin/fetch-sparql-endpoint.js",
   "files": [
     "bin/**/*.d.ts",
     "bin/**/*.js",
     "bin/**/*.js.map",
+    "index.d.ts",
+    "index.js",
+    "index.js.map",
     "lib/**/*.d.ts",
     "lib/**/*.js",
-    "lib/**/*.js.map",
-    "index.d.ts",
-    "index.js.map",
-    "index.js"
+    "lib/**/*.js.map"
   ],
-  "husky": {
-    "hooks": {
-      "pre-commit": "yarn run build && yarn run lint && yarn run test"
-    }
+  "scripts": {
+    "test": "jest",
+    "test-watch": "jest --watch",
+    "coveralls": "jest --coverage && cat ./coverage/lcov.info | coveralls",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "build": "tsc",
+    "validate": "yarn list",
+    "version": "manual-git-changelog onversion"
   },
   "dependencies": {
     "@rdfjs/types": "*",
@@ -72,6 +78,11 @@
     "webpack": "^5.0.0",
     "webpack-cli": "^5.0.0"
   },
+  "husky": {
+    "hooks": {
+      "pre-commit": "yarn run build && yarn run lint && yarn run test"
+    }
+  },
   "jest": {
     "transform": {
       "^.+\\.ts$": "ts-jest"
@@ -89,16 +100,5 @@
       "jest-rdf"
     ],
     "testEnvironment": "node"
-  },
-  "scripts": {
-    "test": "jest",
-    "test-watch": "jest --watch",
-    "coveralls": "jest --coverage && cat ./coverage/lcov.info | coveralls",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
-    "build": "tsc",
-    "validate": "yarn list",
-    "version": "manual-git-changelog onversion"
-  },
-  "sideEffects": false
+  }
 }

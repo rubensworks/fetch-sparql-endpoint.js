@@ -4,9 +4,7 @@ import arrayifyStream from 'arrayify-stream';
 import { DataFactory } from 'rdf-data-factory';
 import { SparqlEndpointFetcher } from '../lib/SparqlEndpointFetcher';
 
-// eslint-disable-next-line import/no-commonjs
 const readableStreamNodeToWeb = require('readable-stream-node-to-web');
-// eslint-disable-next-line import/no-commonjs
 const streamifyString = require('streamify-string');
 
 const DF = new DataFactory();
@@ -53,53 +51,53 @@ describe('SparqlEndpointFetcher', () => {
 
     describe('getQueryType', () => {
       it('should detect a select query', () => {
-        expect(fetcher.getQueryType(querySelect)).toEqual('SELECT');
+        expect(fetcher.getQueryType(querySelect)).toBe('SELECT');
       });
 
       it('should detect an ask query', () => {
-        expect(fetcher.getQueryType(queryAsk)).toEqual('ASK');
+        expect(fetcher.getQueryType(queryAsk)).toBe('ASK');
       });
 
       it('should detect a construct query', () => {
-        expect(fetcher.getQueryType(queryConstruct)).toEqual('CONSTRUCT');
+        expect(fetcher.getQueryType(queryConstruct)).toBe('CONSTRUCT');
       });
 
       it('should detect a describe query as a construct query', () => {
-        expect(fetcher.getQueryType(queryDescribe)).toEqual('CONSTRUCT');
+        expect(fetcher.getQueryType(queryDescribe)).toBe('CONSTRUCT');
       });
 
       it('should detect an unknown insert query', () => {
-        expect(fetcher.getQueryType(queryInsert)).toEqual('UNKNOWN');
+        expect(fetcher.getQueryType(queryInsert)).toBe('UNKNOWN');
       });
 
       it('should detect an unknown delete query', () => {
-        expect(fetcher.getQueryType(queryDelete)).toEqual('UNKNOWN');
+        expect(fetcher.getQueryType(queryDelete)).toBe('UNKNOWN');
       });
 
       it('should throw an error on invalid queries', () => {
-        expect(() => fetcher.getQueryType('{{{')).toThrow();
+        expect(() => fetcher.getQueryType('{{{')).toThrow('Parse error on line 1');
       });
     });
 
     describe('getUpdateTypes', () => {
       it('should detect an unknown update (SELECT)', () => {
-        expect(fetcher.getUpdateTypes(querySelect)).toEqual('UNKNOWN');
+        expect(fetcher.getUpdateTypes(querySelect)).toBe('UNKNOWN');
       });
 
       it('should detect an unknown update (ASK)', () => {
-        expect(fetcher.getUpdateTypes(queryAsk)).toEqual('UNKNOWN');
+        expect(fetcher.getUpdateTypes(queryAsk)).toBe('UNKNOWN');
       });
 
       it('should detect an unknown update (CONSTRUCT)', () => {
-        expect(fetcher.getUpdateTypes(queryConstruct)).toEqual('UNKNOWN');
+        expect(fetcher.getUpdateTypes(queryConstruct)).toBe('UNKNOWN');
       });
 
       it('should detect an unknown update (DESCRIBE)', () => {
-        expect(fetcher.getUpdateTypes(queryDescribe)).toEqual('UNKNOWN');
+        expect(fetcher.getUpdateTypes(queryDescribe)).toBe('UNKNOWN');
       });
 
       it('should throw an error on invalid queries', () => {
-        expect(() => fetcher.getUpdateTypes('{{{')).toThrow();
+        expect(() => fetcher.getUpdateTypes('{{{')).toThrow('Parse error on line 1');
       });
 
       it('should detect an insertdelete query', () => {
@@ -268,6 +266,7 @@ describe('SparqlEndpointFetcher', () => {
         headers.append('Content-Length', '67');
         const body = new URLSearchParams();
         body.set('query', querySelect);
+        // eslint-disable-next-line unicorn/no-array-for-each
         additionalUrlParams.forEach((value: string, key: string) => {
           body.set(key, String(value));
         });
@@ -297,7 +296,6 @@ describe('SparqlEndpointFetcher', () => {
         const headers: Headers = new Headers();
         headers.append('Accept', 'myacceptheader');
         expect(fetchCbThis).toHaveBeenCalledWith(
-          // eslint-disable-next-line max-len
           'https://dbpedia.org/sparql?query=SELECT%20*%20WHERE%20%7B%20%3Fs%20%3Fp%20%3Fo%20%7D&infer=true&sameAs=false',
           expect.objectContaining({ headers, method: 'GET' }),
         );
@@ -314,7 +312,6 @@ describe('SparqlEndpointFetcher', () => {
         const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
         await expect(fetcherThis.fetchRawStream(endpoint, querySelect, 'myacceptheader'))
           .rejects
-          // eslint-disable-next-line max-len
           .toEqual(new Error('Invalid SPARQL endpoint response from https://dbpedia.org/sparql (HTTP status 500):\nthis is an invalid response'));
       });
 
@@ -353,7 +350,7 @@ describe('SparqlEndpointFetcher', () => {
         });
         const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
         const [ contentType, rawStream ] = await fetcherThis.fetchRawStream(endpoint, querySelect, 'myacceptheader');
-        expect(contentType).toEqual('');
+        expect(contentType).toBe('');
         expect(rawStream).toBeInstanceOf(ReadableWebToNodeStream);
       });
 
@@ -368,7 +365,6 @@ describe('SparqlEndpointFetcher', () => {
         const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
         await expect(fetcherThis.fetchRawStream(endpoint, querySelect, 'myacceptheader'))
           .rejects
-          // eslint-disable-next-line max-len
           .toEqual(new Error('Invalid SPARQL endpoint response from https://dbpedia.org/sparql (HTTP status 200):\nempty response'));
       });
 
@@ -472,7 +468,6 @@ describe('SparqlEndpointFetcher', () => {
         const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
         await expect(fetcherThis.fetchUpdate(endpoint, queryDelete))
           .rejects
-          // eslint-disable-next-line max-len
           .toEqual(new Error('Invalid SPARQL endpoint response from https://dbpedia.org/sparql (HTTP status 500):\nempty response'));
       });
     });
@@ -574,7 +569,6 @@ describe('SparqlEndpointFetcher', () => {
         const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
         await expect(fetcherThis.fetchBindings(endpoint, querySelect))
           .rejects
-          // eslint-disable-next-line max-len
           .toEqual(new Error('Invalid SPARQL endpoint response from https://dbpedia.org/sparql (HTTP status 500):\nthis is an invalid response'));
       });
 
@@ -619,7 +613,7 @@ describe('SparqlEndpointFetcher', () => {
         const results = await fetcherThis.fetchBindings(endpoint, querySelect);
         const p = new Promise(resolve => results.on('variables', resolve));
         await arrayifyStream(results);
-        expect(await p).toEqual([ DF.variable('p') ]);
+        await expect(p).resolves.toEqual([ DF.variable('p') ]);
       });
     });
 
@@ -636,7 +630,7 @@ describe('SparqlEndpointFetcher', () => {
           statusText: 'Ok!',
         });
         const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
-        await expect(fetcherThis.fetchAsk(endpoint, queryAsk)).resolves.toEqual(true);
+        await expect(fetcherThis.fetchAsk(endpoint, queryAsk)).resolves.toBe(true);
       });
 
       it('should parse false in JSON', async() => {
@@ -651,7 +645,7 @@ describe('SparqlEndpointFetcher', () => {
           statusText: 'Ok!',
         });
         const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
-        await expect(fetcherThis.fetchAsk(endpoint, queryAsk)).resolves.toEqual(false);
+        await expect(fetcherThis.fetchAsk(endpoint, queryAsk)).resolves.toBe(false);
       });
 
       it('should parse false in XML', async() => {
@@ -666,7 +660,7 @@ describe('SparqlEndpointFetcher', () => {
           statusText: 'Ok!',
         });
         const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
-        await expect(fetcherThis.fetchAsk(endpoint, queryAsk)).resolves.toEqual(false);
+        await expect(fetcherThis.fetchAsk(endpoint, queryAsk)).resolves.toBe(false);
       });
 
       it('should reject on an invalid response', async() => {
@@ -696,7 +690,6 @@ describe('SparqlEndpointFetcher', () => {
         const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
         await expect(fetcherThis.fetchAsk(endpoint, queryAsk))
           .rejects
-          // eslint-disable-next-line max-len
           .toEqual(new Error('Invalid SPARQL endpoint response from https://dbpedia.org/sparql (HTTP status 500):\nthis is an invalid response'));
       });
 
@@ -752,7 +745,7 @@ describe('SparqlEndpointFetcher', () => {
 
         jest.runAllTimers();
 
-        await expect(result).rejects.toThrow();
+        await expect(result).rejects.toThrow('This operation was aborted');
       });
     });
   });
