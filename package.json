@@ -54,11 +54,11 @@
     "yargs": "^17.0.0"
   },
   "devDependencies": {
-    "@rubensworks/eslint-config": "^2.0.0",
+    "@rubensworks/eslint-config": "^3.0.0",
     "@types/jest": "^29.0.0",
     "arrayify-stream": "^2.0.0",
     "coveralls": "^3.0.0",
-    "eslint": "^8.48.0",
+    "eslint": "^8.0.0",
     "husky": "^4.0.0",
     "jest": "^29.0.0",
     "jest-rdf": "^1.0.0",
@@ -94,8 +94,8 @@
     "test": "jest",
     "test-watch": "jest --watch",
     "coveralls": "jest --coverage && cat ./coverage/lcov.info | coveralls",
-    "lint": "eslint . --ext .ts",
-    "lint:fix": "eslint . --ext .ts --fix",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "build": "tsc",
     "validate": "yarn list",
     "version": "manual-git-changelog onversion"
