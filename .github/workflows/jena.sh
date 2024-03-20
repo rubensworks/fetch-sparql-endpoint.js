@@ -26,28 +26,28 @@ elif [ "$1" = "test" ]; then
 
   result=$(
     SPARQL_USERNAME="$jena_username" SPARQL_PASSWORD="$jena_password" node bin/fetch-sparql-endpoint.js \
-      --endpoint "http://localhost:4000/$jena_dataset/update" \
+      --endpoint "http://localhost:$jena_port/$jena_dataset/update" \
       --query 'insert data { <ex:s> <ex:p> <ex:o> }' \
       --auth basic \
-      --timeout "$cli_timeout" \
+      --timeout "$cli_timeout"
   )
   echo "$result" | grep 'OK' &> /dev/null && echo "SPARQL UPDATE OK" || (echo "SPARQL UPDATE failed: $result" && exit 1)
 
   result=$(
     SPARQL_USERNAME="$jena_username" SPARQL_PASSWORD="$jena_password" node bin/fetch-sparql-endpoint.js \
-      --endpoint "http://localhost:4000/$jena_dataset/sparql" \
+      --endpoint "http://localhost:$jena_port/$jena_dataset/sparql" \
       --query 'ask where { <ex:s> <ex:p> <ex:o> }' \
       --auth basic \
-      --timeout "$cli_timeout" \
+      --timeout "$cli_timeout"
   )
   echo "$result" | grep 'true' &> /dev/null && echo "SPARQL ASK OK" || (echo "SPARQL ASK failed: $result" && exit 1)
 
   result=$(
     SPARQL_USERNAME="$jena_username" SPARQL_PASSWORD="$jena_password" node bin/fetch-sparql-endpoint.js \
-      --endpoint "http://localhost:4000/$jena_dataset/sparql" \
+      --endpoint "http://localhost:$jena_port/$jena_dataset/sparql" \
       --query 'select * where { ?s ?p ?o }' \
       --auth basic \
-      --timeout "$cli_timeout" \
+      --timeout "$cli_timeout"
   )
   echo "$result" | grep '{"s":"ex:s","p":"ex:p","o":"ex:o"}' &> /dev/null && echo "SPARQL SELECT OK" || (echo "SPARQL SELECT failed: $result" && exit 1)
 fi
