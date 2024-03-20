@@ -78,6 +78,7 @@ async function run(argv: string[]): Promise<void> {
       'Run the SPARQL query from query.rq against the DBPedia SPARQL endpoint',
     )
     .positional('endpoint', { type: 'string', describe: 'Send the query to this SPARQL endpoint', demandOption: true })
+    .positional('query', { type: 'string', describe: 'The query to execute' })
     .options({
       query: { alias: 'q', type: 'string', describe: 'Evaluate the given SPARQL query string' },
       file: { alias: 'f', type: 'string', describe: 'Evaluate the SPARQL query in the given file' },
@@ -86,7 +87,7 @@ async function run(argv: string[]): Promise<void> {
     .help()
     .parse();
   const endpoint = <string>args._[0];
-  const queryString = await getQuery(args.query, args.file);
+  const queryString = await getQuery(args._.length > 1 ? <string>args._[1] : args.query, args.file);
   const fetcher = new SparqlEndpointFetcher({ method: args.get ? 'GET' : 'POST' });
   const queryType = fetcher.getQueryType(queryString);
   switch (queryType) {
