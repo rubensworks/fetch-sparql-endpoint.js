@@ -49,6 +49,8 @@ jobs:
         with:
           path: '**/node_modules'
           key: ${{ runner.os }}-test-modules-${{ hashFiles('**/yarn.lock') }}
+      - name: Start Jena SPARQL endpoint
+        run: .github/workflows/jena.sh start
       - run: corepack enable
       - run: yarn install --ignore-engines --frozen-lockfile
       - run: yarn run build
@@ -58,25 +60,6 @@ jobs:
           github-token: ${{ secrets.github_token }}
           flag-name: run-${{ matrix.node-version }}
           parallel: true
-
-  commandline:
-    needs: test
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.DEFAULT_NODE_VERSION }}
-      - run: git config --global core.autocrlf input
-      - uses: actions/checkout@v4
-      - name: Start Jena SPARQL endpoint
-        run: .github/workflows/jena.sh start
-      - uses: actions/cache@v4
-        with:
-          path: '**/node_modules'
-          key: ${{ runner.os }}-cli-modules-${{ hashFiles('**/yarn.lock') }}
-      - run: corepack enable
-      - run: yarn install --ignore-engines --frozen-lockfile
-      - run: yarn run build
       - name: Test the command line tool against Jena SPARQL endpoint
         run: .github/workflows/jena.sh test
       - name: Stop Jena SPARQL endpoint
