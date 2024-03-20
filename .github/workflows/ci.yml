@@ -80,7 +80,7 @@ jobs:
       - name: Test data existence using the command line tool
         run: |
           node bin/fetch-sparql-endpoint.js \
-            --endpoint http://localhost:4000/${{ env.JENA_DATASET }}/update \
+            --endpoint http://localhost:4000/${{ env.JENA_DATASET }}/sparql \
             --query 'ask where { <ex:s> <ex:p> <ex:o> }' \
             --username ${{ env.FUSEKI_USERNAME }} \
             --password ${{ env.FUSEKI_PASSWORD }} \
