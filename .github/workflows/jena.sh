@@ -6,7 +6,7 @@ jena_image=stain/jena-fuseki:4.8.0
 jena_dataset=mydataset
 jena_password=pw
 jena_username=admin
-cli_timeout=5
+cli_timeout=10
 
 if [ "$1" = "start" ]; then
   echo "Starting Jena container with name $jena_name using $jena_image"
