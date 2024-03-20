@@ -1,7 +1,7 @@
 #!/bin/bash
 
 jena_port=4000
-jena_name="endpoint$JENA_NAME_SUFFIX"
+jena_name=endpoint
 jena_image=stain/jena-fuseki:4.8.0
 jena_dataset=mydataset
 jena_password=pw
@@ -19,7 +19,8 @@ if [ "$1" = "start" ]; then
   docker start "$jena_name"
 elif [ "$1" = "stop" ]; then
   echo "Stopping Jena container with name $jena_name"
-  docker stop $jena_name
+  docker stop "$jena_name"
+  docker container remove "$jena_name"
 elif [ "$1" = "test" ]; then
   echo "Testing the command line tool against the Jena SPARQL endpoint with basic auth..."
 
