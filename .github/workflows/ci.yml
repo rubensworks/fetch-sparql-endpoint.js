@@ -37,19 +37,7 @@ jobs:
           - 18.x
           - 20.x
     env:
-      FUSEKI_USERNAME: admin
-      SPARQL_USERNAME: admin
-      SPARQL_PASSWORD: pw
-      JENA_DATASET: mydataset
-      CLI_TIMEOUT: 5
-    services:
-      jenafuseki:
-        image: stain/jena-fuseki:4.8.0
-        env:
-          FUSEKI_DATASET_1: ${{ env.JENA_DATASET }}
-          ADMIN_PASSWORD: ${{ env.SPARQL_PASSWORD }}
-        ports:
-          - 4000:3030
+      JENA_NAME_SUFFIX: ${{ matrix.node-version }}
     steps:
       - uses: actions/setup-node@v4
         with:
@@ -69,30 +57,13 @@ jobs:
           github-token: ${{ secrets.github_token }}
           flag-name: run-${{ matrix.node-version }}
           parallel: true
-      - name: Test writing of data using the command line tool
-        run: |
-          node bin/fetch-sparql-endpoint.js \
-            --endpoint http://localhost:4000/${{ env.JENA_DATASET }}/update \
-            --query 'insert data { <ex:s> <ex:p> <ex:o> }' \
-            --auth basic \
-            --timeout ${{ env.CLI_TIMEOUT }} \
-          | grep 'OK' &> /dev/null && echo "OK" || (echo "Update failed" && exit 1)
-      - name: Test data existence using the command line tool
-        run: |
-          node bin/fetch-sparql-endpoint.js \
-            --endpoint http://localhost:4000/${{ env.JENA_DATASET }}/sparql \
-            --query 'ask where { <ex:s> <ex:p> <ex:o> }' \
-            --auth basic \
-            --timeout ${{ env.CLI_TIMEOUT }} \
-          | grep 'true' &> /dev/null && echo "OK" || (echo "Ask failed" && exit 1)
-      - name: Test reading of the written data using the command line tool
-        run: |
-          node bin/fetch-sparql-endpoint.js \
-            --endpoint http://localhost:4000/${{ env.JENA_DATASET }}/sparql \
-            --query 'select * where { ?s ?p ?o }' \
-            --auth basic \
-            --timeout ${{ env.CLI_TIMEOUT }} \
-          | grep '{"s":"ex:s","p":"ex:p","o":"ex:o"}' &> /dev/null && echo "OK" || (echo "Query failed" && exit 1)
+      - name: Start Jena SPARQL endpoint
+        run: bash ${{ github.workspace }}/.github/workflows/jena.sh start
+      - name: Test the command line tool against Jena SPARQL endpoint
+        run: bash ${{ github.workspace }}/.github/workflows/jena.sh test
+      - name: Start Jena SPARQL endpoint
+        run: bash ${{ github.workspace }}/.github/workflows/jena.sh stop
+        if: always()
 
   coveralls:
     needs: test
