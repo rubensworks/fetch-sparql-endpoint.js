@@ -32,7 +32,7 @@ This package also works out-of-the-box in browsers via tools such as [webpack](h
 #### Create a new fetcher
 
 ```js
-import {SparqlEndpointFetcher} from "fetch-sparql-endpoint";
+import { SparqlEndpointFetcher } from 'fetch-sparql-endpoint';
 
 const myFetcher = new SparqlEndpointFetcher();
 ```
@@ -40,13 +40,20 @@ const myFetcher = new SparqlEndpointFetcher();
 Optionally, you can pass an options object with the following optional entries:
 ```js
 const myFetcher = new SparqlEndpointFetcher({
-  method: 'POST',                           // A custom HTTP method for issuing (non-update) queries, defaults to POST. Update queries are always issued via POST.
-  additionalUrlParams: new URLSearchParams({'infer': 'true', 'sameAs': 'false'});  // A set of additional parameters that well be added to fetchAsk, fetchBindings & fetchTriples requests
-  defaultHeaders: new Headers(),            // Optional default headers that will be included in each request
-  fetch: fetch,                             // A custom fetch-API-supporting function
-  dataFactory: DataFactory,                 // A custom RDFJS data factory
-  prefixVariableQuestionMark: false,        // If variable names in bindings should be prefixed with '?', defaults to false
-  timeout: 5000                             // Timeout for setting up server connection (Once a connection has been made, and the response is being parsed, the timeout does not apply anymore).
+  // A custom HTTP method for issuing (non-update) queries, defaults to POST. Update queries are always issued via POST.
+  method: 'POST',
+  // A set of additional parameters that well be added to fetchAsk, fetchBindings & fetchTriples requests
+  additionalUrlParams: new URLSearchParams({ infer: 'true', sameAs: 'false' }),
+  // Optional default headers that will be included in each request
+  defaultHeaders: new Headers(),
+  // A custom fetch-API-supporting function
+  fetch,
+  // A custom RDFJS data factory
+  dataFactory: DataFactory,
+  // If variable names in bindings should be prefixed with '?', defaults to false
+  prefixVariableQuestionMark: false,
+  // Timeout for setting up server connection (Once a connection has been made, and the response is being parsed, the timeout does not apply anymore).
+  timeout: 5000,
 });
 ```
 
@@ -56,7 +63,7 @@ const myFetcher = new SparqlEndpointFetcher({
 
 ```js
 const bindingsStream = await fetcher.fetchBindings('https://dbpedia.org/sparql', 'SELECT * WHERE { ?s ?p ?o } LIMIT 100');
-bindingsStream.on('data', (bindings) => console.log(bindings));
+bindingsStream.on('data', bindings => console.log(bindings));
 ```
 
 This will output bindings in the following form,
@@ -72,9 +79,9 @@ and values and [RDFJS terms](http://rdf.js.org/#term-interface):
 Optionally, you can obtain a list of variables by listening to the `'variables'` event:
 ```js
 const bindingsStream = await fetcher.fetchBindings('https://dbpedia.org/sparql', 'SELECT * WHERE { ?s ?p ?o } LIMIT 100');
-bindingsStream.on('data', (bindings) => console.log(bindings));
+bindingsStream.on('data', bindings => console.log(bindings));
 // Will print [ variable('s'), variable('p'), variable('o') ]
-bindingsStream.on('variables', (variables) => console.log(variables));
+bindingsStream.on('variables', variables => console.log(variables));
 ```
 
 ### Fetch ask
@@ -94,7 +101,7 @@ queries returns a (promise to a) stream of triples.
 
 ```js
 const tripleStream = await fetcher.fetchTriples('https://dbpedia.org/sparql', 'CONSTRUCT { ?s ?p ?o } LIMIT 100');
-tripleStream.on('data', (triple) => console.log(triple));
+tripleStream.on('data', triple => console.log(triple));
 ```
 
 This will output [RDFJS triples](http://rdf.js.org/#triple-interface) as follows:
@@ -121,10 +128,13 @@ If you want to know the query type
 in order to determine which of the above fetch methods to call,
 then you can use the `getQueryType` method as follows:
 
-```
-fetcher.getQueryType('SELECT * WHERE { ?s ?p ?o } LIMIT 100'); // Outputs 'SELECT'
-fetcher.getQueryType('ASK WHERE { ?s ?p ?o }');                // Outputs 'ASK'
-fetcher.getQueryType('CONSTRUCT { ?s ?p ?o } LIMIT 100');      // Outputs 'CONSTRUCT'
+```js
+// Outputs 'SELECT'
+fetcher.getQueryType('SELECT * WHERE { ?s ?p ?o } LIMIT 100');
+// Outputs 'ASK'
+fetcher.getQueryType('ASK WHERE { ?s ?p ?o }');
+// Outputs 'CONSTRUCT'
+fetcher.getQueryType('CONSTRUCT { ?s ?p ?o } LIMIT 100');
 ```
 
 This method will also throw an error if the query contains a syntax error.

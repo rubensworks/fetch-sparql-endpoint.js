@@ -22,7 +22,7 @@ jobs:
         with:
           node-version: 20.x
       - run: corepack enable
-      - run: yarn install --frozen-lockfile
+      - run: yarn install --ignore-engines --frozen-lockfile
       - run: yarn run lint
 
   test:
@@ -47,10 +47,10 @@ jobs:
           path: '**/node_modules'
           key: ${{ runner.os }}-test-modules-${{ hashFiles('**/yarn.lock') }}
       - run: corepack enable
-      - run: yarn install --frozen-lockfile
+      - run: yarn install --ignore-engines --frozen-lockfile
       - run: yarn run build
       - run: yarn run test
-      - uses: coverallsapp/github-action@master
+      - uses: coverallsapp/github-action@v2
         with:
           github-token: ${{ secrets.github_token }}
           flag-name: run-${{ matrix.node-version }}
@@ -61,24 +61,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Consolidate test coverage from different jobs
-        uses: coverallsapp/github-action@master
+        uses: coverallsapp/github-action@v2
         with:
           github-token: ${{ secrets.github_token }}
           parallel-finished: true
 
-  docker:
+  cli:
     needs: test
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os:
-          - ubuntu-latest
-        node-version:
-          - 20.x
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: 20.x
       - run: git config --global core.autocrlf input
       - uses: actions/checkout@v4
       - run: .github/workflows/start-docker.sh
@@ -87,7 +81,7 @@ jobs:
           path: '**/node_modules'
           key: ${{ runner.os }}-docker-modules-${{ hashFiles('**/yarn.lock') }}
       - run: corepack enable
-      - run: yarn install --frozen-lockfile
+      - run: yarn install --ignore-engines --frozen-lockfile
       - run: yarn build
       - run: .github/workflows/test-docker.sh
       - run: .github/workflows/stop-docker.sh
@@ -105,5 +99,5 @@ jobs:
         with:
           node-version: 20.x
       - run: corepack enable
-      - run: yarn install --frozen-lockfile
+      - run: yarn install --ignore-engines --frozen-lockfile
       - run: npx webpack
