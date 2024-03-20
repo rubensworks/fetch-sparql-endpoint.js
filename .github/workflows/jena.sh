@@ -10,6 +10,7 @@ cli_timeout=10
 
 if [ "$1" = "start" ]; then
   echo "Starting Jena container with name $jena_name using $jena_image"
+  docker pull "$jena_image"
   docker container create \
     --name "$jena_name" \
     --publish "$jena_port":3030 \
@@ -17,10 +18,12 @@ if [ "$1" = "start" ]; then
     --env ADMIN_PASSWORD="$jena_password" \
     "$jena_image"
   docker start "$jena_name"
+
 elif [ "$1" = "stop" ]; then
   echo "Stopping Jena container with name $jena_name"
   docker stop "$jena_name"
   docker container remove "$jena_name"
+
 elif [ "$1" = "test" ]; then
   echo "Testing the command line tool against the Jena SPARQL endpoint with basic auth..."
 
