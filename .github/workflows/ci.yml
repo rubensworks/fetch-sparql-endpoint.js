@@ -68,7 +68,7 @@ jobs:
           github-token: ${{ secrets.github_token }}
           flag-name: run-${{ matrix.node-version }}
           parallel: true
-      - name: insert data using the cli
+      - name: Test writing of data using the command line tool
         run: |
           node bin/fetch-sparql-endpoint.js \
             --endpoint http://localhost:4000/${{ env.JENA_DATASET }}/update \
@@ -77,7 +77,7 @@ jobs:
             --password ${{ env.FUSEKI_PASSWORD }} \
             --timeout ${{ env.CLI_TIMEOUT }} \
           | grep 'OK' &> /dev/null && echo "OK" || (echo "Update failed" && exit 1)
-      - name: test data existence using the cli
+      - name: Test reading of the written data using the command line tool
         run: |
           node bin/fetch-sparql-endpoint.js \
             --endpoint http://localhost:4000/${{ env.JENA_DATASET }}/sparql \
