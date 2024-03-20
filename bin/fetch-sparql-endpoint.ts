@@ -66,23 +66,23 @@ function update(endpoint: string, fetcher: SparqlEndpointFetcher, query: string)
 async function run(argv: string[]): Promise<void> {
   const args = await yargs(hideBin(argv))
     .example(
-      '$0 https://dbpedia.org/sparql --query \'SELECT * WHERE { ?s ?p ?o } LIMIT 100\'',
+      '$0 --endpoint https://dbpedia.org/sparql --query \'SELECT * WHERE { ?s ?p ?o } LIMIT 100\'',
       'Fetch 100 triples from the DBPedia SPARQL endpoint',
     )
     .example(
-      '$0 https://dbpedia.org/sparql --file query.rq',
+      '$0 --endpoint https://dbpedia.org/sparql --file query.rq',
       'Run the SPARQL query from query.rq against the DBPedia SPARQL endpoint',
     )
     .example(
-      'cat query.rq | $0 https://dbpedia.org/sparql',
+      'cat query.rq | $0 --endpoint https://dbpedia.org/sparql',
       'Run the SPARQL query from query.rq against the DBPedia SPARQL endpoint',
     )
-    .positional('endpoint', { type: 'string', describe: 'Send the query to this SPARQL endpoint', demandOption: true })
-    .positional('query', { type: 'string', describe: 'The query to execute' })
     .options({
+      endpoint: { type: 'string', describe: 'Send the query to this SPARQL endpoint', demandOption: true },
       query: { type: 'string', describe: 'Evaluate the given SPARQL query string' },
       file: { type: 'string', describe: 'Evaluate the SPARQL query in the given file' },
       get: { type: 'boolean', describe: 'Send query via HTTP GET instead of POST', default: false },
+      timeout: { type: 'number', describe: 'The timeout value in seconds to finish the query' },
       username: { type: 'string', describe: 'Username to use for basic authentication' },
       password: { type: 'string', describe: 'Password to use for basic authentication' },
     })
@@ -96,13 +96,13 @@ async function run(argv: string[]): Promise<void> {
     .parse();
   const endpoint = <string>args._[0];
   const queryString = await getQuery(args.query, args.file);
-  let defaultHeaders: Headers | undefined;
-  if (args.username && args.password) {
-    defaultHeaders = new Headers({
-      authorization: `Basic ${Buffer.from(`${args.username}:${args.password}`, 'binary').toString('base64')}`,
-    });
-  }
-  const fetcher = new SparqlEndpointFetcher({ method: args.get ? 'GET' : 'POST', defaultHeaders });
+  const fetcher = new SparqlEndpointFetcher({
+    method: args.get ? 'GET' : 'POST',
+    timeout: args.timeout ? args.timeout * 1_000 : undefined,
+    defaultHeaders: args.username && args.password ?
+      new Headers({ authorization: `Basic ${Buffer.from(`${args.username}:${args.password}`, 'binary').toString('base64')}` }) :
+      undefined,
+  });
   const queryType = fetcher.getQueryType(queryString);
   switch (queryType) {
     case 'SELECT':
