@@ -10,14 +10,13 @@ cli_timeout=5
 
 if [ "$1" = "start" ]; then
   echo "Starting Jena container with name $jena_name using $jena_image"
-  docker run \
-    --rm \
-    --detach \
+  docker container create \
     --name "$jena_name" \
     --publish "$jena_port":3030 \
     --env FUSEKI_DATASET_1="$jena_dataset" \
     --env ADMIN_PASSWORD="$jena_password" \
     "$jena_image"
+  docker start "$jena_name"
 elif [ "$1" = "stop" ]; then
   echo "Stopping Jena container with name $jena_name"
   docker stop $jena_name
