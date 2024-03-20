@@ -94,7 +94,6 @@ async function run(argv: string[]): Promise<void> {
     })
     .help()
     .parse();
-  const endpoint = <string>args._[0];
   const queryString = await getQuery(args.query, args.file);
   const fetcher = new SparqlEndpointFetcher({
     method: args.get ? 'GET' : 'POST',
@@ -106,17 +105,17 @@ async function run(argv: string[]): Promise<void> {
   const queryType = fetcher.getQueryType(queryString);
   switch (queryType) {
     case 'SELECT':
-      await querySelect(endpoint, fetcher, queryString);
+      await querySelect(args.endpoint, fetcher, queryString);
       break;
     case 'ASK':
-      await queryAsk(endpoint, fetcher, queryString);
+      await queryAsk(args.endpoint, fetcher, queryString);
       break;
     case 'CONSTRUCT':
-      await queryConstruct(endpoint, fetcher, queryString);
+      await queryConstruct(args.endpoint, fetcher, queryString);
       break;
     case 'UNKNOWN':
       if (fetcher.getUpdateTypes(queryString) !== 'UNKNOWN') {
-        await update(endpoint, fetcher, queryString);
+        await update(args.endpoint, fetcher, queryString);
       }
       break;
   }
