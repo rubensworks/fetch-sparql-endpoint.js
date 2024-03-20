@@ -80,15 +80,29 @@ async function run(argv: string[]): Promise<void> {
     .positional('endpoint', { type: 'string', describe: 'Send the query to this SPARQL endpoint', demandOption: true })
     .positional('query', { type: 'string', describe: 'The query to execute' })
     .options({
-      query: { alias: 'q', type: 'string', describe: 'Evaluate the given SPARQL query string' },
-      file: { alias: 'f', type: 'string', describe: 'Evaluate the SPARQL query in the given file' },
-      get: { alias: 'g', type: 'boolean', describe: 'Send query via HTTP GET instead of POST', default: false },
+      query: { type: 'string', describe: 'Evaluate the given SPARQL query string' },
+      file: { type: 'string', describe: 'Evaluate the SPARQL query in the given file' },
+      get: { type: 'boolean', describe: 'Send query via HTTP GET instead of POST', default: false },
+      username: { type: 'string', describe: 'Username to use for basic authentication' },
+      password: { type: 'string', describe: 'Password to use for basic authentication' },
+    })
+    .check((arg) => {
+      if ((arg.username !== undefined) !== (arg.password !== undefined)) {
+        throw new Error('Both username and password is required, or neither should be provided');
+      }
+      return true;
     })
     .help()
     .parse();
   const endpoint = <string>args._[0];
-  const queryString = await getQuery(args._.length > 1 ? <string>args._[1] : args.query, args.file);
-  const fetcher = new SparqlEndpointFetcher({ method: args.get ? 'GET' : 'POST' });
+  const queryString = await getQuery(args.query, args.file);
+  let defaultHeaders: Headers | undefined;
+  if (args.username && args.password) {
+    defaultHeaders = new Headers({
+      authorization: `Basic ${Buffer.from(`${args.username}:${args.password}`, 'binary').toString('base64')}`,
+    });
+  }
+  const fetcher = new SparqlEndpointFetcher({ method: args.get ? 'GET' : 'POST', defaultHeaders });
   const queryType = fetcher.getQueryType(queryString);
   switch (queryType) {
     case 'SELECT':
