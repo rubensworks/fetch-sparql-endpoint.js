@@ -141,22 +141,31 @@ This method will also throw an error if the query contains a syntax error.
 
 ### Command-line
 
-A command-line tool is provided to quickly query or update any SPARQL endpoint:
+A command-line tool is provided to quickly query or update any SPARQL endpoint.
+Basic authentication is meant for development or debugging only.
 
 Usage:
 ```
-fetch-sparql-endpoint Sends a query to a SPARQL endpoint
-
-Usage:
-  fetch-sparql-endpoint https://dbpedia.org/sparql [-q] 'SELECT * WHERE { ?s ?p ?o } 100'
-  fetch-sparql-endpoint https://dbpedia.org/sparql -f query.sparql
-  cat query.sparql | fetch-sparql-endpoint https://dbpedia.org/sparql
-
 Options:
-  -q            evaluate the given SPARQL query string
-  -f            evaluate the SPARQL query in the given file
-  -g            send query via HTTP GET instead of POST
-  --help        print this help message
+  --endpoint  Send the query to this SPARQL endpoint         [string] [required]
+  --query     Evaluate the given SPARQL query string                    [string]
+  --file      Evaluate the SPARQL query in the given file               [string]
+  --get       Send query via HTTP GET instead of POST [boolean] [default: false]
+  --timeout   The timeout value in seconds to finish the query          [number]
+  --username  Username to use for basic authentication                  [string]
+  --password  Password to use for basic authentication                  [string]
+  --version   Show version number                                      [boolean]
+  --help      Show help                                                [boolean]
+
+Examples:
+  fetch-sparql-endpoint.js --endpoint       Fetch 100 triples from the DBPedia
+  https://dbpedia.org/sparql --query        SPARQL endpoint
+  'SELECT * WHERE { ?s ?p ?o } LIMIT 100'
+  fetch-sparql-endpoint.js --endpoint       Run the SPARQL query from query.rq
+  https://dbpedia.org/sparql --file         against the DBPedia SPARQL endpoint
+  query.rq
+  cat query.rq | fetch-sparql-endpoint.js   Run the SPARQL query from query.rq
+  --endpoint https://dbpedia.org/sparql     against the DBPedia SPARQL endpoint
 ```
 
 ## License

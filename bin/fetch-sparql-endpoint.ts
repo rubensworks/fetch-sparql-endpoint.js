@@ -64,7 +64,7 @@ function update(endpoint: string, fetcher: SparqlEndpointFetcher, query: string)
 }
 
 async function run(argv: string[]): Promise<void> {
-  const args = await yargs(hideBin(argv))
+  const args = await yargs(hideBin(argv), 'Sends a query to a SPARQL endpoint')
     .example(
       '$0 --endpoint https://dbpedia.org/sparql --query \'SELECT * WHERE { ?s ?p ?o } LIMIT 100\'',
       'Fetch 100 triples from the DBPedia SPARQL endpoint',
@@ -92,7 +92,8 @@ async function run(argv: string[]): Promise<void> {
       }
       return true;
     })
-    .help()
+    .version()
+    .help('help')
     .parse();
   const queryString = await getQuery(args.query, args.file);
   const fetcher = new SparqlEndpointFetcher({
