@@ -66,19 +66,13 @@ jobs:
           github-token: ${{ secrets.github_token }}
           parallel-finished: true
 
-  docker:
+  cli:
     needs: test
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os:
-          - ubuntu-latest
-        node-version:
-          - 20.x
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: 20.x
       - run: git config --global core.autocrlf input
       - uses: actions/checkout@v4
       - run: .github/workflows/start-docker.sh
