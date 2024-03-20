@@ -8,9 +8,6 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-env:
-  DEFAULT_NODE_VERSION: 20.x
-
 jobs:
 
   lint:
@@ -23,7 +20,7 @@ jobs:
           key: ${{ runner.os }}-lint-modules-${{ hashFiles('**/yarn.lock') }}
       - uses: actions/setup-node@v4
         with:
-          node-version: ${{ env.DEFAULT_NODE_VERSION }}
+          node-version: 20.x
       - run: corepack enable
       - run: yarn install --ignore-engines --frozen-lockfile
       - run: yarn run lint
@@ -59,30 +56,6 @@ jobs:
           flag-name: run-${{ matrix.node-version }}
           parallel: true
 
-  commandline:
-    needs: test
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.DEFAULT_NODE_VERSION }}
-      - run: git config --global core.autocrlf input
-      - uses: actions/checkout@v4
-      - uses: actions/cache@v4
-        with:
-          path: '**/node_modules'
-          key: ${{ runner.os }}-cli-modules-${{ hashFiles('**/yarn.lock') }}
-      - run: corepack enable
-      - run: yarn install --ignore-engines --frozen-lockfile
-      - run: yarn run build
-      - name: Start Jena SPARQL endpoint
-        run: bash .github/workflows/jena.sh start
-      - name: Test the command line tool against Jena SPARQL endpoint
-        run: bash .github/workflows/jena.sh test
-      - name: Stop Jena SPARQL endpoint
-        run: bash .github/workflows/jena.sh stop
-        if: always()
-
   coveralls:
     needs: test
     runs-on: ubuntu-latest
@@ -92,6 +65,27 @@ jobs:
         with:
           github-token: ${{ secrets.github_token }}
           parallel-finished: true
+
+  cli:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+      - run: git config --global core.autocrlf input
+      - uses: actions/checkout@v4
+      - run: .github/workflows/start-docker.sh
+      - uses: actions/cache@v4
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-docker-modules-${{ hashFiles('**/yarn.lock') }}
+      - run: corepack enable
+      - run: yarn install --ignore-engines --frozen-lockfile
+      - run: yarn build
+      - run: .github/workflows/test-docker.sh
+      - run: .github/workflows/stop-docker.sh
+        if: always()
 
   webpack:
     needs: test
@@ -104,7 +98,7 @@ jobs:
           key: ${{ runner.os }}-webpack-modules-${{ hashFiles('**/yarn.lock') }}
       - uses: actions/setup-node@v4
         with:
-          node-version: ${{ env.DEFAULT_NODE_VERSION }}
+          node-version: 20.x
       - run: corepack enable
       - run: yarn install --ignore-engines --frozen-lockfile
       - run: npx webpack
