@@ -76,11 +76,11 @@ jobs:
       - run: yarn install --ignore-engines --frozen-lockfile
       - run: yarn run build
       - name: Start Jena SPARQL endpoint
-        run: bash ${{ github.workspace }}/.github/workflows/jena.sh start
+        run: bash .github/workflows/jena.sh start
       - name: Test the command line tool against Jena SPARQL endpoint
-        run: bash ${{ github.workspace }}/.github/workflows/jena.sh test
+        run: bash .github/workflows/jena.sh test
       - name: Stop Jena SPARQL endpoint
-        run: bash ${{ github.workspace }}/.github/workflows/jena.sh stop
+        run: bash .github/workflows/jena.sh stop
         if: always()
 
   coveralls:
