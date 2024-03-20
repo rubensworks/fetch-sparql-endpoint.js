@@ -125,4 +125,4 @@ async function run(argv: string[]): Promise<void> {
   }
 }
 
-run(process.argv).then().catch(error => process.stderr.write(`${error.toString()}\n`));
+run(process.argv).then().catch((error: Error) => process.stderr.write(`${error.name}: ${error.message}\n${error.stack}`));
