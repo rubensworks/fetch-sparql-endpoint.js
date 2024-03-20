@@ -96,17 +96,21 @@ jobs:
       - run: yarn build
       - name: insert data
         run: |
-          node bin/fetch-sparql-endpoint.js http://localhost:4000/${{ env.JENA_DATASET }}/update \
+          node bin/fetch-sparql-endpoint.js \
+            --endpoint http://localhost:4000/${{ env.JENA_DATASET }}/update \
             --query 'insert data { <ex:s> <ex:p> <ex:o> }' \
             --username ${{ env.FUSEKI_USERNAME }} \
             --password ${{ env.FUSEKI_PASSWORD }} \
+            --timeout 5 \
           | grep 'OK' &> /dev/null && echo "OK" || (echo "Update failed" && exit 1)
       - name: test data existence
         run: |
-          node bin/fetch-sparql-endpoint.js http://localhost:4000/${{ env.JENA_DATASET }}/sparql \
+          node bin/fetch-sparql-endpoint.js \
+            --endpoint http://localhost:4000/${{ env.JENA_DATASET }}/sparql \
             --query 'select * where { ?s ?p ?o }' \
             --username ${{ env.FUSEKI_USERNAME }} \
             --password ${{ env.FUSEKI_PASSWORD }} \
+            --timeout 5 \
           | grep '{"s":"ex:s","p":"ex:p","o":"ex:o"}' &> /dev/null && echo "OK" || (echo "Query failed" && exit 1)
 
   webpack:
