@@ -49,7 +49,6 @@
     "@types/n3": "^1.0.0",
     "@types/readable-stream": "^4.0.0",
     "@types/sparqljs": "^3.0.0",
-    "cross-fetch": "^4.0.0",
     "is-stream": "^2.0.0",
     "n3": "^1.0.0",
     "rdf-string": "^1.0.0",
@@ -75,7 +74,6 @@
     "ts-jest": "^29.0.0",
     "ts-loader": "^9.0.0",
     "typescript": "^5.0.0",
-    "web-streams-ponyfill": "^1.0.0",
     "webpack": "^5.0.0",
     "webpack-cli": "^5.0.0"
   },

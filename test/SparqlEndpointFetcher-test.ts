@@ -4,16 +4,11 @@ import arrayifyStream from 'arrayify-stream';
 import { DataFactory } from 'rdf-data-factory';
 import { SparqlEndpointFetcher } from '../lib/SparqlEndpointFetcher';
 
-const DF = new DataFactory();
-
-if (!globalThis.ReadableStream) {
-  // TODO: Remove this workaround and ponyfill when Node 16 support is dropped
-  globalThis.ReadableStream = require('web-streams-ponyfill').ReadableStream;
-}
-
 // The import of 'readable-stream-node-to-web' is down here because of the above workaround
 const readableStreamNodeToWeb = require('readable-stream-node-to-web');
 const streamifyString = require('streamify-string');
+
+const DF = new DataFactory();
 
 describe('SparqlEndpointFetcher', () => {
   describe('constructed without fetch callback', () => {

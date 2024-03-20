@@ -1,4 +1,3 @@
-import 'cross-fetch/polyfill';
 import type { Readable } from 'node:stream';
 import type * as RDF from '@rdfjs/types';
 import { ReadableWebToNodeStream } from '@smessie/readable-web-to-node-stream';
