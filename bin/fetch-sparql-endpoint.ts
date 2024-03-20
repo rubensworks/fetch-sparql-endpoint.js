@@ -83,12 +83,11 @@ async function run(argv: string[]): Promise<void> {
       file: { type: 'string', describe: 'Evaluate the SPARQL query in the given file' },
       get: { type: 'boolean', describe: 'Send query via HTTP GET instead of POST', default: false },
       timeout: { type: 'number', describe: 'The timeout value in seconds to finish the query' },
-      username: { type: 'string', describe: 'Username to use for basic authentication' },
-      password: { type: 'string', describe: 'Password to use for basic authentication' },
+      auth: { choices: [ 'basic' ], describe: 'The type of authentication to use' },
     })
     .check((arg) => {
-      if ((arg.username !== undefined) !== (arg.password !== undefined)) {
-        throw new Error('Both username and password is required, or neither should be provided');
+      if (arg.auth === 'basic' && (!process.env.SPARQL_USERNAME || !process.env.SPARQL_PASSWORD)) {
+        throw new Error('Basic authentication requires the SPARQL_USERNAME and SPARQL_PASSWORD environment variables.');
       }
       return true;
     })
@@ -96,12 +95,16 @@ async function run(argv: string[]): Promise<void> {
     .help('help')
     .parse();
   const queryString = await getQuery(args.query, args.file);
+  let defaultHeaders: Headers | undefined;
+  if (args.auth === 'basic') {
+    defaultHeaders = new Headers({
+      authorization: `Basic ${Buffer.from(`${process.env.SPARQL_USERNAME}:${process.env.SPARQL_PASSWORD}`, 'binary').toString('base64')}`,
+    });
+  }
   const fetcher = new SparqlEndpointFetcher({
     method: args.get ? 'GET' : 'POST',
     timeout: args.timeout ? args.timeout * 1_000 : undefined,
-    defaultHeaders: args.username && args.password ?
-      new Headers({ authorization: `Basic ${Buffer.from(`${args.username}:${args.password}`, 'binary').toString('base64')}` }) :
-      undefined,
+    defaultHeaders,
   });
   const queryType = fetcher.getQueryType(queryString);
   switch (queryType) {

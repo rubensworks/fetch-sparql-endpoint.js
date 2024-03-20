@@ -38,7 +38,8 @@ jobs:
           - 20.x
     env:
       FUSEKI_USERNAME: admin
-      FUSEKI_PASSWORD: pw
+      SPARQL_USERNAME: admin
+      SPARQL_PASSWORD: pw
       JENA_DATASET: mydataset
       CLI_TIMEOUT: 5
     services:
@@ -46,7 +47,7 @@ jobs:
         image: stain/jena-fuseki:4.8.0
         env:
           FUSEKI_DATASET_1: ${{ env.JENA_DATASET }}
-          ADMIN_PASSWORD: ${{ env.FUSEKI_PASSWORD }}
+          ADMIN_PASSWORD: ${{ env.SPARQL_PASSWORD }}
         ports:
           - 4000:3030
     steps:
@@ -73,8 +74,7 @@ jobs:
           node bin/fetch-sparql-endpoint.js \
             --endpoint http://localhost:4000/${{ env.JENA_DATASET }}/update \
             --query 'insert data { <ex:s> <ex:p> <ex:o> }' \
-            --username ${{ env.FUSEKI_USERNAME }} \
-            --password ${{ env.FUSEKI_PASSWORD }} \
+            --auth basic \
             --timeout ${{ env.CLI_TIMEOUT }} \
           | grep 'OK' &> /dev/null && echo "OK" || (echo "Update failed" && exit 1)
       - name: Test data existence using the command line tool
@@ -82,8 +82,7 @@ jobs:
           node bin/fetch-sparql-endpoint.js \
             --endpoint http://localhost:4000/${{ env.JENA_DATASET }}/sparql \
             --query 'ask where { <ex:s> <ex:p> <ex:o> }' \
-            --username ${{ env.FUSEKI_USERNAME }} \
-            --password ${{ env.FUSEKI_PASSWORD }} \
+            --auth basic \
             --timeout ${{ env.CLI_TIMEOUT }} \
           | grep 'true' &> /dev/null && echo "OK" || (echo "Ask failed" && exit 1)
       - name: Test reading of the written data using the command line tool
@@ -91,8 +90,7 @@ jobs:
           node bin/fetch-sparql-endpoint.js \
             --endpoint http://localhost:4000/${{ env.JENA_DATASET }}/sparql \
             --query 'select * where { ?s ?p ?o }' \
-            --username ${{ env.FUSEKI_USERNAME }} \
-            --password ${{ env.FUSEKI_PASSWORD }} \
+            --auth basic \
             --timeout ${{ env.CLI_TIMEOUT }} \
           | grep '{"s":"ex:s","p":"ex:p","o":"ex:o"}' &> /dev/null && echo "OK" || (echo "Query failed" && exit 1)
 

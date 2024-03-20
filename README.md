@@ -142,7 +142,8 @@ This method will also throw an error if the query contains a syntax error.
 ### Command-line
 
 A command-line tool is provided to quickly query or update any SPARQL endpoint.
-Basic authentication is meant for development or debugging only.
+With basic authentication, the username and password should be made available
+via process-scoped environment variables `SPARQL_USERNAME` and `SPARQL_PASSWORD`.
 
 Usage:
 ```
@@ -152,8 +153,7 @@ Options:
   --file      Evaluate the SPARQL query in the given file               [string]
   --get       Send query via HTTP GET instead of POST [boolean] [default: false]
   --timeout   The timeout value in seconds to finish the query          [number]
-  --username  Username to use for basic authentication                  [string]
-  --password  Password to use for basic authentication                  [string]
+  --auth      The type of authentication to use               [choices: "basic"]
   --version   Show version number                                      [boolean]
   --help      Show help                                                [boolean]
 
