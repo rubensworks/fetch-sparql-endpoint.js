@@ -77,6 +77,15 @@ jobs:
             --password ${{ env.FUSEKI_PASSWORD }} \
             --timeout ${{ env.CLI_TIMEOUT }} \
           | grep 'OK' &> /dev/null && echo "OK" || (echo "Update failed" && exit 1)
+      - name: Test data existence using the command line tool
+        run: |
+          node bin/fetch-sparql-endpoint.js \
+            --endpoint http://localhost:4000/${{ env.JENA_DATASET }}/update \
+            --query 'ask where { <ex:s> <ex:p> <ex:o> }' \
+            --username ${{ env.FUSEKI_USERNAME }} \
+            --password ${{ env.FUSEKI_PASSWORD }} \
+            --timeout ${{ env.CLI_TIMEOUT }} \
+          | grep 'true' &> /dev/null && echo "OK" || (echo "Ask failed" && exit 1)
       - name: Test reading of the written data using the command line tool
         run: |
           node bin/fetch-sparql-endpoint.js \
