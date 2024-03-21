@@ -64,48 +64,65 @@ function update(endpoint: string, fetcher: SparqlEndpointFetcher, query: string)
 }
 
 async function run(argv: string[]): Promise<void> {
-  const args = await yargs(hideBin(argv))
+  const args = await yargs(hideBin(argv), 'Sends a query to a SPARQL endpoint')
     .example(
-      '$0 https://dbpedia.org/sparql --query \'SELECT * WHERE { ?s ?p ?o } LIMIT 100\'',
+      '$0 --endpoint https://dbpedia.org/sparql --query \'SELECT * WHERE { ?s ?p ?o } LIMIT 100\'',
       'Fetch 100 triples from the DBPedia SPARQL endpoint',
     )
     .example(
-      '$0 https://dbpedia.org/sparql --file query.rq',
+      '$0 --endpoint https://dbpedia.org/sparql --file query.rq',
       'Run the SPARQL query from query.rq against the DBPedia SPARQL endpoint',
     )
     .example(
-      'cat query.rq | $0 https://dbpedia.org/sparql',
+      'cat query.rq | $0 --endpoint https://dbpedia.org/sparql',
       'Run the SPARQL query from query.rq against the DBPedia SPARQL endpoint',
     )
-    .positional('endpoint', { type: 'string', describe: 'Send the query to this SPARQL endpoint', demandOption: true })
-    .positional('query', { type: 'string', describe: 'The query to execute' })
     .options({
-      query: { alias: 'q', type: 'string', describe: 'Evaluate the given SPARQL query string' },
-      file: { alias: 'f', type: 'string', describe: 'Evaluate the SPARQL query in the given file' },
-      get: { alias: 'g', type: 'boolean', describe: 'Send query via HTTP GET instead of POST', default: false },
+      endpoint: { type: 'string', describe: 'Send the query to this SPARQL endpoint', demandOption: true },
+      query: { type: 'string', describe: 'Evaluate the given SPARQL query string' },
+      file: { type: 'string', describe: 'Evaluate the SPARQL query in the given file' },
+      get: { type: 'boolean', describe: 'Send query via HTTP GET instead of POST', default: false },
+      timeout: { type: 'number', describe: 'The timeout value in seconds to finish the query' },
+      auth: { choices: [ 'basic' ], describe: 'The type of authentication to use' },
     })
-    .help()
+    .check((arg) => {
+      if (arg.auth === 'basic' && (!process.env.SPARQL_USERNAME || !process.env.SPARQL_PASSWORD)) {
+        throw new Error('Basic authentication requires the SPARQL_USERNAME and SPARQL_PASSWORD environment variables.');
+      }
+      return true;
+    })
+    .version()
+    .help('help')
     .parse();
-  const endpoint = <string>args._[0];
-  const queryString = await getQuery(args._.length > 1 ? <string>args._[1] : args.query, args.file);
-  const fetcher = new SparqlEndpointFetcher({ method: args.get ? 'GET' : 'POST' });
+  const queryString = await getQuery(args.query, args.file);
+  let defaultHeaders: Headers | undefined;
+  if (args.auth === 'basic') {
+    defaultHeaders = new Headers({
+      authorization: `Basic ${Buffer.from(`${process.env.SPARQL_USERNAME}:${process.env.SPARQL_PASSWORD}`, 'binary').toString('base64')}`,
+    });
+  }
+  const fetcher = new SparqlEndpointFetcher({
+    method: args.get ? 'GET' : 'POST',
+    timeout: args.timeout ? args.timeout * 1_000 : undefined,
+    defaultHeaders,
+  });
   const queryType = fetcher.getQueryType(queryString);
   switch (queryType) {
     case 'SELECT':
-      await querySelect(endpoint, fetcher, queryString);
+      await querySelect(args.endpoint, fetcher, queryString);
       break;
     case 'ASK':
-      await queryAsk(endpoint, fetcher, queryString);
+      await queryAsk(args.endpoint, fetcher, queryString);
       break;
     case 'CONSTRUCT':
-      await queryConstruct(endpoint, fetcher, queryString);
+      await queryConstruct(args.endpoint, fetcher, queryString);
       break;
     case 'UNKNOWN':
       if (fetcher.getUpdateTypes(queryString) !== 'UNKNOWN') {
-        await update(endpoint, fetcher, queryString);
+        await update(args.endpoint, fetcher, queryString);
       }
       break;
   }
 }
 
-run(process.argv).then().catch(error => process.stderr.write(`${error.toString()}\n`));
+run(process.argv).then().catch((error: Error) => process.stderr.write(`${error.name}: ${error.message}\n${error.stack}`));
