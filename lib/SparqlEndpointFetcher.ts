@@ -2,6 +2,7 @@ import type * as RDF from '@rdfjs/types';
 import * as isStream from 'is-stream';
 import { StreamParser } from 'n3';
 import { readableFromWeb } from 'readable-from-web';
+import type { Readable } from 'readable-stream';
 import { type InsertDeleteOperation, type ManagementOperation, Parser as SparqlParser } from 'sparqljs';
 import { type ISettings as ISparqlJsonParserArgs, SparqlJsonParser } from 'sparqljson-parse';
 import { type ISettings as ISparqlXmlParserArgs, SparqlXmlParser } from 'sparqlxml-parse';
@@ -136,13 +137,13 @@ export class SparqlEndpointFetcher {
    * @param {string} query    A SPARQL query string.
    * @return {Promise<Stream>} A stream of triples.
    */
-  public async fetchTriples(endpoint: string, query: string): Promise<NodeJS.ReadableStream & RDF.Stream> {
+  public async fetchTriples(endpoint: string, query: string): Promise<Readable & RDF.Stream> {
     const [ contentType, responseStream ] = await this.fetchRawStream(
       endpoint,
       query,
       SparqlEndpointFetcher.CONTENTTYPE_TURTLE,
     );
-    return responseStream.pipe(new StreamParser({ format: contentType }));
+    return <Readable> <unknown> responseStream.pipe(new StreamParser({ format: contentType }));
   }
 
   /**
