@@ -2,7 +2,6 @@ import type * as RDF from '@rdfjs/types';
 import * as isStream from 'is-stream';
 import { StreamParser } from 'n3';
 import { readableFromWeb } from 'readable-from-web';
-import type { Readable } from 'readable-stream';
 import { type InsertDeleteOperation, type ManagementOperation, Parser as SparqlParser } from 'sparqljs';
 import { type ISettings as ISparqlJsonParserArgs, SparqlJsonParser } from 'sparqljson-parse';
 import { type ISettings as ISparqlXmlParserArgs, SparqlXmlParser } from 'sparqlxml-parse';
@@ -41,13 +40,13 @@ export class SparqlEndpointFetcher {
         parseBooleanStream: sparqlResponseStream =>
           this.sparqlJsonParser.parseJsonBooleanStream(sparqlResponseStream),
         parseResultsStream: sparqlResponseStream =>
-          <Readable> this.sparqlJsonParser.parseJsonResultsStream(sparqlResponseStream),
+          this.sparqlJsonParser.parseJsonResultsStream(sparqlResponseStream),
       },
       [SparqlEndpointFetcher.CONTENTTYPE_SPARQL_XML]: {
         parseBooleanStream: sparqlResponseStream =>
           this.sparqlXmlParser.parseXmlBooleanStream(sparqlResponseStream),
         parseResultsStream: sparqlResponseStream =>
-          <Readable> this.sparqlXmlParser.parseXmlResultsStream(sparqlResponseStream),
+          this.sparqlXmlParser.parseXmlResultsStream(sparqlResponseStream),
       },
     };
   }
@@ -97,9 +96,9 @@ export class SparqlEndpointFetcher {
    * @see IBindings
    * @param {string} endpoint A SPARQL endpoint URL. (without the `?query=` suffix).
    * @param {string} query    A SPARQL query string.
-   * @return {Promise<Readable>} A stream of {@link IBindings}.
+   * @return {Promise<NodeJS.ReadableStream>} A stream of {@link IBindings}.
    */
-  public async fetchBindings(endpoint: string, query: string): Promise<Readable> {
+  public async fetchBindings(endpoint: string, query: string): Promise<NodeJS.ReadableStream> {
     const [ contentType, responseStream ] = await this.fetchRawStream(
       endpoint,
       query,
@@ -137,13 +136,13 @@ export class SparqlEndpointFetcher {
    * @param {string} query    A SPARQL query string.
    * @return {Promise<Stream>} A stream of triples.
    */
-  public async fetchTriples(endpoint: string, query: string): Promise<Readable & RDF.Stream> {
+  public async fetchTriples(endpoint: string, query: string): Promise<NodeJS.ReadableStream & RDF.Stream> {
     const [ contentType, responseStream ] = await this.fetchRawStream(
       endpoint,
       query,
       SparqlEndpointFetcher.CONTENTTYPE_TURTLE,
     );
-    return <Readable & RDF.Stream> <unknown> responseStream.pipe(new StreamParser({ format: contentType }));
+    return responseStream.pipe(new StreamParser({ format: contentType }));
   }
 
   /**
@@ -184,13 +183,13 @@ export class SparqlEndpointFetcher {
    * @param {string} endpoint     A SPARQL endpoint URL. (without the `?query=` suffix).
    * @param {string} query        A SPARQL query string.
    * @param {string} acceptHeader The HTTP accept to use.
-   * @return {Promise<[string, Readable]>} The content type and SPARQL endpoint response stream.
+   * @return {Promise<[ string, NodeJS.ReadableStream ]>} The content type and SPARQL endpoint response stream.
    */
   public async fetchRawStream(
     endpoint: string,
     query: string,
     acceptHeader: string,
-  ): Promise<[ string, Readable ]> {
+  ): Promise<[ string, NodeJS.ReadableStream ]> {
     let url: string = this.method === 'POST' ? endpoint : `${endpoint}?query=${encodeURIComponent(query)}`;
 
     // Initiate request
@@ -219,15 +218,15 @@ export class SparqlEndpointFetcher {
    * @param {string}      url     The URL to call.
    * @param {RequestInit} init    Options to pass along to the fetch call.
    * @param {any}         options Other specific fetch options.
-   * @return {Promise<[string, Readable]>} The content type and SPARQL endpoint response stream.
+   * @return {Promise<[ string, NodeJS.ReadableStream ]>} The content type and SPARQL endpoint response stream.
    */
   private async handleFetchCall(
     url: string,
     init: RequestInit,
     options?: { ignoreBody: boolean },
-  ): Promise<[ string, Readable ]> {
+  ): Promise<[ string, NodeJS.ReadableStream ]> {
     let timeout;
-    let responseStream: Readable | undefined;
+    let responseStream: NodeJS.ReadableStream | undefined;
 
     if (this.timeout) {
       const controller = new AbortController();
@@ -244,7 +243,7 @@ export class SparqlEndpointFetcher {
       // Wrap WhatWG readable stream into a Node.js readable stream
       // If the body already is a Node.js stream (in the case of node-fetch), don't do explicit conversion.
       responseStream = isStream(httpResponse.body) ?
-        <Readable> <unknown> httpResponse.body :
+        <NodeJS.ReadableStream> <unknown> httpResponse.body :
         readableFromWeb(httpResponse.body);
     }
 
@@ -278,8 +277,8 @@ export interface ISparqlEndpointFetcherArgs extends ISparqlJsonParserArgs, ISpar
 }
 
 export interface ISparqlResultsParser {
-  parseResultsStream: (sparqlResponseStream: Readable) => Readable;
-  parseBooleanStream: (sparqlResponseStream: Readable) => Promise<boolean>;
+  parseResultsStream: (sparqlResponseStream: NodeJS.ReadableStream) => NodeJS.ReadableStream;
+  parseBooleanStream: (sparqlResponseStream: NodeJS.ReadableStream) => Promise<boolean>;
 }
 
 export type IBindings = Record<string, RDF.Term>;
