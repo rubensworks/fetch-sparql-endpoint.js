@@ -243,9 +243,9 @@ export class SparqlEndpointFetcher {
     if (!options?.ignoreBody && httpResponse.body) {
       // Wrap WhatWG readable stream into a Node.js readable stream
       // If the body already is a Node.js stream (in the case of node-fetch), don't do explicit conversion.
-      responseStream = isStream(httpResponse.body) ?
-        <NodeJS.ReadableStream> <unknown> httpResponse.body :
-        readableFromWeb(httpResponse.body);
+      responseStream = <NodeJS.ReadableStream> (
+        isStream(httpResponse.body) ? httpResponse.body : readableFromWeb(httpResponse.body)
+      );
     }
 
     // Emit an error if the server returned an invalid response
