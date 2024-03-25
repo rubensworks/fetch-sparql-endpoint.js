@@ -184,7 +184,7 @@ export class SparqlEndpointFetcher {
    * @param {string} endpoint     A SPARQL endpoint URL. (without the `?query=` suffix).
    * @param {string} query        A SPARQL query string.
    * @param {string} acceptHeader The HTTP accept to use.
-   * @return {Promise<[ string, NodeJS.ReadableStream ]>} The content type and SPARQL endpoint response stream.
+   * @return {Promise<[string, NodeJS.ReadableStream]>} The content type and SPARQL endpoint response stream.
    */
   public async fetchRawStream(
     endpoint: string,
@@ -219,7 +219,7 @@ export class SparqlEndpointFetcher {
    * @param {string}      url     The URL to call.
    * @param {RequestInit} init    Options to pass along to the fetch call.
    * @param {any}         options Other specific fetch options.
-   * @return {Promise<[ string, NodeJS.ReadableStream ]>} The content type and SPARQL endpoint response stream.
+   * @return {Promise<[string, NodeJS.ReadableStream]>} The content type and SPARQL endpoint response stream.
    */
   private async handleFetchCall(
     url: string,
