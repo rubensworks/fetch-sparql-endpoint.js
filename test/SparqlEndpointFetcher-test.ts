@@ -1,11 +1,12 @@
 import 'jest-rdf';
-import { ReadableWebToNodeStream } from '@smessie/readable-web-to-node-stream';
 import arrayifyStream from 'arrayify-stream';
 import { DataFactory } from 'rdf-data-factory';
+import { Readable } from 'readable-stream';
 import { SparqlEndpointFetcher } from '../lib/SparqlEndpointFetcher';
 
 // The import of 'readable-stream-node-to-web' is down here because of the above workaround
 const readableStreamNodeToWeb = require('readable-stream-node-to-web');
+const stringifyStream = require('stream-to-string');
 const streamifyString = require('streamify-string');
 
 const DF = new DataFactory();
@@ -341,6 +342,26 @@ describe('SparqlEndpointFetcher', () => {
         ]);
       });
 
+      it('should throw with a failing node stream', async() => {
+        const expectedError = new Error('Expected error');
+        const nodeStream = new Readable();
+        nodeStream._read = () => {
+          throw expectedError;
+        };
+        const fetchCbThis = () => Promise.resolve(<Response> {
+          body: <any>nodeStream,
+          headers: new Headers(),
+          ok: true,
+          status: 200,
+          statusText: 'Ok!',
+        });
+        const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
+        const [ contentType, rawStream ] = await fetcherThis.fetchRawStream(endpoint, querySelect, 'myacceptheader');
+        expect(contentType).toBe('');
+        expect(rawStream).toBeInstanceOf(Readable);
+        await expect(stringifyStream(rawStream)).rejects.toBe(expectedError);
+      });
+
       it('should fetch with a web stream', async() => {
         const fetchCbThis = () => Promise.resolve(<Response> {
           body: readableStreamNodeToWeb(streamifyString('abc')),
@@ -352,7 +373,27 @@ describe('SparqlEndpointFetcher', () => {
         const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
         const [ contentType, rawStream ] = await fetcherThis.fetchRawStream(endpoint, querySelect, 'myacceptheader');
         expect(contentType).toBe('');
-        expect(rawStream).toBeInstanceOf(ReadableWebToNodeStream);
+        expect(rawStream).toBeInstanceOf(Readable);
+      });
+
+      it('should throw with a failing web stream', async() => {
+        const expectedError = new Error('Expected error');
+        const nodeStream = new Readable();
+        nodeStream._read = () => {
+          throw expectedError;
+        };
+        const fetchCbThis = () => Promise.resolve(<Response> {
+          body: readableStreamNodeToWeb(nodeStream),
+          headers: new Headers(),
+          ok: true,
+          status: 200,
+          statusText: 'Ok!',
+        });
+        const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
+        const [ contentType, rawStream ] = await fetcherThis.fetchRawStream(endpoint, querySelect, 'myacceptheader');
+        expect(contentType).toBe('');
+        expect(rawStream).toBeInstanceOf(Readable);
+        await expect(stringifyStream(rawStream)).rejects.toBe(expectedError);
       });
 
       it('should throw with a missing stream', async() => {

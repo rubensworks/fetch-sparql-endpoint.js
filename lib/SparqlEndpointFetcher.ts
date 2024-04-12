@@ -1,8 +1,8 @@
-import type { Readable } from 'node:stream';
 import type * as RDF from '@rdfjs/types';
-import { ReadableWebToNodeStream } from '@smessie/readable-web-to-node-stream';
 import * as isStream from 'is-stream';
 import { StreamParser } from 'n3';
+import { readableFromWeb } from 'readable-from-web';
+import type { Readable } from 'readable-stream';
 import { type InsertDeleteOperation, type ManagementOperation, Parser as SparqlParser } from 'sparqljs';
 import { type ISettings as ISparqlJsonParserArgs, SparqlJsonParser } from 'sparqljson-parse';
 import { type ISettings as ISparqlXmlParserArgs, SparqlXmlParser } from 'sparqlxml-parse';
@@ -143,7 +143,7 @@ export class SparqlEndpointFetcher {
       query,
       SparqlEndpointFetcher.CONTENTTYPE_TURTLE,
     );
-    return responseStream.pipe(new StreamParser({ format: contentType }));
+    return <Readable> <unknown> responseStream.pipe(new StreamParser({ format: contentType }));
   }
 
   /**
@@ -226,7 +226,7 @@ export class SparqlEndpointFetcher {
     init: RequestInit,
     options?: { ignoreBody: boolean },
   ): Promise<[ string, NodeJS.ReadableStream ]> {
-    let timeout: NodeJS.Timeout | undefined;
+    let timeout;
     let responseStream: NodeJS.ReadableStream | undefined;
 
     if (this.timeout) {
@@ -243,8 +243,8 @@ export class SparqlEndpointFetcher {
     if (!options?.ignoreBody && httpResponse.body) {
       // Wrap WhatWG readable stream into a Node.js readable stream
       // If the body already is a Node.js stream (in the case of node-fetch), don't do explicit conversion.
-      responseStream = <NodeJS.ReadableStream>(
-        isStream(httpResponse.body) ? httpResponse.body : new ReadableWebToNodeStream(httpResponse.body)
+      responseStream = <NodeJS.ReadableStream> (
+        isStream(httpResponse.body) ? httpResponse.body : readableFromWeb(httpResponse.body)
       );
     }
 
