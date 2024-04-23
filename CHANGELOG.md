@@ -1,6 +1,21 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v4.2.1"></a>
+## [v4.2.1](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v4.1.1...v4.2.1) - 2024-04-23
+
+Reversion of v4.2.0 to remain backwards-compatible with Node 16.
+
+<a name="v4.2.0"></a>
+## [v4.2.0](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v4.1.1...v4.2.0) - 2024-04-23
+
+### Added
+* [Add basic auth and timeout support to the CLI](https://github.com/rubensworks/fetch-sparql-endpoint.js/commit/837e944542a333f938ff1faa48fdc4e84ca0d6be)
+
+### Changed
+* [Migrate from readable-web-to-node-stream to readable-from-web](https://github.com/rubensworks/fetch-sparql-endpoint.js/commit/6f62a481ff264c7148265c9927eee528367705a9)
+* [Updates to dependencies and GitHub actions, and code clean-up](https://github.com/rubensworks/fetch-sparql-endpoint.js/commit/7a067922a85f31d54b81fdb9f906b1fab2b521be)
+
 <a name="v4.1.1"></a>
 ## [v4.1.1](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v4.1.0...v4.1.1) - 2024-01-16
 
