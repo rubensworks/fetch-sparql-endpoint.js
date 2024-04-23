@@ -41,7 +41,8 @@
     "lint:fix": "eslint . --fix",
     "build": "tsc",
     "validate": "yarn list",
-    "version": "manual-git-changelog onversion"
+    "version": "manual-git-changelog onversion",
+    "prepare": "yarn husky"
   },
   "dependencies": {
     "@rdfjs/types": "*",
@@ -76,28 +77,5 @@
     "typescript": "^5.0.0",
     "webpack": "^5.0.0",
     "webpack-cli": "^5.0.0"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "yarn run build && yarn run lint && yarn run test"
-    }
-  },
-  "jest": {
-    "transform": {
-      "^.+\\.ts$": "ts-jest"
-    },
-    "transformIgnorePatterns": [
-      "[/\\\\]node_modules[/\\\\].+\\.(js|jsx)$"
-    ],
-    "testRegex": "(/test/.*|(\\.|/)(test|spec))\\.ts$",
-    "moduleFileExtensions": [
-      "ts",
-      "js"
-    ],
-    "collectCoverage": true,
-    "setupFilesAfterEnv": [
-      "jest-rdf"
-    ],
-    "testEnvironment": "node"
   }
 }
