@@ -13,7 +13,7 @@ async function getQuery(query?: string, file?: string): Promise<string> {
     return query;
   }
   if (file) {
-    readFileSync(file, { encoding: 'utf-8' });
+    return readFileSync(file, { encoding: 'utf-8' });
   }
   return streamToString(process.stdin);
 }
