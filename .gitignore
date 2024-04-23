@@ -1,4 +1,5 @@
 node_modules
+.husky/_
 .idea
 lerna-debug.log
 yarn-error.log
