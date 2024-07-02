@@ -20,7 +20,7 @@ export class SparqlEndpointFetcher {
 
   protected readonly method: 'GET' | 'POST';
   protected readonly timeout?: number;
-  protected readonly additionalUrlParams: URLSearchParams;
+  public additionalUrlParams: URLSearchParams;
   protected readonly defaultHeaders: Headers;
   public readonly fetchCb?: (input: Request | string, init?: RequestInit) => Promise<Response>;
 
