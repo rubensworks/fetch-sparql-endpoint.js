@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v5.1.0"></a>
+## [v5.1.0](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v5.0.0...v5.1.0) - 2024-07-02
+
+### Changed
+* [Make additionalUrlParams public and non-readonly](https://github.com/rubensworks/fetch-sparql-endpoint.js/commit/790e23217f64713dcb699b58bad715cccb787c26)
+
 <a name="v5.0.0"></a>
 ## [v5.0.0](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v4.1.1...v5.0.0) - 2024-04-23
 
