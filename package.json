@@ -49,17 +49,16 @@
     "prepare": "yarn husky"
   },
   "dependencies": {
-    "@rdfjs/types": "*",
     "@types/n3": "^1.0.0",
     "@types/readable-stream": "^4.0.0",
     "@types/sparqljs": "^3.0.0",
     "is-stream": "^2.0.0",
     "n3": "^1.0.0",
-    "rdf-string": "^1.0.0",
+    "rdf-string": "^2.0.0",
     "readable-from-web": "^1.0.0",
     "sparqljs": "^3.0.0",
-    "sparqljson-parse": "^2.0.0",
-    "sparqlxml-parse": "^2.0.0",
+    "sparqljson-parse": "^3.0.0",
+    "sparqlxml-parse": "^3.0.0",
     "stream-to-string": "^1.0.0",
     "yargs": "^17.0.0"
   },
@@ -71,14 +70,14 @@
     "eslint": "^8.0.0",
     "husky": "^9.0.0",
     "jest": "^29.0.0",
-    "jest-rdf": "^1.0.0",
+    "jest-rdf": "^2.0.0",
     "manual-git-changelog": "^1.0.0",
-    "rdf-data-factory": "^1.0.0",
+    "rdf-data-factory": "^2.0.0",
     "readable-stream-node-to-web": "^1.0.0",
     "streamify-string": "^1.0.0",
     "ts-jest": "^29.0.0",
     "ts-loader": "^9.0.0",
-    "typescript": "^5.0.0",
+    "typescript": "^5.7.2",
     "webpack": "^5.0.0",
     "webpack-cli": "^6.0.0"
   }
