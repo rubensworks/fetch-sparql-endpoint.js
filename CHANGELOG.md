@@ -1,6 +1,13 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v6.0.0"></a>
+## [v6.0.0](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v5.1.0...v6.0.0) - 2025-01-08
+
+### BREAKING CHANGES
+* [Update to rdf-data-factory v2](https://github.com/rubensworks/fetch-sparql-endpoint.js/commit/5f1713f6e6ee4aa03933c7928601800ba63ee028)
+    This includes a bump to @rdfjs/types@2.0.0, which requires TypeScript 5 and Node 14+
+
 <a name="v5.1.0"></a>
 ## [v5.1.0](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v5.0.0...v5.1.0) - 2024-07-02
 
