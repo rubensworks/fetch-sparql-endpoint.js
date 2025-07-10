@@ -303,7 +303,7 @@ describe('SparqlEndpointFetcher', () => {
         );
       });
 
-      it('should use HTTP GET when endpoint + encoded query length is less than maxUrlLengthForGet', async() => {
+      it('should use HTTP GET when url length is less than maxUrlLengthForGet', async() => {
         const fetchCbThis = jest.fn(() => Promise.resolve(new Response(streamifyString('dummy'))));
         const fetcherThis = new SparqlEndpointFetcher({ method: 'POST', fetch: fetchCbThis, maxUrlLengthForGet: 600 });
         await fetcherThis.fetchRawStream(endpoint, querySelect, 'myacceptheader');
