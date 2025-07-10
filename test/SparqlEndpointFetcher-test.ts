@@ -303,6 +303,40 @@ describe('SparqlEndpointFetcher', () => {
         );
       });
 
+      it('should use HTTP GET when url length is below forceGetIfUrlLengthBelow', async() => {
+        const fetchCbThis = jest.fn(() => Promise.resolve(new Response(streamifyString('dummy'))));
+        const fetcherThis = new SparqlEndpointFetcher({
+          method: 'POST',
+          fetch: fetchCbThis,
+          forceGetIfUrlLengthBelow: 600,
+        });
+        await fetcherThis.fetchRawStream(endpoint, querySelect, 'myacceptheader');
+        const headers: Headers = new Headers();
+        headers.append('Accept', 'myacceptheader');
+        expect(fetchCbThis).toHaveBeenCalledWith(
+          'https://dbpedia.org/sparql?query=SELECT%20*%20WHERE%20%7B%20%3Fs%20%3Fp%20%3Fo%20%7D',
+          expect.objectContaining({ headers, method: 'GET' }),
+        );
+      });
+
+      it('should use HTTP POST when url length is above or the same as forceGetIfUrlLengthBelow', async() => {
+        const fetchCbThis = jest.fn(() => Promise.resolve(new Response(streamifyString('dummy'))));
+        const fetcherThis = new SparqlEndpointFetcher({
+          method: 'POST',
+          fetch: fetchCbThis,
+          forceGetIfUrlLengthBelow: 30,
+        });
+        await fetcherThis.fetchRawStream(endpoint, querySelect, 'myacceptheader');
+        const headers: Headers = new Headers();
+        headers.append('Accept', 'myacceptheader');
+        const body = new URLSearchParams();
+        body.set('query', querySelect);
+        expect(fetchCbThis).toHaveBeenCalledWith(
+          'https://dbpedia.org/sparql',
+          expect.objectContaining({ headers, method: 'POST', body }),
+        );
+      });
+
       it('should reject for an invalid server response', async() => {
         const fetchCbThis = () => Promise.resolve(<Response> {
           body: streamifyString('this is an invalid response'),

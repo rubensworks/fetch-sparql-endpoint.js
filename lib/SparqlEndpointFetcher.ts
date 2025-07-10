@@ -20,6 +20,7 @@ export class SparqlEndpointFetcher {
 
   protected readonly method: 'GET' | 'POST';
   protected readonly timeout?: number;
+  protected readonly forceGetIfUrlLengthBelow: number;
   public additionalUrlParams: URLSearchParams;
   protected readonly defaultHeaders: Headers;
   public readonly fetchCb?: (input: Request | string, init?: RequestInit) => Promise<Response>;
@@ -31,6 +32,7 @@ export class SparqlEndpointFetcher {
   public constructor(args?: ISparqlEndpointFetcherArgs) {
     this.method = args?.method ?? 'POST';
     this.timeout = args?.timeout;
+    this.forceGetIfUrlLengthBelow = args?.forceGetIfUrlLengthBelow ?? 0;
     this.additionalUrlParams = args?.additionalUrlParams ?? new URLSearchParams();
     this.defaultHeaders = args?.defaultHeaders ?? new Headers();
     this.fetchCb = args?.fetch;
@@ -74,7 +76,7 @@ export class SparqlEndpointFetcher {
    * This will parse the update query and thrown an exception on syntax errors.
    *
    * @param {string} query An update query.
-   * @return {'UNKNOWN' | UpdateTypes} The included update operations.
+   * @return {'UNKNOWN' | IUpdateTypes} The included update operations.
    */
   public getUpdateTypes(query: string): 'UNKNOWN' | IUpdateTypes {
     const parsedQuery = new SparqlParser({ sparqlStar: true }).parse(query);
@@ -191,14 +193,24 @@ export class SparqlEndpointFetcher {
     query: string,
     acceptHeader: string,
   ): Promise<[ string, NodeJS.ReadableStream ]> {
-    let url: string = this.method === 'POST' ? endpoint : `${endpoint}?query=${encodeURIComponent(query)}`;
+    let method: 'GET' | 'POST';
+    let url: string;
+
+    if (this.method === 'POST' && this.forceGetIfUrlLengthBelow <= endpoint.length) {
+      method = this.method;
+      url = endpoint;
+    } else {
+      const getEndpoint = `${endpoint}?query=${encodeURIComponent(query)}`;
+      method = this.method === 'GET' || getEndpoint.length < this.forceGetIfUrlLengthBelow ? 'GET' : 'POST';
+      url = method === 'POST' ? endpoint : getEndpoint;
+    }
 
     // Initiate request
     let body: URLSearchParams | undefined;
     const headers: Headers = new Headers(this.defaultHeaders);
     headers.append('Accept', acceptHeader);
 
-    if (this.method === 'POST') {
+    if (method === 'POST') {
       headers.append('Content-Type', 'application/x-www-form-urlencoded');
       body = new URLSearchParams();
       body.set('query', query);
@@ -210,7 +222,7 @@ export class SparqlEndpointFetcher {
       url += `&${this.additionalUrlParams.toString()}`;
     }
 
-    return this.handleFetchCall(url, { headers, method: this.method, body });
+    return this.handleFetchCall(url, { headers, method, body });
   }
 
   /**
@@ -270,6 +282,7 @@ export interface ISparqlEndpointFetcherArgs extends ISparqlJsonParserArgs, ISpar
   method?: 'POST' | 'GET';
   additionalUrlParams?: URLSearchParams;
   timeout?: number;
+  forceGetIfUrlLengthBelow?: number;
   defaultHeaders?: Headers;
   /**
    * A custom fetch function.
