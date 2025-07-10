@@ -54,8 +54,8 @@ const myFetcher = new SparqlEndpointFetcher({
   prefixVariableQuestionMark: false,
   // Timeout for setting up server connection (Once a connection has been made, and the response is being parsed, the timeout does not apply anymore).
   timeout: 5000,
-  // If the url length is less than this maximum, HTTP GET is used regardless of the value of this.method, defaults to 0.
-  maxUrlLengthForGet: 600,
+  // If the url length is below this number, HTTP GET is used regardless of the value of this.method, defaults to 0.
+  forceGetIfUrlLengthBelow: 600,
 });
 ```
 

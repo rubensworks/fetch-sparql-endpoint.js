@@ -20,7 +20,7 @@ export class SparqlEndpointFetcher {
 
   protected readonly method: 'GET' | 'POST';
   protected readonly timeout?: number;
-  protected readonly maxUrlLengthForGet: number;
+  protected readonly forceGetIfUrlLengthBelow: number;
   public additionalUrlParams: URLSearchParams;
   protected readonly defaultHeaders: Headers;
   public readonly fetchCb?: (input: Request | string, init?: RequestInit) => Promise<Response>;
@@ -32,7 +32,7 @@ export class SparqlEndpointFetcher {
   public constructor(args?: ISparqlEndpointFetcherArgs) {
     this.method = args?.method ?? 'POST';
     this.timeout = args?.timeout;
-    this.maxUrlLengthForGet = args?.maxUrlLengthForGet ?? 0;
+    this.forceGetIfUrlLengthBelow = args?.forceGetIfUrlLengthBelow ?? 0;
     this.additionalUrlParams = args?.additionalUrlParams ?? new URLSearchParams();
     this.defaultHeaders = args?.defaultHeaders ?? new Headers();
     this.fetchCb = args?.fetch;
@@ -195,7 +195,7 @@ export class SparqlEndpointFetcher {
   ): Promise<[ string, NodeJS.ReadableStream ]> {
     const getEndpoint = `${endpoint}?query=${encodeURIComponent(query)}`;
 
-    const method = this.method === 'GET' || getEndpoint.length < this.maxUrlLengthForGet ? 'GET' : 'POST';
+    const method = this.method === 'GET' || getEndpoint.length < this.forceGetIfUrlLengthBelow ? 'GET' : 'POST';
 
     let url: string = method === 'POST' ? endpoint : getEndpoint;
 
@@ -276,7 +276,7 @@ export interface ISparqlEndpointFetcherArgs extends ISparqlJsonParserArgs, ISpar
   method?: 'POST' | 'GET';
   additionalUrlParams?: URLSearchParams;
   timeout?: number;
-  maxUrlLengthForGet?: number;
+  forceGetIfUrlLengthBelow?: number;
   defaultHeaders?: Headers;
   /**
    * A custom fetch function.
