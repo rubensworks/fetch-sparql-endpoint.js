@@ -324,7 +324,7 @@ describe('SparqlEndpointFetcher', () => {
         const fetcherThis = new SparqlEndpointFetcher({
           method: 'POST',
           fetch: fetchCbThis,
-          forceGetIfUrlLengthBelow: 20,
+          forceGetIfUrlLengthBelow: 30,
         });
         await fetcherThis.fetchRawStream(endpoint, querySelect, 'myacceptheader');
         const headers: Headers = new Headers();
