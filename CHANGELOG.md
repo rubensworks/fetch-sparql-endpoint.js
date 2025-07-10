@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v6.1.0"></a>
+## [v6.1.0](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v6.0.0...v6.1.0) - 2025-07-10
+
+### Added
+* [Add option to force GET requests if URL length is low](https://github.com/rubensworks/fetch-sparql-endpoint.js/commit/2525630d7f893c8a6ae5086ac71005d19e3db708)
+
 <a name="v6.0.0"></a>
 ## [v6.0.0](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v5.1.0...v6.0.0) - 2025-01-08
 
