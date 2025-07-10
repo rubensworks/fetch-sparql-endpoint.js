@@ -303,6 +303,18 @@ describe('SparqlEndpointFetcher', () => {
         );
       });
 
+      it('should use HTTP GET when endpoint + encoded query length is less than maxUrlLengthForGet', async() => {
+        const fetchCbThis = jest.fn(() => Promise.resolve(new Response(streamifyString('dummy'))));
+        const fetcherThis = new SparqlEndpointFetcher({ method: 'POST', fetch: fetchCbThis, maxUrlLengthForGet: 600 });
+        await fetcherThis.fetchRawStream(endpoint, querySelect, 'myacceptheader');
+        const headers: Headers = new Headers();
+        headers.append('Accept', 'myacceptheader');
+        expect(fetchCbThis).toHaveBeenCalledWith(
+          'https://dbpedia.org/sparql?query=SELECT%20*%20WHERE%20%7B%20%3Fs%20%3Fp%20%3Fo%20%7D',
+          expect.objectContaining({ headers, method: 'GET' }),
+        );
+      });
+
       it('should reject for an invalid server response', async() => {
         const fetchCbThis = () => Promise.resolve(<Response> {
           body: streamifyString('this is an invalid response'),
