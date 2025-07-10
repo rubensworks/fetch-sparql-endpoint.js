@@ -193,11 +193,17 @@ export class SparqlEndpointFetcher {
     query: string,
     acceptHeader: string,
   ): Promise<[ string, NodeJS.ReadableStream ]> {
-    const getEndpoint = `${endpoint}?query=${encodeURIComponent(query)}`;
+    let method: 'GET' | 'POST';
+    let url: string;
 
-    const method = this.method === 'GET' || getEndpoint.length < this.forceGetIfUrlLengthBelow ? 'GET' : 'POST';
-
-    let url: string = method === 'POST' ? endpoint : getEndpoint;
+    if (this.method === 'POST' && this.forceGetIfUrlLengthBelow <= endpoint.length) {
+      method = this.method;
+      url = endpoint;
+    } else {
+      const getEndpoint = `${endpoint}?query=${encodeURIComponent(query)}`;
+      method = this.method === 'GET' || getEndpoint.length < this.forceGetIfUrlLengthBelow ? 'GET' : 'POST';
+      url = method === 'POST' ? endpoint : getEndpoint;
+    }
 
     // Initiate request
     let body: URLSearchParams | undefined;
