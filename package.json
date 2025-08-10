@@ -64,7 +64,7 @@
   },
   "devDependencies": {
     "@rubensworks/eslint-config": "^3.0.0",
-    "@types/jest": "^29.0.0",
+    "@types/jest": "^30.0.0",
     "arrayify-stream": "^2.0.0",
     "coveralls": "^3.0.0",
     "eslint": "^8.0.0",
