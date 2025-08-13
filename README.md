@@ -56,6 +56,8 @@ const myFetcher = new SparqlEndpointFetcher({
   timeout: 5000,
   // If the url length is below this number, HTTP GET is used regardless of the value of this.method, defaults to 0.
   forceGetIfUrlLengthBelow: 600,
+  // Force usage of direct POST (body = query string), normally a POST with URL-encoded parameters is used, defaults to false.
+  forceDirectPost: false,
 });
 ```
 

@@ -337,6 +337,42 @@ describe('SparqlEndpointFetcher', () => {
         );
       });
 
+      it('should use direct HTTP POST when forceDirectPost is true', async() => {
+        const fetchCbThis = jest.fn(() => Promise.resolve(new Response(streamifyString('dummy'))));
+        const fetcherThis = new SparqlEndpointFetcher({
+          method: 'POST',
+          fetch: fetchCbThis,
+          forceDirectPost: true,
+        });
+        await fetcherThis.fetchRawStream(endpoint, querySelect, 'myacceptheader');
+        const headers: Headers = new Headers();
+        headers.append('Accept', 'myacceptheader');
+        const body = querySelect;
+        expect(fetchCbThis).toHaveBeenCalledWith(
+          'https://dbpedia.org/sparql',
+          expect.objectContaining({ headers, method: 'POST', body }),
+        );
+      });
+
+      it('should use direct HTTP POST when forceDirectPost is true with additional URL parameters', async() => {
+        const fetchCbThis = jest.fn(() => Promise.resolve(new Response(streamifyString('dummy'))));
+        const additionalUrlParams = new URLSearchParams({ infer: 'true', sameAs: 'false' });
+        const fetcherThis = new SparqlEndpointFetcher({
+          method: 'POST',
+          fetch: fetchCbThis,
+          forceDirectPost: true,
+          additionalUrlParams,
+        });
+        await fetcherThis.fetchRawStream(endpoint, querySelect, 'myacceptheader');
+        const headers: Headers = new Headers();
+        headers.append('Accept', 'myacceptheader');
+        const body = querySelect;
+        expect(fetchCbThis).toHaveBeenCalledWith(
+          'https://dbpedia.org/sparql?infer=true&sameAs=false',
+          expect.objectContaining({ headers, method: 'POST', body }),
+        );
+      });
+
       it('should reject for an invalid server response', async() => {
         const fetchCbThis = () => Promise.resolve(<Response> {
           body: streamifyString('this is an invalid response'),
