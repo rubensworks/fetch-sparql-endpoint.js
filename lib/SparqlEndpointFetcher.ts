@@ -21,7 +21,7 @@ export class SparqlEndpointFetcher {
   protected readonly method: 'GET' | 'POST';
   protected readonly timeout?: number;
   protected readonly forceGetIfUrlLengthBelow: number;
-  protected readonly forceDirectPost: boolean;
+  protected readonly directPost: boolean;
   public additionalUrlParams: URLSearchParams;
   protected readonly defaultHeaders: Headers;
   public readonly fetchCb?: (input: Request | string, init?: RequestInit) => Promise<Response>;
@@ -34,7 +34,7 @@ export class SparqlEndpointFetcher {
     this.method = args?.method ?? 'POST';
     this.timeout = args?.timeout;
     this.forceGetIfUrlLengthBelow = args?.forceGetIfUrlLengthBelow ?? 0;
-    this.forceDirectPost = args?.forceDirectPost ?? false;
+    this.directPost = args?.directPost ?? false;
     this.additionalUrlParams = args?.additionalUrlParams ?? new URLSearchParams();
     this.defaultHeaders = args?.defaultHeaders ?? new Headers();
     this.fetchCb = args?.fetch;
@@ -213,7 +213,7 @@ export class SparqlEndpointFetcher {
     headers.append('Accept', acceptHeader);
 
     if (method === 'POST') {
-      if (this.forceDirectPost) {
+      if (this.directPost) {
         headers.append('Content-Type', 'application/sparql-query');
         body = query;
         if (this.additionalUrlParams.toString().length > 0) {
@@ -293,7 +293,7 @@ export interface ISparqlEndpointFetcherArgs extends ISparqlJsonParserArgs, ISpar
   additionalUrlParams?: URLSearchParams;
   timeout?: number;
   forceGetIfUrlLengthBelow?: number;
-  forceDirectPost?: boolean;
+  directPost?: boolean;
   defaultHeaders?: Headers;
   /**
    * A custom fetch function.

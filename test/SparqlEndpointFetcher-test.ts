@@ -337,12 +337,12 @@ describe('SparqlEndpointFetcher', () => {
         );
       });
 
-      it('should use direct HTTP POST when forceDirectPost is true', async() => {
+      it('should use direct HTTP POST when directPost is true', async() => {
         const fetchCbThis = jest.fn(() => Promise.resolve(new Response(streamifyString('dummy'))));
         const fetcherThis = new SparqlEndpointFetcher({
           method: 'POST',
           fetch: fetchCbThis,
-          forceDirectPost: true,
+          directPost: true,
         });
         await fetcherThis.fetchRawStream(endpoint, querySelect, 'myacceptheader');
         const headers: Headers = new Headers();
@@ -354,13 +354,13 @@ describe('SparqlEndpointFetcher', () => {
         );
       });
 
-      it('should use direct HTTP POST when forceDirectPost is true with additional URL parameters', async() => {
+      it('should use direct HTTP POST when directPost is true with additional URL parameters', async() => {
         const fetchCbThis = jest.fn(() => Promise.resolve(new Response(streamifyString('dummy'))));
         const additionalUrlParams = new URLSearchParams({ infer: 'true', sameAs: 'false' });
         const fetcherThis = new SparqlEndpointFetcher({
           method: 'POST',
           fetch: fetchCbThis,
-          forceDirectPost: true,
+          directPost: true,
           additionalUrlParams,
         });
         await fetcherThis.fetchRawStream(endpoint, querySelect, 'myacceptheader');
