@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v6.2.0"></a>
+## [v6.2.0](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v6.1.0...v6.2.0) - 2025-08-22
+
+### Added
+* [Add option to force direct POST requests](https://github.com/rubensworks/fetch-sparql-endpoint.js/commit/7b4ebc91362b89711e808fdff3d91229db5b8ee8)
+
 <a name="v6.1.0"></a>
 ## [v6.1.0](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v6.0.0...v6.1.0) - 2025-07-10
 
