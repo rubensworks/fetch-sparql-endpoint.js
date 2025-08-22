@@ -43,6 +43,9 @@ const myFetcher = new SparqlEndpointFetcher({
   // A custom HTTP method for issuing (non-update) queries, defaults to POST. Update queries are always issued via POST.
   method: 'POST',
   // A set of additional parameters that well be added to fetchAsk, fetchBindings & fetchTriples requests
+  // With a GET request, these are encoded in the URL.
+  // With a POST request when directPost is true (see below), these are also encoded in the URL.
+  // With other POST requests, it's encoded in the body.
   additionalUrlParams: new URLSearchParams({ infer: 'true', sameAs: 'false' }),
   // Optional default headers that will be included in each request
   defaultHeaders: new Headers(),
@@ -56,6 +59,10 @@ const myFetcher = new SparqlEndpointFetcher({
   timeout: 5000,
   // If the url length is below this number, HTTP GET is used regardless of the value of this.method, defaults to 0.
   forceGetIfUrlLengthBelow: 600,
+  // If true, POST requests will be sent as application/sparql-query (unencoded query string).
+  // If false, POST requests will be sent as application/x-www-form-urlencoded (URL-encoded query string).
+  // Defaults to false.
+  directPost: false,
 });
 ```
 

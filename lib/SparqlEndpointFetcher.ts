@@ -21,6 +21,7 @@ export class SparqlEndpointFetcher {
   protected readonly method: 'GET' | 'POST';
   protected readonly timeout?: number;
   protected readonly forceGetIfUrlLengthBelow: number;
+  protected readonly directPost: boolean;
   public additionalUrlParams: URLSearchParams;
   protected readonly defaultHeaders: Headers;
   public readonly fetchCb?: (input: Request | string, init?: RequestInit) => Promise<Response>;
@@ -33,6 +34,7 @@ export class SparqlEndpointFetcher {
     this.method = args?.method ?? 'POST';
     this.timeout = args?.timeout;
     this.forceGetIfUrlLengthBelow = args?.forceGetIfUrlLengthBelow ?? 0;
+    this.directPost = args?.directPost ?? false;
     this.additionalUrlParams = args?.additionalUrlParams ?? new URLSearchParams();
     this.defaultHeaders = args?.defaultHeaders ?? new Headers();
     this.fetchCb = args?.fetch;
@@ -206,16 +208,24 @@ export class SparqlEndpointFetcher {
     }
 
     // Initiate request
-    let body: URLSearchParams | undefined;
+    let body: URLSearchParams | string | undefined;
     const headers: Headers = new Headers(this.defaultHeaders);
     headers.append('Accept', acceptHeader);
 
     if (method === 'POST') {
-      headers.append('Content-Type', 'application/x-www-form-urlencoded');
-      body = new URLSearchParams();
-      body.set('query', query);
-      for (const [ key, value ] of this.additionalUrlParams.entries()) {
-        body.set(key, value);
+      if (this.directPost) {
+        headers.append('Content-Type', 'application/sparql-query');
+        body = query;
+        if (this.additionalUrlParams.toString().length > 0) {
+          url += `?${this.additionalUrlParams.toString()}`;
+        }
+      } else {
+        headers.append('Content-Type', 'application/x-www-form-urlencoded');
+        body = new URLSearchParams();
+        body.set('query', query);
+        for (const [ key, value ] of this.additionalUrlParams.entries()) {
+          body.set(key, value);
+        }
       }
       headers.append('Content-Length', body.toString().length.toString());
     } else if (this.additionalUrlParams.toString().length > 0) {
@@ -283,6 +293,7 @@ export interface ISparqlEndpointFetcherArgs extends ISparqlJsonParserArgs, ISpar
   additionalUrlParams?: URLSearchParams;
   timeout?: number;
   forceGetIfUrlLengthBelow?: number;
+  directPost?: boolean;
   defaultHeaders?: Headers;
   /**
    * A custom fetch function.
