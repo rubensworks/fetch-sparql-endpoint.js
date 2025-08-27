@@ -329,6 +329,7 @@ describe('SparqlEndpointFetcher', () => {
         await fetcherThis.fetchRawStream(endpoint, querySelect, 'myacceptheader');
         const headers: Headers = new Headers();
         headers.append('Accept', 'myacceptheader');
+        headers.append('Content-type', 'application/x-www-form-urlencoded');
         const body = new URLSearchParams();
         body.set('query', querySelect);
         expect(fetchCbThis).toHaveBeenCalledWith(
@@ -347,6 +348,7 @@ describe('SparqlEndpointFetcher', () => {
         await fetcherThis.fetchRawStream(endpoint, querySelect, 'myacceptheader');
         const headers: Headers = new Headers();
         headers.append('Accept', 'myacceptheader');
+        headers.append('Content-type', 'application/sparql-query');
         const body = querySelect;
         expect(fetchCbThis).toHaveBeenCalledWith(
           'https://dbpedia.org/sparql',
@@ -366,6 +368,7 @@ describe('SparqlEndpointFetcher', () => {
         await fetcherThis.fetchRawStream(endpoint, querySelect, 'myacceptheader');
         const headers: Headers = new Headers();
         headers.append('Accept', 'myacceptheader');
+        headers.append('Content-type', 'application/sparql-query');
         const body = querySelect;
         expect(fetchCbThis).toHaveBeenCalledWith(
           'https://dbpedia.org/sparql?infer=true&sameAs=false',
