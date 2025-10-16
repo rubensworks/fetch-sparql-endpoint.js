@@ -21,7 +21,7 @@ jobs:
         with:
           path: '**/node_modules'
           key: ${{ runner.os }}-lint-modules-${{ hashFiles('**/yarn.lock') }}
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v6
         with:
           node-version: ${{ env.DEFAULT_NODE_VERSION }}
       - run: corepack enable
@@ -40,7 +40,7 @@ jobs:
           - 22.x
           - 24.x
     steps:
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v6
         with:
           node-version: ${{ matrix.node-version }}
       - run: git config --global core.autocrlf input
@@ -85,7 +85,7 @@ jobs:
         with:
           path: '**/node_modules'
           key: ${{ runner.os }}-webpack-modules-${{ hashFiles('**/yarn.lock') }}
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v6
         with:
           node-version: ${{ env.DEFAULT_NODE_VERSION }}
       - run: corepack enable
