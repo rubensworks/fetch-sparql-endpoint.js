@@ -1,9 +1,10 @@
 import type * as RDF from '@rdfjs/types';
+import { Parser as SparqlParser } from '@traqula/parser-sparql-1-2';
+import type { UpdateOperation } from '@traqula/rules-sparql-1-2';
 import * as isStream from 'is-stream';
 import { StreamParser } from 'n3';
 import { readableFromWeb } from 'readable-from-web';
 import type { Readable } from 'readable-stream';
-import { type InsertDeleteOperation, type ManagementOperation, Parser as SparqlParser } from 'sparqljs';
 import { type ISettings as ISparqlJsonParserArgs, SparqlJsonParser } from 'sparqljson-parse';
 import { type ISettings as ISparqlXmlParserArgs, SparqlXmlParser } from 'sparqlxml-parse';
 import * as stringifyStream from 'stream-to-string';
@@ -26,6 +27,7 @@ export class SparqlEndpointFetcher {
   protected readonly defaultHeaders: Headers;
   public readonly fetchCb?: (input: Request | string, init?: RequestInit) => Promise<Response>;
 
+  protected readonly sparqlQueryParser: SparqlParser;
   protected readonly sparqlParsers: Record<string, ISparqlResultsParser>;
   protected readonly sparqlJsonParser: SparqlJsonParser;
   protected readonly sparqlXmlParser: SparqlXmlParser;
@@ -38,6 +40,11 @@ export class SparqlEndpointFetcher {
     this.additionalUrlParams = args?.additionalUrlParams ?? new URLSearchParams();
     this.defaultHeaders = args?.defaultHeaders ?? new Headers();
     this.fetchCb = args?.fetch;
+    this.sparqlQueryParser = new SparqlParser({
+      lexerConfig: {
+        positionTracking: 'onlyOffset',
+      },
+    });
     this.sparqlJsonParser = new SparqlJsonParser(args);
     this.sparqlXmlParser = new SparqlXmlParser(args);
     this.sparqlParsers = {
@@ -65,9 +72,11 @@ export class SparqlEndpointFetcher {
    * @return {'SELECT' | 'ASK' | 'CONSTRUCT' | 'UNKNOWN'} The query type.
    */
   public getQueryType(query: string): 'SELECT' | 'ASK' | 'CONSTRUCT' | 'UNKNOWN' {
-    const parsedQuery = new SparqlParser({ sparqlStar: true }).parse(query);
+    const parsedQuery = this.sparqlQueryParser.parse(query);
     if (parsedQuery.type === 'query') {
-      return parsedQuery.queryType === 'DESCRIBE' ? 'CONSTRUCT' : parsedQuery.queryType;
+      return parsedQuery.subType === 'describe' ?
+        'CONSTRUCT' :
+        <Uppercase<typeof parsedQuery.subType>>parsedQuery.subType.toUpperCase();
     }
     return 'UNKNOWN';
   }
@@ -81,14 +90,12 @@ export class SparqlEndpointFetcher {
    * @return {'UNKNOWN' | IUpdateTypes} The included update operations.
    */
   public getUpdateTypes(query: string): 'UNKNOWN' | IUpdateTypes {
-    const parsedQuery = new SparqlParser({ sparqlStar: true }).parse(query);
+    const parsedQuery = this.sparqlQueryParser.parse(query);
     if (parsedQuery.type === 'update') {
       const operations: IUpdateTypes = {};
       for (const update of parsedQuery.updates) {
-        if ('type' in update) {
-          operations[update.type] = true;
-        } else {
-          operations[update.updateType] = true;
+        if (update.operation) {
+          operations[update.operation.subType] = true;
         }
       }
       return operations;
@@ -309,5 +316,5 @@ export interface ISparqlResultsParser {
 export type IBindings = Record<string, RDF.Term>;
 
 export type IUpdateTypes = {
-  [K in ManagementOperation['type'] | InsertDeleteOperation['updateType']]?: boolean;
+  [K in UpdateOperation['subType']]?: boolean;
 };
