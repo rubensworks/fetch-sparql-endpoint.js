@@ -40,7 +40,7 @@ export class SparqlEndpointFetcher {
     this.additionalUrlParams = args?.additionalUrlParams ?? new URLSearchParams();
     this.defaultHeaders = args?.defaultHeaders ?? new Headers();
     this.fetchCb = args?.fetch;
-    this.sparqlQueryParser = new SparqlParser({
+    this.sparqlQueryParser = args?.sparqlQueryParser ?? new SparqlParser({
       lexerConfig: {
         positionTracking: 'onlyOffset',
       },
@@ -306,6 +306,7 @@ export interface ISparqlEndpointFetcherArgs extends ISparqlJsonParserArgs, ISpar
    * A custom fetch function.
    */
   fetch?: (input: Request | string, init?: RequestInit) => Promise<Response>;
+  sparqlQueryParser?: SparqlParser;
 }
 
 export interface ISparqlResultsParser {
