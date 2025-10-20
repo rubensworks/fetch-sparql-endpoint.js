@@ -1,4 +1,5 @@
 import 'jest-rdf';
+import { Parser as SparqlParser } from '@traqula/parser-sparql-1-2';
 import arrayifyStream from 'arrayify-stream';
 import { DataFactory } from 'rdf-data-factory';
 import { Readable } from 'readable-stream';
@@ -210,6 +211,29 @@ describe('SparqlEndpointFetcher', () => {
       });
 
       it('should detect a combined move, add, insert and delete operations', () => {
+        expect(fetcher.getUpdateTypes(`${updateMove};${updateAdd};${updateInsertData};${updateDeleteData}`)).toEqual({
+          move: true,
+          add: true,
+          insertdata: true,
+          deletedata: true,
+        });
+      });
+
+      it('should detect with tailing empty operation', () => {
+        expect(fetcher.getUpdateTypes(`${updateMove};${updateAdd};${updateInsertData};${updateDeleteData};PREFIX temp: <https://example.temp>`)).toEqual({
+          move: true,
+          add: true,
+          insertdata: true,
+          deletedata: true,
+        });
+      });
+
+      it('can detect when providing own parser', () => {
+        fetchCb = () => Promise.resolve(new Response('dummy'));
+        fetcher = new SparqlEndpointFetcher({
+          fetch: fetchCb,
+          sparqlQueryParser: new SparqlParser(),
+        });
         expect(fetcher.getUpdateTypes(`${updateMove};${updateAdd};${updateInsertData};${updateDeleteData}`)).toEqual({
           move: true,
           add: true,
