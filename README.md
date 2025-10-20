@@ -63,6 +63,8 @@ const myFetcher = new SparqlEndpointFetcher({
   // If false, POST requests will be sent as application/x-www-form-urlencoded (URL-encoded query string).
   // Defaults to false.
   directPost: false,
+  // A SPARQL query parser used by the endpoint fetcher to detect query types.
+  sparqlQueryParser: new SparqlParser({ lexerConfig: { positionTracking: 'onlyOffset' }}),
 });
 ```
 

@@ -306,6 +306,9 @@ export interface ISparqlEndpointFetcherArgs extends ISparqlJsonParserArgs, ISpar
    * A custom fetch function.
    */
   fetch?: (input: Request | string, init?: RequestInit) => Promise<Response>;
+  /**
+   * A SPARQL query parser used by the endpoint fetcher to detect query types.
+   */
   sparqlQueryParser?: SparqlParser;
 }
 
