@@ -478,6 +478,38 @@
   dependencies:
     buffer "^6.0.3"
 
+"@chevrotain/cst-dts-gen@11.0.3":
+  version "11.0.3"
+  resolved "https://registry.yarnpkg.com/@chevrotain/cst-dts-gen/-/cst-dts-gen-11.0.3.tgz#5e0863cc57dc45e204ccfee6303225d15d9d4783"
+  integrity sha512-BvIKpRLeS/8UbfxXxgC33xOumsacaeCKAjAeLyOn7Pcp95HiRbrpl14S+9vaZLolnbssPIUuiUd8IvgkRyt6NQ==
+  dependencies:
+    "@chevrotain/gast" "11.0.3"
+    "@chevrotain/types" "11.0.3"
+    lodash-es "4.17.21"
+
+"@chevrotain/gast@11.0.3":
+  version "11.0.3"
+  resolved "https://registry.yarnpkg.com/@chevrotain/gast/-/gast-11.0.3.tgz#e84d8880323fe8cbe792ef69ce3ffd43a936e818"
+  integrity sha512-+qNfcoNk70PyS/uxmj3li5NiECO+2YKZZQMbmjTqRI3Qchu8Hig/Q9vgkHpI3alNjr7M+a2St5pw5w5F6NL5/Q==
+  dependencies:
+    "@chevrotain/types" "11.0.3"
+    lodash-es "4.17.21"
+
+"@chevrotain/regexp-to-ast@11.0.3":
+  version "11.0.3"
+  resolved "https://registry.yarnpkg.com/@chevrotain/regexp-to-ast/-/regexp-to-ast-11.0.3.tgz#11429a81c74a8e6a829271ce02fc66166d56dcdb"
+  integrity sha512-1fMHaBZxLFvWI067AVbGJav1eRY7N8DDvYCTwGBiE/ytKBgP8azTdgyrKyWZ9Mfh09eHWb5PgTSO8wi7U824RA==
+
+"@chevrotain/types@11.0.3":
+  version "11.0.3"
+  resolved "https://registry.yarnpkg.com/@chevrotain/types/-/types-11.0.3.tgz#f8a03914f7b937f594f56eb89312b3b8f1c91848"
+  integrity sha512-gsiM3G8b58kZC2HaWR50gu6Y1440cHiJ+i3JUvcp/35JchYejb2+5MVeJK0iKThYpAa/P2PYFV4hoi44HD+aHQ==
+
+"@chevrotain/utils@11.0.3":
+  version "11.0.3"
+  resolved "https://registry.yarnpkg.com/@chevrotain/utils/-/utils-11.0.3.tgz#e39999307b102cff3645ec4f5b3665f5297a2224"
+  integrity sha512-YslZMgtJUyuMbZ+aKvfF3x1f5liK4mWNxghFRv7jqRR9C3R3fAOGTTKvxXDa2Y1s9zSbcpuO0cAxDYsc9SrXoQ==
+
 "@discoveryjs/json-ext@^0.6.1":
   version "0.6.3"
   resolved "https://registry.yarnpkg.com/@discoveryjs/json-ext/-/json-ext-0.6.3.tgz#f13c7c205915eb91ae54c557f5e92bddd8be0e83"
@@ -974,17 +1006,17 @@
   resolved "https://registry.yarnpkg.com/@pkgr/core/-/core-0.2.7.tgz#eb5014dfd0b03e7f3ba2eeeff506eed89b028058"
   integrity sha512-YLT9Zo3oNPJoBjBc4q8G2mjU4tqIbf5CEOORbUUr48dCD9q3umJ3IPlVqOqDakPfd2HuwccBaqlGhN4Gmr5OWg==
 
-"@rdfjs/types@>=1.0.0", "@rdfjs/types@^2.0.0":
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/@rdfjs/types/-/types-2.0.0.tgz#b360e8892728f6e6345fc5adbdbfe2acde82c8cd"
-  integrity sha512-bHIjRZ6wuQQY/47dKfGI9fCs9/gs83IgHnoPsAgEIj/ASFTl3Eo4SWIPMC0F1B0LqhrapQb1HaakuD6ikpTDEQ==
-  dependencies:
-    "@types/node" "*"
-
-"@rdfjs/types@^1.0.0", "@rdfjs/types@^1.1.0":
+"@rdfjs/types@^1.1.0":
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/@rdfjs/types/-/types-1.1.2.tgz#9c2f9848c44c26d383bed2a808571de3b93b808d"
   integrity sha512-wqpOJK1QCbmsGNtyzYnojPU8gRDPid2JO0Q0kMtb4j65xhCK880cnKAfEOwC+dX85VJcCByQx5zOwyyfCjDJsg==
+  dependencies:
+    "@types/node" "*"
+
+"@rdfjs/types@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@rdfjs/types/-/types-2.0.0.tgz#b360e8892728f6e6345fc5adbdbfe2acde82c8cd"
+  integrity sha512-bHIjRZ6wuQQY/47dKfGI9fCs9/gs83IgHnoPsAgEIj/ASFTl3Eo4SWIPMC0F1B0LqhrapQb1HaakuD6ikpTDEQ==
   dependencies:
     "@types/node" "*"
 
@@ -1088,6 +1120,55 @@
     "@stylistic/eslint-plugin-plus" "1.8.1"
     "@stylistic/eslint-plugin-ts" "1.8.1"
     "@types/eslint" "^8.56.10"
+
+"@traqula/chevrotain@^0.0.24":
+  version "0.0.24"
+  resolved "https://registry.yarnpkg.com/@traqula/chevrotain/-/chevrotain-0.0.24.tgz#22a51f09af38daf93af36df831757036aa3d0c0c"
+  integrity sha512-JJuGZiccR1xGlwg4MFM70qMjPniJrNhiuY+Xm7oNSyy6mi25pyOiFJ1zVO4AhA0tfbNxMJMvKNVBx9ftoi+ebg==
+  dependencies:
+    chevrotain "^11.0.3"
+
+"@traqula/core@^0.0.24":
+  version "0.0.24"
+  resolved "https://registry.yarnpkg.com/@traqula/core/-/core-0.0.24.tgz#5cd7aeb94d812a23d398eadcf3cc4a45074dc00d"
+  integrity sha512-JTnQ/n56tQnaNug17Cb67oM9Xj8gHFMqtyF2dnOOFQeqB4kMN3bMN1973QlEf45TExF+tN2uFiZKCfgH0LGkng==
+  dependencies:
+    "@traqula/chevrotain" "^0.0.24"
+
+"@traqula/parser-sparql-1-1@^0.0.24":
+  version "0.0.24"
+  resolved "https://registry.yarnpkg.com/@traqula/parser-sparql-1-1/-/parser-sparql-1-1-0.0.24.tgz#a9a00abd0963e9419b2c1ae47d5c935cd6132115"
+  integrity sha512-thffmJEvj+lTq1yF9Xq287acAxMAbyklH15AC4zaB4b2xxRGhg1eSfa7TSSUUWXqrjX2yLPZQ54/ZaH68kbTlg==
+  dependencies:
+    "@traqula/core" "^0.0.24"
+    "@traqula/rules-sparql-1-1" "^0.0.24"
+
+"@traqula/parser-sparql-1-2@^0.0.24":
+  version "0.0.24"
+  resolved "https://registry.yarnpkg.com/@traqula/parser-sparql-1-2/-/parser-sparql-1-2-0.0.24.tgz#4135d5405003f309c5a9f1f0e709f3636d311c63"
+  integrity sha512-3DrzEouLLOEElE370fu6xrlXa/0zEp6p47Kgk/kOV8+EDUZBuWxv84GmRuHvgRYfn9OAVP6H3w8wVoFvqqIiNg==
+  dependencies:
+    "@traqula/core" "^0.0.24"
+    "@traqula/parser-sparql-1-1" "^0.0.24"
+    "@traqula/rules-sparql-1-1" "^0.0.24"
+    "@traqula/rules-sparql-1-2" "^0.0.24"
+    rdf-data-factory "^2.0.1"
+
+"@traqula/rules-sparql-1-1@^0.0.24":
+  version "0.0.24"
+  resolved "https://registry.yarnpkg.com/@traqula/rules-sparql-1-1/-/rules-sparql-1-1-0.0.24.tgz#2c398097df3a61973db5b5de52e5bbd3386fb5eb"
+  integrity sha512-z6B9TaaHrxQkvJiIUbx0e+pXF1wqPeAydP2AWy8K8ljuAW3ff3DLsHzO3SoZ5T1TME5fqkzkQ6xoiPMcbkJhqg==
+  dependencies:
+    "@traqula/chevrotain" "^0.0.24"
+    "@traqula/core" "^0.0.24"
+
+"@traqula/rules-sparql-1-2@^0.0.24":
+  version "0.0.24"
+  resolved "https://registry.yarnpkg.com/@traqula/rules-sparql-1-2/-/rules-sparql-1-2-0.0.24.tgz#101c4f51bd6038cc8b04dbcc3456dff63c93f198"
+  integrity sha512-+NfFrgYiPLid2Jx/Pr5vDqEAjAbvabIx+tYIXkJ80T2NazEjWUZAQf8X4MZHn7eWzPzfyWArYkZ/wHGncD09Fw==
+  dependencies:
+    "@traqula/core" "^0.0.24"
+    "@traqula/rules-sparql-1-1" "^0.0.24"
 
 "@tybys/wasm-util@^0.9.0":
   version "0.9.0"
@@ -1239,13 +1320,6 @@
   version "7.5.8"
   resolved "https://registry.yarnpkg.com/@types/semver/-/semver-7.5.8.tgz#8268a8c57a3e4abd25c165ecd36237db7948a55e"
   integrity sha512-I8EUhyrgfLrcTkzV3TSsGyl1tSuPrEDzr0yd5m90UgNxQkyDXULk3b6MlQqTCpZpNtWe1K0hzclnZkTcLBe2UQ==
-
-"@types/sparqljs@^3.0.0":
-  version "3.1.12"
-  resolved "https://registry.yarnpkg.com/@types/sparqljs/-/sparqljs-3.1.12.tgz#29a030615a3aed6eb05fbd618ecf58ab345506f8"
-  integrity sha512-zg/sdKKtYI0845wKPSuSgunyU1o/+7tRzMw85lHsf4p/0UbA6+65MXAyEtv1nkaqSqrq/bXm7+bqXas+Xo5dpQ==
-  dependencies:
-    "@rdfjs/types" ">=1.0.0"
 
 "@types/stack-utils@^2.0.0", "@types/stack-utils@^2.0.3":
   version "2.0.3"
@@ -2193,6 +2267,18 @@ character-reference-invalid@^1.0.0:
   version "1.1.4"
   resolved "https://registry.yarnpkg.com/character-reference-invalid/-/character-reference-invalid-1.1.4.tgz#083329cda0eae272ab3dbbf37e9a382c13af1560"
   integrity sha512-mKKUkUbhPpQlCOfIuZkvSEgktjPFIsZKRRbC6KWVEMvlzblj3i3asQv5ODsrwt0N3pHAEvjP8KTQPHkp0+6jOg==
+
+chevrotain@^11.0.3:
+  version "11.0.3"
+  resolved "https://registry.yarnpkg.com/chevrotain/-/chevrotain-11.0.3.tgz#88ffc1fb4b5739c715807eaeedbbf200e202fc1b"
+  integrity sha512-ci2iJH6LeIkvP9eJW6gpueU8cnZhv85ELY8w8WiFtNjMHA5ad6pQLaJo9mEly/9qUyCpvqX8/POVUTf18/HFdw==
+  dependencies:
+    "@chevrotain/cst-dts-gen" "11.0.3"
+    "@chevrotain/gast" "11.0.3"
+    "@chevrotain/regexp-to-ast" "11.0.3"
+    "@chevrotain/types" "11.0.3"
+    "@chevrotain/utils" "11.0.3"
+    lodash-es "4.17.21"
 
 chrome-trace-event@^1.0.2:
   version "1.0.4"
@@ -4733,6 +4819,11 @@ locate-path@^6.0.0:
   dependencies:
     p-locate "^5.0.0"
 
+lodash-es@4.17.21:
+  version "4.17.21"
+  resolved "https://registry.yarnpkg.com/lodash-es/-/lodash-es-4.17.21.tgz#43e626c46e6591b7750beb2b50117390c609e3ee"
+  integrity sha512-mKnC+QJ9pWVzv+C4/U3rRsHapFfHvQFoFB92e52xeyGMcX6/OlIl78je1u8vePzYZSkkogMPJ2yjxxsb89cxyw==
+
 lodash.memoize@^4.1.2:
   version "4.1.2"
   resolved "https://registry.yarnpkg.com/lodash.memoize/-/lodash.memoize-4.1.2.tgz#bcc6c49a42a2840ed997f323eada5ecd182e0bfe"
@@ -5435,17 +5526,17 @@ randombytes@^2.1.0:
   dependencies:
     safe-buffer "^5.1.0"
 
-rdf-data-factory@^1.1.2:
-  version "1.1.3"
-  resolved "https://registry.yarnpkg.com/rdf-data-factory/-/rdf-data-factory-1.1.3.tgz#11b39e0c80e51bca83828b2ddaa686f733be966f"
-  integrity sha512-ny6CI7m2bq4lfQQmDYvcb2l1F9KtGwz9chipX4oWu2aAtVoXjb7k3d8J1EsgAsEbMXnBipB/iuRen5H2fwRWWQ==
-  dependencies:
-    "@rdfjs/types" "^1.0.0"
-
 rdf-data-factory@^2.0.0:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/rdf-data-factory/-/rdf-data-factory-2.0.1.tgz#d45895e5b3a7e940a01deade5dee9b313f979134"
   integrity sha512-qpCmbtuCjdH5I2vnn+RpdAcWr32RKOv0ATKM4A2Df+d4yRk1YWiBnAY/S6ndxxY90bb5Ig9458I6Tlytozu5eg==
+  dependencies:
+    "@rdfjs/types" "^2.0.0"
+
+rdf-data-factory@^2.0.1:
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/rdf-data-factory/-/rdf-data-factory-2.0.2.tgz#dfac1fdf99502f3b6d61f8e99e97af2490346e32"
+  integrity sha512-WzPoYHwQYWvIP9k+7IBLY1b4nIDitzAK4mA37WumAF/Cjvu/KOtYJH9IPZnUTWNSd5K2+pq4vrcE9WZC4sRHhg==
   dependencies:
     "@rdfjs/types" "^2.0.0"
 
@@ -5933,13 +6024,6 @@ source-map@^0.7.4:
   version "0.7.4"
   resolved "https://registry.yarnpkg.com/source-map/-/source-map-0.7.4.tgz#a9bbe705c9d8846f4e08ff6765acf0f1b0898656"
   integrity sha512-l3BikUxvPOcn5E74dZiq5BGsTb5yEwhaTSzccU6t4sDOH8NWJCstKO5QT2CvtFoK6F0saL7p9xHAqHOlCPJygA==
-
-sparqljs@^3.0.0:
-  version "3.7.3"
-  resolved "https://registry.yarnpkg.com/sparqljs/-/sparqljs-3.7.3.tgz#075821d51ef4954284e36569503fe5558cfb71b0"
-  integrity sha512-FQfHUhfwn5PD9WH6xPU7DhFfXMgqK/XoDrYDVxz/grhw66Il0OjRg3JBgwuEvwHnQt7oSTiKWEiCZCPNaUbqgg==
-  dependencies:
-    rdf-data-factory "^1.1.2"
 
 sparqljson-parse@^3.0.0:
   version "3.0.0"
