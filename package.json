@@ -57,8 +57,8 @@
     "n3": "^1.0.0",
     "rdf-string": "^2.0.0",
     "readable-from-web": "^1.0.0",
-    "sparqljson-parse": "^3.0.0",
-    "sparqlxml-parse": "^3.0.0",
+    "sparqljson-parse": "^3.2.0",
+    "sparqlxml-parse": "^3.2.0",
     "stream-to-string": "^1.0.0",
     "yargs": "^17.0.0"
   },

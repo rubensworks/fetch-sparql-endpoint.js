@@ -84,6 +84,11 @@ async function run(argv: string[]): Promise<void> {
       get: { type: 'boolean', describe: 'Send query via HTTP GET instead of POST', default: false },
       timeout: { type: 'number', describe: 'The timeout value in seconds to finish the query' },
       auth: { choices: [ 'basic' ], describe: 'The type of authentication to use' },
+      parseUnsupported: {
+        type: 'boolean',
+        describe: 'If no error should be emitted on unsupported versions',
+        default: false,
+      },
     })
     .check((arg) => {
       if (arg.auth === 'basic' && (!process.env.SPARQL_USERNAME || !process.env.SPARQL_PASSWORD)) {
@@ -105,6 +110,7 @@ async function run(argv: string[]): Promise<void> {
     method: args.get ? 'GET' : 'POST',
     timeout: args.timeout ? args.timeout * 1_000 : undefined,
     defaultHeaders,
+    parseUnsupportedVersions: args.parseUnsupported,
   });
   const queryType = fetcher.getQueryType(queryString);
   switch (queryType) {
