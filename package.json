@@ -1,6 +1,6 @@
 {
   "name": "fetch-sparql-endpoint",
-  "version": "7.0.0-beta.1",
+  "version": "7.0.0-beta.2",
   "packageManager": "yarn@1.22.22",
   "description": "A simple, lightweight module to send queries to SPARQL endpoints and retrieve their results in a streaming fashion.",
   "author": "Ruben Taelman <rubensworks@gmail.com>",
