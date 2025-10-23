@@ -310,6 +310,11 @@ export interface ISparqlEndpointFetcherArgs extends ISparqlJsonParserArgs, ISpar
    * A SPARQL query parser used by the endpoint fetcher to detect query types.
    */
   sparqlQueryParser?: SparqlParser;
+  /**
+   * If no error should be emitted on unsupported versions.
+   * By default, an error will be emitted.
+   */
+  parseUnsupportedVersions?: boolean;
 }
 
 export interface ISparqlResultsParser {
