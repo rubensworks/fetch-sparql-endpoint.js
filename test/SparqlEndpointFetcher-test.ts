@@ -435,6 +435,7 @@ describe('SparqlEndpointFetcher', () => {
         const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
         await expect(fetcherThis.fetchRawStream(endpoint, querySelect, 'myacceptheader')).resolves.toEqual([
           '',
+          undefined,
           streamifyString('abc'),
         ]);
       });
@@ -453,7 +454,8 @@ describe('SparqlEndpointFetcher', () => {
           statusText: 'Ok!',
         });
         const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
-        const [ contentType, rawStream ] = await fetcherThis.fetchRawStream(endpoint, querySelect, 'myacceptheader');
+        const [ contentType, _version, rawStream ] = await fetcherThis
+          .fetchRawStream(endpoint, querySelect, 'myacceptheader');
         expect(contentType).toBe('');
         expect(rawStream).toBeInstanceOf(Readable);
         await expect(stringifyStream(rawStream)).rejects.toBe(expectedError);
@@ -468,8 +470,42 @@ describe('SparqlEndpointFetcher', () => {
           statusText: 'Ok!',
         });
         const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
-        const [ contentType, rawStream ] = await fetcherThis.fetchRawStream(endpoint, querySelect, 'myacceptheader');
+        const [ contentType, version, rawStream ] = await fetcherThis
+          .fetchRawStream(endpoint, querySelect, 'myacceptheader');
         expect(contentType).toBe('');
+        expect(version).toBeUndefined();
+        expect(rawStream).toBeInstanceOf(Readable);
+      });
+
+      it('should parse the version media type parameter', async() => {
+        const fetchCbThis = () => Promise.resolve(<Response> {
+          body: readableStreamNodeToWeb(streamifyString('abc')),
+          headers: new Headers({ 'Content-Type': 'text/turtle; version=1.2' }),
+          ok: true,
+          status: 200,
+          statusText: 'Ok!',
+        });
+        const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
+        const [ contentType, version, rawStream ] = await fetcherThis
+          .fetchRawStream(endpoint, querySelect, 'myacceptheader');
+        expect(contentType).toBe('text/turtle');
+        expect(version).toBe('1.2');
+        expect(rawStream).toBeInstanceOf(Readable);
+      });
+
+      it('should parse the version media type parameter among other parameters', async() => {
+        const fetchCbThis = () => Promise.resolve(<Response> {
+          body: readableStreamNodeToWeb(streamifyString('abc')),
+          headers: new Headers({ 'Content-Type': 'text/turtle; version=1.2; bla=true' }),
+          ok: true,
+          status: 200,
+          statusText: 'Ok!',
+        });
+        const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
+        const [ contentType, version, rawStream ] = await fetcherThis
+          .fetchRawStream(endpoint, querySelect, 'myacceptheader');
+        expect(contentType).toBe('text/turtle');
+        expect(version).toBe('1.2');
         expect(rawStream).toBeInstanceOf(Readable);
       });
 
@@ -487,7 +523,8 @@ describe('SparqlEndpointFetcher', () => {
           statusText: 'Ok!',
         });
         const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
-        const [ contentType, rawStream ] = await fetcherThis.fetchRawStream(endpoint, querySelect, 'myacceptheader');
+        const [ contentType, _version, rawStream ] = await fetcherThis
+          .fetchRawStream(endpoint, querySelect, 'myacceptheader');
         expect(contentType).toBe('');
         expect(rawStream).toBeInstanceOf(Readable);
         await expect(stringifyStream(rawStream)).rejects.toBe(expectedError);
@@ -518,6 +555,7 @@ describe('SparqlEndpointFetcher', () => {
         const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
         await expect(fetcherThis.fetchRawStream(endpoint, querySelect, 'myacceptheader')).resolves.toEqual([
           '',
+          undefined,
           streamifyString('abc'),
         ]);
       });
@@ -533,6 +571,7 @@ describe('SparqlEndpointFetcher', () => {
         const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
         await expect(fetcherThis.fetchRawStream(endpoint, querySelect, 'myacceptheader')).resolves.toEqual([
           'abc',
+          undefined,
           streamifyString('abc'),
         ]);
       });
@@ -548,6 +587,7 @@ describe('SparqlEndpointFetcher', () => {
         const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
         await expect(fetcherThis.fetchRawStream(endpoint, querySelect, 'myacceptheader')).resolves.toEqual([
           'abc',
+          undefined,
           streamifyString('abc'),
         ]);
       });
@@ -725,6 +765,46 @@ describe('SparqlEndpointFetcher', () => {
           .toEqual(new Error('Unknown SPARQL results content type: bla'));
       });
 
+      it('should reject on an invalid version as media type parameter', async() => {
+        const fetchCbThis = () => Promise.resolve(<Response> {
+          body: streamifyString(''),
+          headers: new Headers({ 'Content-Type': 'application/sparql-results+json; version=1.2-unknown' }),
+          ok: true,
+          status: 200,
+          statusText: 'Error!',
+        });
+        const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
+        const bindings = await fetcherThis.fetchBindings(endpoint, querySelect);
+        await expect(arrayifyStream(bindings)).rejects
+          .toThrow('Detected unsupported version as media type parameter: 1.2-unknown');
+      });
+
+      it('should not reject on an valid version as media type parameter', async() => {
+        const fetchCbThis = () => Promise.resolve(<Response> {
+          body: streamifyString(''),
+          headers: new Headers({ 'Content-Type': 'application/sparql-results+json; version=1.2' }),
+          ok: true,
+          status: 200,
+          statusText: 'Error!',
+        });
+        const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
+        const bindings = await fetcherThis.fetchBindings(endpoint, querySelect);
+        await expect(arrayifyStream(bindings)).resolves.toEqual([]);
+      });
+
+      it('should not reject on an invalid version as media type parameter with parseUnsupportedVersions', async() => {
+        const fetchCbThis = () => Promise.resolve(<Response> {
+          body: streamifyString(''),
+          headers: new Headers({ 'Content-Type': 'application/sparql-results+json; version=1.2-unknown' }),
+          ok: true,
+          status: 200,
+          statusText: 'Error!',
+        });
+        const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis, parseUnsupportedVersions: true });
+        const bindings = await fetcherThis.fetchBindings(endpoint, querySelect);
+        await expect(arrayifyStream(bindings)).resolves.toEqual([]);
+      });
+
       it('should emit the variables event', async() => {
         const fetchCbThis = () => Promise.resolve(<Response> {
           body: streamifyString(`{
@@ -844,6 +924,50 @@ describe('SparqlEndpointFetcher', () => {
         await expect(fetcherThis.fetchAsk(endpoint, queryAsk))
           .rejects
           .toEqual(new Error('Unknown SPARQL results content type: bla'));
+      });
+
+      it('should reject on an invalid version as media type parameter', async() => {
+        const fetchCbThis = () => Promise.resolve(<Response> {
+          body: streamifyString(''),
+          headers: new Headers({ 'Content-Type': 'application/sparql-results+json; version=1.2-unknown' }),
+          ok: true,
+          status: 200,
+          statusText: 'Error!',
+        });
+        const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
+        await expect(fetcherThis.fetchAsk(endpoint, queryAsk))
+          .rejects
+          .toEqual(new Error('Detected unsupported version as media type parameter: 1.2-unknown'));
+      });
+
+      it('should not reject on an valid version as media type parameter', async() => {
+        const fetchCbThis = () => Promise.resolve(<Response> {
+          body: streamifyString(`{
+  "head": { },
+  "boolean": false
+}`),
+          headers: new Headers({ 'Content-Type': 'application/sparql-results+json; version=1.2' }),
+          ok: true,
+          status: 200,
+          statusText: 'Ok!',
+        });
+        const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
+        await expect(fetcherThis.fetchAsk(endpoint, queryAsk)).resolves.toBe(false);
+      });
+
+      it('should not reject on an invalid version as media type parameter with parseUnsupportedVersions', async() => {
+        const fetchCbThis = () => Promise.resolve(<Response> {
+          body: streamifyString(`{
+  "head": { },
+  "boolean": false
+}`),
+          headers: new Headers({ 'Content-Type': 'application/sparql-results+json; version=1.2-unknown' }),
+          ok: true,
+          status: 200,
+          statusText: 'Ok!',
+        });
+        const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis, parseUnsupportedVersions: true });
+        await expect(fetcherThis.fetchAsk(endpoint, queryAsk)).resolves.toBe(false);
       });
     });
 

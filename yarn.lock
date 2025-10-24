@@ -6025,20 +6025,20 @@ source-map@^0.7.4:
   resolved "https://registry.yarnpkg.com/source-map/-/source-map-0.7.4.tgz#a9bbe705c9d8846f4e08ff6765acf0f1b0898656"
   integrity sha512-l3BikUxvPOcn5E74dZiq5BGsTb5yEwhaTSzccU6t4sDOH8NWJCstKO5QT2CvtFoK6F0saL7p9xHAqHOlCPJygA==
 
-sparqljson-parse@^3.2.0:
-  version "3.2.0"
-  resolved "https://registry.yarnpkg.com/sparqljson-parse/-/sparqljson-parse-3.2.0.tgz#ba143a18c2006f2e453cad9313851b99f2e0a105"
-  integrity sha512-FCrakS22jA+FIC1smbTGLOGcv0Jn7cRqUaziGdhxPu4KuVXG4SkpkKfqkS5FKeJLR58x+N3DlusgTY5K4NLSdQ==
+sparqljson-parse@^3.3.0:
+  version "3.3.0"
+  resolved "https://registry.yarnpkg.com/sparqljson-parse/-/sparqljson-parse-3.3.0.tgz#d6770a1f3fd4fd2e168c2cc7027eaaa72051a31c"
+  integrity sha512-XrmkCsrx4n69Ak63Ju7t91hVlWw7YhEPPdA+giW2GRTosQxPur0JWh7rQin/8aT0WjKZgBgGpsNnVBYyyWUq1w==
   dependencies:
     "@bergos/jsonparse" "^1.4.1"
     "@types/readable-stream" "^4.0.0"
     rdf-data-factory "^2.0.0"
     readable-stream "^4.0.0"
 
-sparqlxml-parse@^3.2.0:
-  version "3.2.0"
-  resolved "https://registry.yarnpkg.com/sparqlxml-parse/-/sparqlxml-parse-3.2.0.tgz#ec1f825a2ed664182d525faab92082ffcbf8045f"
-  integrity sha512-cPPO5ukySg4NCAAhMEz/NTD8Urtw3mDECb2aaVc5oIfROb3nAHWi5mKQNQA9cq7pIev/AB0mgDTdiJBDfYOxKg==
+sparqlxml-parse@^3.3.0:
+  version "3.3.0"
+  resolved "https://registry.yarnpkg.com/sparqlxml-parse/-/sparqlxml-parse-3.3.0.tgz#829d01c2ca38e92180fe20957a192d6d0d797c81"
+  integrity sha512-FUVgcUr2YePDtDuu/UcMTF2ODiKBQdZdcfTSvaR3QhWVAcBmIGX4r4apsePK1zCc1kkRR53JBHXHJho/Pk538g==
   dependencies:
     "@rubensworks/saxes" "^6.0.1"
     "@types/readable-stream" "^4.0.0"

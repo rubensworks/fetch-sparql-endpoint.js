@@ -18,6 +18,7 @@ export class SparqlEndpointFetcher {
   public static readonly CONTENTTYPE_SPARQL_XML = 'application/sparql-results+xml';
   public static readonly CONTENTTYPE_TURTLE = 'text/turtle';
   public static readonly CONTENTTYPE_SPARQL = `${SparqlEndpointFetcher.CONTENTTYPE_SPARQL_JSON};q=1.0,${SparqlEndpointFetcher.CONTENTTYPE_SPARQL_XML};q=0.7`;
+  private static readonly REGEX_VERSION_HEADER = /version=([^ ;]*)/u;
 
   protected readonly method: 'GET' | 'POST';
   protected readonly timeout?: number;
@@ -49,16 +50,16 @@ export class SparqlEndpointFetcher {
     this.sparqlXmlParser = new SparqlXmlParser(args);
     this.sparqlParsers = {
       [SparqlEndpointFetcher.CONTENTTYPE_SPARQL_JSON]: {
-        parseBooleanStream: sparqlResponseStream =>
-          this.sparqlJsonParser.parseJsonBooleanStream(sparqlResponseStream),
-        parseResultsStream: sparqlResponseStream =>
-          this.sparqlJsonParser.parseJsonResultsStream(sparqlResponseStream),
+        parseBooleanStream: (sparqlResponseStream, version) =>
+          this.sparqlJsonParser.parseJsonBooleanStream(sparqlResponseStream, version),
+        parseResultsStream: (sparqlResponseStream, version) =>
+          this.sparqlJsonParser.parseJsonResultsStream(sparqlResponseStream, version),
       },
       [SparqlEndpointFetcher.CONTENTTYPE_SPARQL_XML]: {
-        parseBooleanStream: sparqlResponseStream =>
-          this.sparqlXmlParser.parseXmlBooleanStream(sparqlResponseStream),
-        parseResultsStream: sparqlResponseStream =>
-          this.sparqlXmlParser.parseXmlResultsStream(sparqlResponseStream),
+        parseBooleanStream: (sparqlResponseStream, version) =>
+          this.sparqlXmlParser.parseXmlBooleanStream(sparqlResponseStream, version),
+        parseResultsStream: (sparqlResponseStream, version) =>
+          this.sparqlXmlParser.parseXmlResultsStream(sparqlResponseStream, version),
       },
     };
   }
@@ -111,7 +112,7 @@ export class SparqlEndpointFetcher {
    * @return {Promise<NodeJS.ReadableStream>} A stream of {@link IBindings}.
    */
   public async fetchBindings(endpoint: string, query: string): Promise<NodeJS.ReadableStream> {
-    const [ contentType, responseStream ] = await this.fetchRawStream(
+    const [ contentType, version, responseStream ] = await this.fetchRawStream(
       endpoint,
       query,
       SparqlEndpointFetcher.CONTENTTYPE_SPARQL,
@@ -120,7 +121,7 @@ export class SparqlEndpointFetcher {
     if (!parser) {
       throw new Error(`Unknown SPARQL results content type: ${contentType}`);
     }
-    return parser.parseResultsStream(responseStream);
+    return parser.parseResultsStream(responseStream, version);
   }
 
   /**
@@ -130,7 +131,7 @@ export class SparqlEndpointFetcher {
    * @return {Promise<boolean>} A boolean resolving to the answer.
    */
   public async fetchAsk(endpoint: string, query: string): Promise<boolean> {
-    const [ contentType, responseStream ] = await this.fetchRawStream(
+    const [ contentType, version, responseStream ] = await this.fetchRawStream(
       endpoint,
       query,
       SparqlEndpointFetcher.CONTENTTYPE_SPARQL,
@@ -139,7 +140,7 @@ export class SparqlEndpointFetcher {
     if (!parser) {
       throw new Error(`Unknown SPARQL results content type: ${contentType}`);
     }
-    return parser.parseBooleanStream(responseStream);
+    return parser.parseBooleanStream(responseStream, version);
   }
 
   /**
@@ -149,11 +150,12 @@ export class SparqlEndpointFetcher {
    * @return {Promise<Stream>} A stream of triples.
    */
   public async fetchTriples(endpoint: string, query: string): Promise<Readable & RDF.Stream> {
-    const [ contentType, responseStream ] = await this.fetchRawStream(
+    const [ contentType, _version, responseStream ] = await this.fetchRawStream(
       endpoint,
       query,
       SparqlEndpointFetcher.CONTENTTYPE_TURTLE,
     );
+    // TODO: pass version when N3.js has support
     return <Readable> <unknown> responseStream.pipe(new StreamParser({ format: contentType }));
   }
 
@@ -195,13 +197,13 @@ export class SparqlEndpointFetcher {
    * @param {string} endpoint     A SPARQL endpoint URL. (without the `?query=` suffix).
    * @param {string} query        A SPARQL query string.
    * @param {string} acceptHeader The HTTP accept to use.
-   * @return {Promise<[string, NodeJS.ReadableStream]>} The content type and SPARQL endpoint response stream.
+   * @return {Promise<[string, NodeJS.ReadableStream]>} The media type, version, and SPARQL endpoint response stream.
    */
   public async fetchRawStream(
     endpoint: string,
     query: string,
     acceptHeader: string,
-  ): Promise<[ string, NodeJS.ReadableStream ]> {
+  ): Promise<[ string, string | undefined, NodeJS.ReadableStream ]> {
     let method: 'GET' | 'POST';
     let url: string;
 
@@ -248,13 +250,13 @@ export class SparqlEndpointFetcher {
    * @param {string}      url     The URL to call.
    * @param {RequestInit} init    Options to pass along to the fetch call.
    * @param {any}         options Other specific fetch options.
-   * @return {Promise<[string, NodeJS.ReadableStream]>} The content type and SPARQL endpoint response stream.
+   * @return {Promise<[string, NodeJS.ReadableStream]>} The media type, version, and SPARQL endpoint response stream.
    */
   private async handleFetchCall(
     url: string,
     init: RequestInit,
     options?: { ignoreBody: boolean },
-  ): Promise<[ string, NodeJS.ReadableStream ]> {
+  ): Promise<[ string, string | undefined, NodeJS.ReadableStream ]> {
     let timeout;
     let responseStream: NodeJS.ReadableStream | undefined;
 
@@ -284,10 +286,20 @@ export class SparqlEndpointFetcher {
       throw new Error(`Invalid SPARQL endpoint response from ${simpleUrl} (HTTP status ${httpResponse.status}):\n${bodyString}`);
     }
 
-    // Determine the content type
-    const contentType = httpResponse.headers.get('Content-Type')?.split(';').at(0) ?? '';
+    // Determine the media type
+    const contentType = httpResponse.headers.get('Content-Type');
+    const mediaType = contentType?.split(';').at(0) ?? '';
 
-    return [ contentType, responseStream! ];
+    // Determine the optional version parameter
+    let version: string | undefined;
+    if (contentType) {
+      const matches = SparqlEndpointFetcher.REGEX_VERSION_HEADER.exec(contentType);
+      if (matches) {
+        version = matches[1];
+      }
+    }
+
+    return [ mediaType, version, responseStream! ];
   }
 }
 
@@ -318,8 +330,11 @@ export interface ISparqlEndpointFetcherArgs extends ISparqlJsonParserArgs, ISpar
 }
 
 export interface ISparqlResultsParser {
-  parseResultsStream: (sparqlResponseStream: NodeJS.ReadableStream) => NodeJS.ReadableStream;
-  parseBooleanStream: (sparqlResponseStream: NodeJS.ReadableStream) => Promise<boolean>;
+  parseResultsStream: (
+    sparqlResponseStream: NodeJS.ReadableStream,
+    version: string | undefined
+  ) => NodeJS.ReadableStream;
+  parseBooleanStream: (sparqlResponseStream: NodeJS.ReadableStream, version: string | undefined) => Promise<boolean>;
 }
 
 export type IBindings = Record<string, RDF.Term>;
