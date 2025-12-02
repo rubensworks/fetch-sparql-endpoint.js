@@ -49,8 +49,8 @@
     "prepare": "yarn husky"
   },
   "dependencies": {
-    "@traqula/parser-sparql-1-2": "^0.0.24",
-    "@traqula/rules-sparql-1-2": "^0.0.24",
+    "@traqula/parser-sparql-1-2": "^1.0.0",
+    "@traqula/rules-sparql-1-2": "^1.0.0",
     "@types/n3": "^1.0.0",
     "@types/readable-stream": "^4.0.0",
     "is-stream": "^2.0.0",
