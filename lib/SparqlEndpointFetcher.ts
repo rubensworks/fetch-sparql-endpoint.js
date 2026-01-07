@@ -27,6 +27,7 @@ export class SparqlEndpointFetcher {
   public additionalUrlParams: URLSearchParams;
   protected readonly defaultHeaders: Headers;
   public readonly fetchCb?: (input: Request | string, init?: RequestInit) => Promise<Response>;
+  protected readonly parseUnsupportedVersions: boolean;
 
   protected readonly sparqlQueryParser: SparqlParser;
   protected readonly sparqlParsers: Record<string, ISparqlResultsParser>;
@@ -41,6 +42,7 @@ export class SparqlEndpointFetcher {
     this.additionalUrlParams = args?.additionalUrlParams ?? new URLSearchParams();
     this.defaultHeaders = args?.defaultHeaders ?? new Headers();
     this.fetchCb = args?.fetch;
+    this.parseUnsupportedVersions = Boolean(args?.parseUnsupportedVersions);
     this.sparqlQueryParser = args?.sparqlQueryParser ?? new SparqlParser({
       lexerConfig: {
         positionTracking: 'onlyOffset',
@@ -150,13 +152,18 @@ export class SparqlEndpointFetcher {
    * @return {Promise<Stream>} A stream of triples.
    */
   public async fetchTriples(endpoint: string, query: string): Promise<Readable & RDF.Stream> {
-    const [ contentType, _version, responseStream ] = await this.fetchRawStream(
+    const [ contentType, version, responseStream ] = await this.fetchRawStream(
       endpoint,
       query,
       SparqlEndpointFetcher.CONTENTTYPE_TURTLE,
     );
-    // TODO: pass version when N3.js has support
-    return <Readable> <unknown> responseStream.pipe(new StreamParser({ format: contentType }));
+    return <Readable> <unknown> responseStream.pipe(new StreamParser({
+      format: contentType,
+      // eslint-disable-next-line ts/ban-ts-comment
+      // @ts-expect-error // TODO: remove this once n3.js typings have been updated to include version option
+      version,
+      parseUnsupportedVersions: this.parseUnsupportedVersions,
+    }));
   }
 
   /**

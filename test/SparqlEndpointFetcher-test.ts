@@ -991,6 +991,61 @@ describe('SparqlEndpointFetcher', () => {
             DF.quad(DF.namedNode('http://ex.org/s'), DF.namedNode('http://ex.org/p'), DF.namedNode('http://ex.org/o2')),
           ]);
       });
+
+      it('should reject on an invalid version as media type parameter', async() => {
+        const fetchCbThis = () => Promise.resolve(<Response> {
+          body: streamifyString(`
+<http://ex.org/s> <http://ex.org/p> <http://ex.org/o1>, <http://ex.org/o2>.
+`),
+          headers: new Headers({ 'Content-Type': 'text/turtle; version=1.2-unknown' }),
+          ok: true,
+          status: 200,
+          statusText: 'Error!',
+        });
+        const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
+        await expect(arrayifyStream(await fetcherThis.fetchTriples(endpoint, queryAsk))).rejects
+          .toThrow('Detected unsupported version as media type parameter: "1.2-unknown" on line 2.');
+      });
+
+      it('should not reject on an valid version as media type parameter', async() => {
+        const fetchCbThis = () => Promise.resolve(<Response> {
+          body: streamifyString(`
+<http://ex.org/s> <http://ex.org/p> <http://ex.org/o1>, <http://ex.org/o2>.
+`),
+          headers: new Headers({ 'Content-Type': 'text/turtle; version=1.2' }),
+          ok: true,
+          status: 200,
+          statusText: 'Ok!',
+        });
+        const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
+        const tripleStream = await fetcherThis.fetchTriples(endpoint, queryConstruct);
+        await expect(arrayifyStream(tripleStream))
+          .resolves
+          .toEqualRdfQuadArray([
+            DF.quad(DF.namedNode('http://ex.org/s'), DF.namedNode('http://ex.org/p'), DF.namedNode('http://ex.org/o1')),
+            DF.quad(DF.namedNode('http://ex.org/s'), DF.namedNode('http://ex.org/p'), DF.namedNode('http://ex.org/o2')),
+          ]);
+      });
+
+      it('should not reject on an invalid version as media type parameter with parseUnsupportedVersions', async() => {
+        const fetchCbThis = () => Promise.resolve(<Response> {
+          body: streamifyString(`
+<http://ex.org/s> <http://ex.org/p> <http://ex.org/o1>, <http://ex.org/o2>.
+`),
+          headers: new Headers({ 'Content-Type': 'text/turtle; version=1.2-unknown' }),
+          ok: true,
+          status: 200,
+          statusText: 'Ok!',
+        });
+        const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis, parseUnsupportedVersions: true });
+        const tripleStream = await fetcherThis.fetchTriples(endpoint, queryConstruct);
+        await expect(arrayifyStream(tripleStream))
+          .resolves
+          .toEqualRdfQuadArray([
+            DF.quad(DF.namedNode('http://ex.org/s'), DF.namedNode('http://ex.org/p'), DF.namedNode('http://ex.org/o1')),
+            DF.quad(DF.namedNode('http://ex.org/s'), DF.namedNode('http://ex.org/p'), DF.namedNode('http://ex.org/o2')),
+          ]);
+      });
     });
 
     describe('with a timeout', () => {
