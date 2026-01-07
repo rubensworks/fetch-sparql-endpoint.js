@@ -1,6 +1,18 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v7.0.0"></a>
+## [v7.0.0](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v6.2.0...v7.0.0) - 2026-01-07
+
+### BREAKING CHANGE
+* [Replace sparql.js with traqula (#90)](https://github.com/rubensworks/fetch-sparql-endpoint.js/commit/dde72fd1d495254f391564d61c71df6ee3a13bda)
+    [Traqula](https://github.com/comunica/traqula) replaces the to-be-deprecated sparql.js.
+    This includes SPARQL 1.2 support.
+
+### Added
+* [Handle version media type parameter](https://github.com/rubensworks/fetch-sparql-endpoint.js/commit/b68939f6ce22c8766e2ef5a7a047095e8e433519)
+* [Add parseUnsupportedVersions flag](https://github.com/rubensworks/fetch-sparql-endpoint.js/commit/13c7b1e600ecfc7e060f7c3a17b5504dd90e2796)
+
 <a name="v6.2.0"></a>
 ## [v6.2.0](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v6.1.0...v6.2.0) - 2025-08-22
 
