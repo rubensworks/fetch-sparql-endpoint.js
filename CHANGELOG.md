@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v7.1.0"></a>
+## [v7.1.0](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v7.0.0...v7.1.0) - 2026-01-07
+
+### Added
+* [Pass version media type parameters to Turtle parser](https://github.com/rubensworks/fetch-sparql-endpoint.js/commit/30038ad387e6c0d3633dd5d48a82ac4e9c490429)
+
 <a name="v7.0.0"></a>
 ## [v7.0.0](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v6.2.0...v7.0.0) - 2026-01-07
 
