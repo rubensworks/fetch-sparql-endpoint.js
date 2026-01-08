@@ -60,7 +60,7 @@
     "sparqljson-parse": "^3.3.0",
     "sparqlxml-parse": "^3.3.0",
     "stream-to-string": "^1.0.0",
-    "yargs": "^17.0.0"
+    "yargs": "^18.0.0"
   },
   "devDependencies": {
     "@rubensworks/eslint-config": "^3.0.0",
