@@ -1,13 +1,16 @@
 import type * as RDF from '@rdfjs/types';
 import { Parser as SparqlParser } from '@traqula/parser-sparql-1-2';
 import type { UpdateOperation } from '@traqula/rules-sparql-1-2';
-import * as isStream from 'is-stream';
 import { StreamParser } from 'n3';
 import { readableFromWeb } from 'readable-from-web';
 import type { Readable } from 'readable-stream';
 import { type ISettings as ISparqlJsonParserArgs, SparqlJsonParser } from 'sparqljson-parse';
 import { type ISettings as ISparqlXmlParserArgs, SparqlXmlParser } from 'sparqlxml-parse';
-import * as stringifyStream from 'stream-to-string';
+
+// eslint-disable-next-line ts/no-require-imports,ts/no-var-requires,ts/no-unsafe-assignment
+const isStream = require('is-stream');
+// eslint-disable-next-line ts/no-require-imports,ts/no-var-requires,ts/no-unsafe-assignment
+const stringifyStream = require('stream-to-string');
 
 /**
  * A SparqlEndpointFetcher can send queries to SPARQL endpoints,
@@ -289,7 +292,7 @@ export class SparqlEndpointFetcher {
     // Emit an error if the server returned an invalid response
     if (!httpResponse.ok || (!responseStream && !options?.ignoreBody)) {
       const simpleUrl = url.split('?').at(0);
-      const bodyString = responseStream ? await stringifyStream(responseStream) : 'empty response';
+      const bodyString = responseStream ? <string> await stringifyStream(responseStream) : 'empty response';
       throw new Error(`Invalid SPARQL endpoint response from ${simpleUrl} (HTTP status ${httpResponse.status}):\n${bodyString}`);
     }
 

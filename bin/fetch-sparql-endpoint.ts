@@ -3,10 +3,12 @@
 import { readFileSync } from 'node:fs';
 import { StreamWriter } from 'n3';
 import { termToString } from 'rdf-string';
-import * as streamToString from 'stream-to-string';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import { SparqlEndpointFetcher, type IBindings } from '..';
+
+// eslint-disable-next-line ts/no-require-imports,ts/no-var-requires,ts/no-unsafe-assignment
+const streamToString = require('stream-to-string');
 
 async function getQuery(query?: string, file?: string): Promise<string> {
   if (query) {
@@ -15,7 +17,7 @@ async function getQuery(query?: string, file?: string): Promise<string> {
   if (file) {
     return readFileSync(file, { encoding: 'utf-8' });
   }
-  return streamToString(process.stdin);
+  return <string> streamToString(process.stdin);
 }
 
 function querySelect(endpoint: string, fetcher: SparqlEndpointFetcher, query: string): Promise<void> {

@@ -7,6 +7,7 @@
       "dom"
     ],
     "module": "commonjs",
+    "types": ["node", "jest"],
     "strict": true,
     "noImplicitAny": true,
     "declaration": true,
