@@ -1,6 +1,6 @@
 import 'jest-rdf';
 import { Parser as SparqlParser } from '@traqula/parser-sparql-1-2';
-import arrayifyStream from 'arrayify-stream';
+import { arrayifyStream } from 'arrayify-stream';
 import { DataFactory } from 'rdf-data-factory';
 import { Readable } from 'readable-stream';
 import { SparqlEndpointFetcher } from '../lib/SparqlEndpointFetcher';
