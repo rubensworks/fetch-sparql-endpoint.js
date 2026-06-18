@@ -271,7 +271,6 @@ describe('SparqlEndpointFetcher', () => {
         headers.append('Accept', 'mydefaultacceptheader');
         headers.append('Accept', 'myacceptheader');
         headers.append('Content-Type', 'application/x-www-form-urlencoded');
-        headers.append('Content-Length', '43');
         headers.append('Authorization', 'mytoken');
         const body = new URLSearchParams();
         body.set('query', querySelect);

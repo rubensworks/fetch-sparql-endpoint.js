@@ -246,7 +246,6 @@ export class SparqlEndpointFetcher {
           body.set(key, value);
         }
       }
-      headers.append('Content-Length', body.toString().length.toString());
     } else if (this.additionalUrlParams.toString().length > 0) {
       url += `&${this.additionalUrlParams.toString()}`;
     }
