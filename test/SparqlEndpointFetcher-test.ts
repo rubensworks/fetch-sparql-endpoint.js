@@ -251,7 +251,6 @@ describe('SparqlEndpointFetcher', () => {
         const headers: Headers = new Headers();
         headers.append('Accept', 'myacceptheader');
         headers.append('Content-Type', 'application/x-www-form-urlencoded');
-        headers.append('Content-Length', '43');
         const body = new URLSearchParams();
         body.set('query', querySelect);
         expect(fetchCbThis).toHaveBeenCalledWith(
@@ -288,7 +287,6 @@ describe('SparqlEndpointFetcher', () => {
         const headers: Headers = new Headers();
         headers.append('Accept', 'myacceptheader');
         headers.append('Content-Type', 'application/x-www-form-urlencoded');
-        headers.append('Content-Length', '67');
         const body = new URLSearchParams();
         body.set('query', querySelect);
         // eslint-disable-next-line unicorn/no-array-for-each
@@ -589,6 +587,69 @@ describe('SparqlEndpointFetcher', () => {
           undefined,
           streamifyString('abc'),
         ]);
+      });
+    });
+
+    describe('Content-Length for multibyte request bodies', () => {
+      // Regression test for
+      // https://github.com/rubensworks/fetch-sparql-endpoint.js/issues/96 (fixed in 71272ca).
+      // The manual Content-Length header used to be computed from the JS string length
+      // (UTF-16 code units) instead of the UTF-8 byte length. A query or update containing
+      // multibyte characters (accents, emoji, non-Latin scripts) therefore produced a
+      // too-small Content-Length, which can truncate the request body or be rejected by
+      // strict HTTP clients (e.g. undici). The fix drops the manual header and lets the
+      // fetch client compute the correct byte count. These tests guard that a
+      // byte-incorrect Content-Length is never sent again.
+
+      // 'é' encodes as 2 UTF-8 bytes and '😀' as 4, so byteLength > string length here.
+      const multibyteQuery = 'SELECT * WHERE { ?s ?p "café 😀" }';
+      const multibyteUpdate = 'INSERT DATA { <ex:s> <ex:p> "café 😀" }';
+
+      // Assert the request never carries a Content-Length equal to the (smaller) JS string
+      // length. Either the header is absent (the fetch client derives the correct length)
+      // or, if present, it equals the UTF-8 byte length of the body.
+      function expectNoStringLengthContentLength(headers: Headers, body: string): void {
+        expect(Buffer.byteLength(body)).toBeGreaterThan(body.length);
+        const contentLength = headers.get('content-length');
+        if (contentLength !== null) {
+          expect(Number(contentLength)).toBe(Buffer.byteLength(body));
+          expect(Number(contentLength)).not.toBe(body.length);
+        }
+      }
+
+      it('should not send a string-length Content-Length for a directPost query', async() => {
+        const fetchCbThis: jest.Mock<Promise<Response>, any[]> = jest
+          .fn(() => Promise.resolve(new Response(streamifyString('dummy'))));
+        const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis, directPost: true });
+        await fetcherThis.fetchRawStream(endpoint, multibyteQuery, 'myacceptheader');
+        const init: RequestInit = fetchCbThis.mock.calls[0][1];
+        expectNoStringLengthContentLength(<Headers> init.headers, <string> init.body);
+      });
+
+      it('should not send a string-length Content-Length for an urlencoded query', async() => {
+        const fetchCbThis: jest.Mock<Promise<Response>, any[]> = jest
+          .fn(() => Promise.resolve(new Response(streamifyString('dummy'))));
+        const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
+        await fetcherThis.fetchRawStream(endpoint, multibyteQuery, 'myacceptheader');
+        const init: RequestInit = fetchCbThis.mock.calls[0][1];
+        // The urlencoded body is percent-encoded to ASCII, so string length equals byte
+        // length; assert directly that no manual Content-Length is attached.
+        expect((<Headers> init.headers).get('content-length')).toBeNull();
+      });
+
+      it('should not send a string-length Content-Length for an update', async() => {
+        const fetchCbThis: jest.Mock<Promise<Response>, any[]> = jest.fn(() => Promise.resolve(<Response> {
+          body: {},
+          headers: new Headers(),
+          ok: true,
+          status: 200,
+          statusText: 'Ok!',
+        }));
+        const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
+        await fetcherThis.fetchUpdate(endpoint, multibyteUpdate);
+        const init: RequestInit = fetchCbThis.mock.calls[0][1];
+        const headers = new Headers(<Record<string, string>> init.headers);
+        expectNoStringLengthContentLength(headers, <string> init.body);
       });
     });
 
