@@ -3,7 +3,7 @@
   "compilerOptions": {
     "target": "es6",
     "lib": [
-      "es6",
+      "es2022",
       "dom"
     ],
     "module": "commonjs",
