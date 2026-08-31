@@ -41,6 +41,7 @@ Optionally, you can pass an options object with the following optional entries:
 ```js
 const myFetcher = new SparqlEndpointFetcher({
   // A custom HTTP method for issuing (non-update) queries, defaults to POST. Update queries are always issued via POST.
+  // Use 'QUERY' to use the HTTP QUERY method as defined in RFC 10008 (sends the query in the request body as application/sparql-query).
   method: 'POST',
   // A set of additional parameters that well be added to fetchAsk, fetchBindings & fetchTriples requests
   // With a GET request, these are encoded in the URL.
@@ -166,6 +167,8 @@ Options:
   --file              Evaluate the SPARQL query in the given file       [string]
   --get               Send query via HTTP GET instead of POST
                                                       [boolean] [default: false]
+  --httpQuery         Send query via HTTP QUERY method (RFC 10008) instead of
+                      POST                            [boolean] [default: false]
   --timeout           The timeout value in seconds to finish the query  [number]
   --auth              The type of authentication to use       [choices: "basic"]
   --parseUnsupported  If no error should be emitted on unsupported versions
