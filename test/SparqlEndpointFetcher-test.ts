@@ -991,6 +991,23 @@ describe('SparqlEndpointFetcher', () => {
           ]);
       });
 
+      it('should forward errors on the response body to the triple stream', async() => {
+        // Emulates an endpoint that answers with 200 OK, and then drops the connection mid-body.
+        const body = new Readable({ read: () => {} });
+        body.push('<http://ex.org/s> <http://ex.org/p> <http://ex.org/o1>. <http://ex.org/s2> ');
+        const fetchCbThis = () => Promise.resolve(<Response> <any> {
+          body,
+          headers: new Headers(),
+          ok: true,
+          status: 200,
+          statusText: 'Ok!',
+        });
+        const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
+        const tripleStream = await fetcherThis.fetchTriples(endpoint, queryConstruct);
+        body.destroy(new Error('Response body dropped'));
+        await expect(arrayifyStream(tripleStream)).rejects.toThrow('Response body dropped');
+      });
+
       it('should reject on an invalid version as media type parameter', async() => {
         const fetchCbThis = () => Promise.resolve(<Response> {
           body: streamifyString(`
