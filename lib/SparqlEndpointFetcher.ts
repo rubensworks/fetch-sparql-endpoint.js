@@ -160,13 +160,18 @@ export class SparqlEndpointFetcher {
       query,
       SparqlEndpointFetcher.CONTENTTYPE_TURTLE,
     );
-    return <Readable> <unknown> responseStream.pipe(new StreamParser({
+    const parser = new StreamParser({
       format: contentType,
       // eslint-disable-next-line ts/ban-ts-comment
       // @ts-expect-error // TODO: remove this once n3.js typings have been updated to include version option
       version,
       parseUnsupportedVersions: this.parseUnsupportedVersions,
-    }));
+    });
+    // Errors are not forwarded by pipe, so forward them explicitly.
+    // Without this, an endpoint dropping the connection halfway through the response body
+    // would emit an error on a stream without any listeners, which crashes the process.
+    responseStream.on('error', error => parser.emit('error', error));
+    return <Readable> <unknown> responseStream.pipe(parser);
   }
 
   /**
