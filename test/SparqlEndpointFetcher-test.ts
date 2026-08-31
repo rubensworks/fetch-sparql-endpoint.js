@@ -399,6 +399,35 @@ describe('SparqlEndpointFetcher', () => {
         );
       });
 
+      it('should use HTTP QUERY method when method is QUERY', async() => {
+        const fetchCbThis = jest.fn(() => Promise.resolve(new Response(streamifyString('dummy'))));
+        const fetcherThis = new SparqlEndpointFetcher({ method: 'QUERY', fetch: fetchCbThis });
+        await fetcherThis.fetchRawStream(endpoint, querySelect, 'myacceptheader');
+        const headers: Headers = new Headers();
+        headers.append('Accept', 'myacceptheader');
+        headers.append('Content-Type', 'application/sparql-query');
+        const body = querySelect;
+        expect(fetchCbThis).toHaveBeenCalledWith(
+          'https://dbpedia.org/sparql',
+          expect.objectContaining({ headers, method: 'QUERY', body }),
+        );
+      });
+
+      it('should use HTTP QUERY method with additional URL parameters', async() => {
+        const fetchCbThis = jest.fn(() => Promise.resolve(new Response(streamifyString('dummy'))));
+        const additionalUrlParams = new URLSearchParams({ infer: 'true', sameAs: 'false' });
+        const fetcherThis = new SparqlEndpointFetcher({ method: 'QUERY', fetch: fetchCbThis, additionalUrlParams });
+        await fetcherThis.fetchRawStream(endpoint, querySelect, 'myacceptheader');
+        const headers: Headers = new Headers();
+        headers.append('Accept', 'myacceptheader');
+        headers.append('Content-Type', 'application/sparql-query');
+        const body = querySelect;
+        expect(fetchCbThis).toHaveBeenCalledWith(
+          'https://dbpedia.org/sparql?infer=true&sameAs=false',
+          expect.objectContaining({ headers, method: 'QUERY', body }),
+        );
+      });
+
       it('should reject for an invalid server response', async() => {
         const fetchCbThis = () => Promise.resolve(<Response> {
           body: streamifyString('this is an invalid response'),

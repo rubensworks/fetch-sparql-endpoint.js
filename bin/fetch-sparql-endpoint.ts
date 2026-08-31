@@ -84,6 +84,7 @@ async function run(argv: string[]): Promise<void> {
       query: { type: 'string', describe: 'Evaluate the given SPARQL query string' },
       file: { type: 'string', describe: 'Evaluate the SPARQL query in the given file' },
       get: { type: 'boolean', describe: 'Send query via HTTP GET instead of POST', default: false },
+      httpQuery: { type: 'boolean', describe: 'Send query via HTTP QUERY method (RFC 10008) instead of POST', default: false },
       timeout: { type: 'number', describe: 'The timeout value in seconds to finish the query' },
       auth: { choices: [ 'basic' ], describe: 'The type of authentication to use' },
       parseUnsupported: {
@@ -109,7 +110,7 @@ async function run(argv: string[]): Promise<void> {
     });
   }
   const fetcher = new SparqlEndpointFetcher({
-    method: args.get ? 'GET' : 'POST',
+    method: args.get ? 'GET' : args.httpQuery ? 'QUERY' : 'POST',
     timeout: args.timeout ? args.timeout * 1_000 : undefined,
     defaultHeaders,
     parseUnsupportedVersions: args.parseUnsupported,
