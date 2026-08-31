@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v7.1.2"></a>
+## [v7.1.2](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v7.1.1...v7.1.2) - 2026-08-31
+
+### Fixed
+* [Forward response body errors to the triple stream](https://github.com/rubensworks/fetch-sparql-endpoint.js/commit/f3cdccca3e534b74516279165229b7bd38e70286)
+
 <a name="v7.1.1"></a>
 ## [v7.1.1](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v7.1.0...v7.1.1) - 2026-06-18
 
