@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v7.2.0"></a>
+## [v7.2.0](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v7.1.2...v7.2.0) - 2026-09-01
+
+### Added
+* [Optionally allow requests to be send using HTTP QUERY](https://github.com/rubensworks/fetch-sparql-endpoint.js/commit/59c0693fd76256401da24ceeb0944040dad1da83)
+
 <a name="v7.1.2"></a>
 ## [v7.1.2](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v7.1.1...v7.1.2) - 2026-08-31
 
