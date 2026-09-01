@@ -23,7 +23,7 @@ export class SparqlEndpointFetcher {
   public static readonly CONTENTTYPE_SPARQL = `${SparqlEndpointFetcher.CONTENTTYPE_SPARQL_JSON};q=1.0,${SparqlEndpointFetcher.CONTENTTYPE_SPARQL_XML};q=0.7`;
   private static readonly REGEX_VERSION_HEADER = /version=([^ ;]*)/u;
 
-  protected readonly method: 'GET' | 'POST';
+  protected readonly method: 'GET' | 'POST' | 'QUERY';
   protected readonly timeout?: number;
   protected readonly forceGetIfUrlLengthBelow: number;
   protected readonly directPost: boolean;
@@ -219,10 +219,13 @@ export class SparqlEndpointFetcher {
     query: string,
     acceptHeader: string,
   ): Promise<[ string, string | undefined, NodeJS.ReadableStream ]> {
-    let method: 'GET' | 'POST';
+    let method: 'GET' | 'POST' | 'QUERY';
     let url: string;
 
-    if (this.method === 'POST' && this.forceGetIfUrlLengthBelow <= endpoint.length) {
+    if (this.method === 'QUERY') {
+      method = 'QUERY';
+      url = endpoint;
+    } else if (this.method === 'POST' && this.forceGetIfUrlLengthBelow <= endpoint.length) {
       method = this.method;
       url = endpoint;
     } else {
@@ -236,7 +239,13 @@ export class SparqlEndpointFetcher {
     const headers: Headers = new Headers(this.defaultHeaders);
     headers.append('Accept', acceptHeader);
 
-    if (method === 'POST') {
+    if (method === 'QUERY') {
+      headers.append('Content-Type', 'application/sparql-query');
+      body = query;
+      if (this.additionalUrlParams.toString().length > 0) {
+        url += `?${this.additionalUrlParams.toString()}`;
+      }
+    } else if (method === 'POST') {
       if (this.directPost) {
         headers.append('Content-Type', 'application/sparql-query');
         body = query;
@@ -321,8 +330,9 @@ export interface ISparqlEndpointFetcherArgs extends ISparqlJsonParserArgs, ISpar
   /**
    * A custom HTTP method for issuing (non-update) queries, defaults to POST.
    * Update queries are always issued via POST.
+   * Use 'QUERY' to use the HTTP QUERY method as defined in RFC 10008.
    */
-  method?: 'POST' | 'GET';
+  method?: 'POST' | 'GET' | 'QUERY';
   additionalUrlParams?: URLSearchParams;
   timeout?: number;
   forceGetIfUrlLengthBelow?: number;
