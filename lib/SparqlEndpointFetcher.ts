@@ -124,6 +124,7 @@ export class SparqlEndpointFetcher {
     );
     const parser: ISparqlResultsParser | undefined = this.sparqlParsers[contentType];
     if (!parser) {
+      SparqlEndpointFetcher.closeResponseStream(responseStream);
       throw new Error(`Unknown SPARQL results content type: ${contentType}`);
     }
     return parser.parseResultsStream(responseStream, version);
@@ -143,6 +144,7 @@ export class SparqlEndpointFetcher {
     );
     const parser: ISparqlResultsParser | undefined = this.sparqlParsers[contentType];
     if (!parser) {
+      SparqlEndpointFetcher.closeResponseStream(responseStream);
       throw new Error(`Unknown SPARQL results content type: ${contentType}`);
     }
     return parser.parseBooleanStream(responseStream, version);
@@ -265,6 +267,17 @@ export class SparqlEndpointFetcher {
     }
 
     return this.handleFetchCall(url, { headers, method, body });
+  }
+
+  /**
+   * Close a response stream that will not be consumed.
+   * This releases its connection,
+   * and prevents it from emitting errors without any listeners when its request is aborted afterwards,
+   * which would crash the process.
+   * @param {NodeJS.ReadableStream} responseStream A response stream.
+   */
+  protected static closeResponseStream(responseStream: NodeJS.ReadableStream): void {
+    (<Readable> <unknown> responseStream).destroy();
   }
 
   /**
