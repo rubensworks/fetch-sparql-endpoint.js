@@ -114,13 +114,19 @@ export class SparqlEndpointFetcher {
    * @see IBindings
    * @param {string} endpoint A SPARQL endpoint URL. (without the `?query=` suffix).
    * @param {string} query    A SPARQL query string.
+   * @param {ISparqlEndpointFetcherRequestOptions} options Optional options for this request.
    * @return {Promise<NodeJS.ReadableStream>} A stream of {@link IBindings}.
    */
-  public async fetchBindings(endpoint: string, query: string): Promise<NodeJS.ReadableStream> {
+  public async fetchBindings(
+    endpoint: string,
+    query: string,
+    options?: ISparqlEndpointFetcherRequestOptions,
+  ): Promise<NodeJS.ReadableStream> {
     const [ contentType, version, responseStream ] = await this.fetchRawStream(
       endpoint,
       query,
       SparqlEndpointFetcher.CONTENTTYPE_SPARQL,
+      options,
     );
     const parser: ISparqlResultsParser | undefined = this.sparqlParsers[contentType];
     if (!parser) {
@@ -133,13 +139,19 @@ export class SparqlEndpointFetcher {
    * Send an ASK query to the given endpoint URL and return a promise resolving to the boolean answer.
    * @param {string} endpoint A SPARQL endpoint URL. (without the `?query=` suffix).
    * @param {string} query    A SPARQL query string.
+   * @param {ISparqlEndpointFetcherRequestOptions} options Optional options for this request.
    * @return {Promise<boolean>} A boolean resolving to the answer.
    */
-  public async fetchAsk(endpoint: string, query: string): Promise<boolean> {
+  public async fetchAsk(
+    endpoint: string,
+    query: string,
+    options?: ISparqlEndpointFetcherRequestOptions,
+  ): Promise<boolean> {
     const [ contentType, version, responseStream ] = await this.fetchRawStream(
       endpoint,
       query,
       SparqlEndpointFetcher.CONTENTTYPE_SPARQL,
+      options,
     );
     const parser: ISparqlResultsParser | undefined = this.sparqlParsers[contentType];
     if (!parser) {
@@ -152,13 +164,19 @@ export class SparqlEndpointFetcher {
    * Send a CONSTRUCT/DESCRIBE query to the given endpoint URL and return the resulting triple stream.
    * @param {string} endpoint A SPARQL endpoint URL. (without the `?query=` suffix).
    * @param {string} query    A SPARQL query string.
+   * @param {ISparqlEndpointFetcherRequestOptions} options Optional options for this request.
    * @return {Promise<Stream>} A stream of triples.
    */
-  public async fetchTriples(endpoint: string, query: string): Promise<Readable & RDF.Stream> {
+  public async fetchTriples(
+    endpoint: string,
+    query: string,
+    options?: ISparqlEndpointFetcherRequestOptions,
+  ): Promise<Readable & RDF.Stream> {
     const [ contentType, version, responseStream ] = await this.fetchRawStream(
       endpoint,
       query,
       SparqlEndpointFetcher.CONTENTTYPE_TURTLE,
+      options,
     );
     const parser = new StreamParser({
       format: contentType,
@@ -179,8 +197,13 @@ export class SparqlEndpointFetcher {
    *
    * @param {string} endpoint     A SPARQL endpoint URL. (without the `?query=` suffix).
    * @param {string} query        A SPARQL query string.
+   * @param {ISparqlEndpointFetcherRequestOptions} options Optional options for this request.
    */
-  public async fetchUpdate(endpoint: string, query: string): Promise<void> {
+  public async fetchUpdate(
+    endpoint: string,
+    query: string,
+    options?: ISparqlEndpointFetcherRequestOptions,
+  ): Promise<void> {
     const abortController = new AbortController();
     const defaultHeadersRaw: Record<string, string> = {};
 
@@ -200,7 +223,7 @@ export class SparqlEndpointFetcher {
       signal: abortController.signal,
     };
 
-    await this.handleFetchCall(endpoint, init, { ignoreBody: true });
+    await this.handleFetchCall(endpoint, init, { ...options, ignoreBody: true });
     abortController.abort();
   }
 
@@ -212,12 +235,14 @@ export class SparqlEndpointFetcher {
    * @param {string} endpoint     A SPARQL endpoint URL. (without the `?query=` suffix).
    * @param {string} query        A SPARQL query string.
    * @param {string} acceptHeader The HTTP accept to use.
+   * @param {ISparqlEndpointFetcherRequestOptions} options Optional options for this request.
    * @return {Promise<[string, NodeJS.ReadableStream]>} The media type, version, and SPARQL endpoint response stream.
    */
   public async fetchRawStream(
     endpoint: string,
     query: string,
     acceptHeader: string,
+    options?: ISparqlEndpointFetcherRequestOptions,
   ): Promise<[ string, string | undefined, NodeJS.ReadableStream ]> {
     let method: 'GET' | 'POST' | 'QUERY';
     let url: string;
@@ -264,7 +289,7 @@ export class SparqlEndpointFetcher {
       url += `&${this.additionalUrlParams.toString()}`;
     }
 
-    return this.handleFetchCall(url, { headers, method, body });
+    return this.handleFetchCall(url, { headers, method, body }, options);
   }
 
   /**
@@ -278,7 +303,7 @@ export class SparqlEndpointFetcher {
   private async handleFetchCall(
     url: string,
     init: RequestInit,
-    options?: { ignoreBody: boolean },
+    options?: ISparqlEndpointFetcherRequestOptions & { ignoreBody?: boolean },
   ): Promise<[ string, string | undefined, NodeJS.ReadableStream ]> {
     let timeout;
     let responseStream: NodeJS.ReadableStream | undefined;
@@ -289,7 +314,7 @@ export class SparqlEndpointFetcher {
       timeout = setTimeout(() => controller.abort(), this.timeout);
     }
 
-    const httpResponse: Response = await (this.fetchCb ?? fetch)(url, init);
+    const httpResponse: Response = await (options?.fetch ?? this.fetchCb ?? fetch)(url, init);
 
     clearTimeout(timeout);
 
@@ -351,6 +376,16 @@ export interface ISparqlEndpointFetcherArgs extends ISparqlJsonParserArgs, ISpar
    * By default, an error will be emitted.
    */
   parseUnsupportedVersions?: boolean;
+}
+
+/**
+ * Options for a single request of an endpoint fetcher.
+ */
+export interface ISparqlEndpointFetcherRequestOptions {
+  /**
+   * A custom fetch function for this request, which takes precedence over the fetch function of the fetcher.
+   */
+  fetch?: (input: Request | string, init?: RequestInit) => Promise<Response>;
 }
 
 export interface ISparqlResultsParser {

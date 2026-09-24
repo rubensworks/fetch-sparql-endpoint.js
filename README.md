@@ -136,6 +136,19 @@ await fetcher.fetchUpdate('https://dbpedia.org/sparql', 'INSERT DATA { <ex:s> <e
 
 The `await` will throw an error if the update has failed.
 
+### Request options
+
+All fetch methods accept an optional options object as last argument,
+with options that only apply to that request.
+
+```js
+const bindingsStream = await fetcher.fetchBindings('https://dbpedia.org/sparql', 'SELECT * WHERE { ?s ?p ?o } LIMIT 100', {
+  // A custom fetch-API-supporting function for this request, which takes precedence over the fetch function of the fetcher.
+  // This allows requests to be sent differently (e.g., with different credentials) without creating a new fetcher.
+  fetch,
+});
+```
+
 ### Detect query type
 
 If you want to know the query type
