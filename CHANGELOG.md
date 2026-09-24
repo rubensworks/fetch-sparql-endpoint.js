@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v7.2.1"></a>
+## [v7.2.1](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v7.2.0...v7.2.1) - 2026-09-24
+
+### Fixed
+* [Close responses with an unknown SPARQL results content type (#102)](https://github.com/rubensworks/fetch-sparql-endpoint.js/commit/121e3a2f0c9c1cc5752ba78778f8f7d68c66932f)
+
 <a name="v7.2.0"></a>
 ## [v7.2.0](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v7.1.2...v7.2.0) - 2026-09-01
 
