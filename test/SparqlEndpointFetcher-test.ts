@@ -1155,6 +1155,71 @@ describe('SparqlEndpointFetcher', () => {
       });
     });
 
+    describe('with a fetch function in the request options', () => {
+      let fetchCbFetcher: jest.Mock;
+      let fetchCbRequest: jest.Mock;
+      let fetcherThis: SparqlEndpointFetcher;
+
+      function respond(contentType: string, body: string): Promise<Response> {
+        return Promise.resolve(<Response> {
+          body: streamifyString(body),
+          headers: new Headers({ 'Content-Type': contentType }),
+          ok: true,
+          status: 200,
+        });
+      }
+
+      beforeEach(() => {
+        fetchCbFetcher = jest.fn();
+        fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbFetcher });
+      });
+
+      it('should use it instead of the fetcher\'s fetch function for fetchBindings', async() => {
+        fetchCbRequest = jest.fn(() => respond(
+          SparqlEndpointFetcher.CONTENTTYPE_SPARQL_JSON,
+          '{ "head": { "vars": [ "p" ] }, "results": { "bindings": [ { "p": { "type": "uri", "value": "p1" } } ] } }',
+        ));
+        const bindings = await fetcherThis.fetchBindings(endpoint, querySelect, { fetch: fetchCbRequest });
+        await expect(arrayifyStream(bindings)).resolves.toEqual([{ p: DF.namedNode('p1') }]);
+        expect(fetchCbRequest).toHaveBeenCalledTimes(1);
+        expect(fetchCbRequest).toHaveBeenCalledWith(endpoint, expect.objectContaining({ method: 'POST' }));
+        expect(fetchCbFetcher).not.toHaveBeenCalled();
+      });
+
+      it('should use it instead of the fetcher\'s fetch function for fetchAsk', async() => {
+        fetchCbRequest = jest.fn(() => respond(SparqlEndpointFetcher.CONTENTTYPE_SPARQL_JSON, '{ "boolean": true }'));
+        await expect(fetcherThis.fetchAsk(endpoint, queryAsk, { fetch: fetchCbRequest })).resolves.toBe(true);
+        expect(fetchCbRequest).toHaveBeenCalledTimes(1);
+        expect(fetchCbFetcher).not.toHaveBeenCalled();
+      });
+
+      it('should use it instead of the fetcher\'s fetch function for fetchTriples', async() => {
+        fetchCbRequest = jest.fn(() => respond(SparqlEndpointFetcher.CONTENTTYPE_TURTLE, '<ex:s> <ex:p> <ex:o>.'));
+        const triples = await fetcherThis.fetchTriples(endpoint, queryConstruct, { fetch: fetchCbRequest });
+        await expect(arrayifyStream(triples)).resolves.toHaveLength(1);
+        expect(fetchCbRequest).toHaveBeenCalledTimes(1);
+        expect(fetchCbFetcher).not.toHaveBeenCalled();
+      });
+
+      it('should use it instead of the fetcher\'s fetch function for fetchUpdate', async() => {
+        fetchCbRequest = jest.fn(() => respond('text/plain', ''));
+        await fetcherThis.fetchUpdate(endpoint, queryInsert, { fetch: fetchCbRequest });
+        expect(fetchCbRequest).toHaveBeenCalledTimes(1);
+        expect(fetchCbRequest).toHaveBeenCalledWith(endpoint, expect.objectContaining({ body: queryInsert }));
+        expect(fetchCbFetcher).not.toHaveBeenCalled();
+      });
+
+      it('should use it instead of the fetcher\'s fetch function for fetchRawStream', async() => {
+        fetchCbRequest = jest.fn(() => respond('text/plain', 'abc'));
+        const [ contentType, , stream ] = await fetcherThis
+          .fetchRawStream(endpoint, querySelect, 'text/plain', { fetch: fetchCbRequest });
+        expect(contentType).toBe('text/plain');
+        await expect(stringifyStream(stream)).resolves.toBe('abc');
+        expect(fetchCbRequest).toHaveBeenCalledTimes(1);
+        expect(fetchCbFetcher).not.toHaveBeenCalled();
+      });
+    });
+
     describe('with a timeout', () => {
       beforeAll(() => jest.useFakeTimers());
       afterAll(() => jest.useRealTimers());
