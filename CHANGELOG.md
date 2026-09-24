@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+<a name="v7.3.0"></a>
+## [v7.3.0](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v7.2.1...v7.3.0) - 2026-09-24
+
+### Added
+* [Allow a custom fetch function to be passed per request (#103)](https://github.com/rubensworks/fetch-sparql-endpoint.js/commit/6bc284fe5069ab64ad68bc68415d7a944dc2348e)
+
 <a name="v7.2.1"></a>
 ## [v7.2.1](https://github.com/rubensworks/fetch-sparql-endpoint.js/compare/v7.2.0...v7.2.1) - 2026-09-24
 
