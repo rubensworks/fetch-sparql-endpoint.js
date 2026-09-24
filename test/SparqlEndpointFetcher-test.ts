@@ -793,6 +793,37 @@ describe('SparqlEndpointFetcher', () => {
           .toEqual(new Error('Unknown SPARQL results content type: bla'));
       });
 
+      it('should close the response on an invalid content type', async() => {
+        const body = streamifyString('');
+        const fetchCbThis = () => Promise.resolve(<Response> <unknown> {
+          body,
+          headers: new Headers({ 'Content-Type': 'bla' }),
+          ok: true,
+          status: 200,
+        });
+        const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
+        await expect(fetcherThis.fetchBindings(endpoint, querySelect))
+          .rejects
+          .toEqual(new Error('Unknown SPARQL results content type: bla'));
+        expect(body.destroyed).toBe(true);
+      });
+
+      it('should cancel a web response on an invalid content type', async() => {
+        const cancel = jest.fn();
+        const body = new ReadableStream({ cancel });
+        const fetchCbThis = () => Promise.resolve(<Response> <unknown> {
+          body,
+          headers: new Headers({ 'Content-Type': 'bla' }),
+          ok: true,
+          status: 200,
+        });
+        const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
+        await expect(fetcherThis.fetchBindings(endpoint, querySelect))
+          .rejects
+          .toEqual(new Error('Unknown SPARQL results content type: bla'));
+        expect(cancel).toHaveBeenCalledTimes(1);
+      });
+
       it('should reject on an invalid version as media type parameter', async() => {
         const fetchCbThis = () => Promise.resolve(<Response> {
           body: streamifyString(''),
@@ -952,6 +983,37 @@ describe('SparqlEndpointFetcher', () => {
         await expect(fetcherThis.fetchAsk(endpoint, queryAsk))
           .rejects
           .toEqual(new Error('Unknown SPARQL results content type: bla'));
+      });
+
+      it('should close the response on an invalid content type', async() => {
+        const body = streamifyString('');
+        const fetchCbThis = () => Promise.resolve(<Response> <unknown> {
+          body,
+          headers: new Headers({ 'Content-Type': 'bla' }),
+          ok: true,
+          status: 200,
+        });
+        const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
+        await expect(fetcherThis.fetchAsk(endpoint, queryAsk))
+          .rejects
+          .toEqual(new Error('Unknown SPARQL results content type: bla'));
+        expect(body.destroyed).toBe(true);
+      });
+
+      it('should cancel a web response on an invalid content type', async() => {
+        const cancel = jest.fn();
+        const body = new ReadableStream({ cancel });
+        const fetchCbThis = () => Promise.resolve(<Response> <unknown> {
+          body,
+          headers: new Headers({ 'Content-Type': 'bla' }),
+          ok: true,
+          status: 200,
+        });
+        const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
+        await expect(fetcherThis.fetchAsk(endpoint, queryAsk))
+          .rejects
+          .toEqual(new Error('Unknown SPARQL results content type: bla'));
+        expect(cancel).toHaveBeenCalledTimes(1);
       });
 
       it('should reject on an invalid version as media type parameter', async() => {
