@@ -256,7 +256,7 @@ export class SparqlEndpointFetcher {
       method = this.method;
       url = endpoint;
     } else {
-      const getEndpoint = `${endpoint}?query=${encodeURIComponent(query)}`;
+      const getEndpoint = SparqlEndpointFetcher.appendUrlParams(endpoint, `query=${encodeURIComponent(query)}`);
       method = this.method === 'GET' || getEndpoint.length < this.forceGetIfUrlLengthBelow ? 'GET' : 'POST';
       url = method === 'POST' ? endpoint : getEndpoint;
     }
@@ -270,14 +270,14 @@ export class SparqlEndpointFetcher {
       headers.append('Content-Type', 'application/sparql-query');
       body = query;
       if (this.additionalUrlParams.toString().length > 0) {
-        url += `?${this.additionalUrlParams.toString()}`;
+        url = SparqlEndpointFetcher.appendUrlParams(url, this.additionalUrlParams.toString());
       }
     } else if (method === 'POST') {
       if (this.directPost) {
         headers.append('Content-Type', 'application/sparql-query');
         body = query;
         if (this.additionalUrlParams.toString().length > 0) {
-          url += `?${this.additionalUrlParams.toString()}`;
+          url = SparqlEndpointFetcher.appendUrlParams(url, this.additionalUrlParams.toString());
         }
       } else {
         headers.append('Content-Type', 'application/x-www-form-urlencoded');
@@ -288,10 +288,23 @@ export class SparqlEndpointFetcher {
         }
       }
     } else if (this.additionalUrlParams.toString().length > 0) {
-      url += `&${this.additionalUrlParams.toString()}`;
+      url = SparqlEndpointFetcher.appendUrlParams(url, this.additionalUrlParams.toString());
     }
 
     return this.handleFetchCall(url, { headers, method, body }, options);
+  }
+
+  /**
+   * Append an encoded query string to a URL that may already have a query string.
+   * @param {string} url A URL.
+   * @param {string} params An encoded query string, without leading `?` or `&`.
+   * @return {string} The URL with the parameters appended.
+   */
+  protected static appendUrlParams(url: string, params: string): string {
+    if (!url.includes('?')) {
+      return `${url}?${params}`;
+    }
+    return url.endsWith('?') || url.endsWith('&') ? `${url}${params}` : `${url}&${params}`;
   }
 
   /**
