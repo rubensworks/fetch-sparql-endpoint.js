@@ -428,6 +428,95 @@ describe('SparqlEndpointFetcher', () => {
         );
       });
 
+      describe('for an endpoint URL with a query string', () => {
+        const endpointQs = 'https://example.org/query?slug=abc';
+        const encodedQuery = 'SELECT%20*%20WHERE%20%7B%20%3Fs%20%3Fp%20%3Fo%20%7D';
+        const additionalUrlParams = new URLSearchParams({ infer: 'true', sameAs: 'false' });
+        let fetchCbThis: jest.Mock;
+
+        beforeEach(() => {
+          fetchCbThis = jest.fn(() => Promise.resolve(new Response(streamifyString('dummy'))));
+        });
+
+        it('should keep the URL as is when using HTTP POST', async() => {
+          const fetcherThis = new SparqlEndpointFetcher({ fetch: fetchCbThis });
+          await fetcherThis.fetchRawStream(endpointQs, querySelect, 'myacceptheader');
+          expect(fetchCbThis).toHaveBeenCalledWith(endpointQs, expect.objectContaining({ method: 'POST' }));
+        });
+
+        it('should append the query when using HTTP GET', async() => {
+          const fetcherThis = new SparqlEndpointFetcher({ method: 'GET', fetch: fetchCbThis });
+          await fetcherThis.fetchRawStream(endpointQs, querySelect, 'myacceptheader');
+          expect(fetchCbThis).toHaveBeenCalledWith(
+            `https://example.org/query?slug=abc&query=${encodedQuery}`,
+            expect.objectContaining({ method: 'GET' }),
+          );
+        });
+
+        it('should append the query and additional URL parameters when using HTTP GET', async() => {
+          const fetcherThis = new SparqlEndpointFetcher({ method: 'GET', fetch: fetchCbThis, additionalUrlParams });
+          await fetcherThis.fetchRawStream(endpointQs, querySelect, 'myacceptheader');
+          expect(fetchCbThis).toHaveBeenCalledWith(
+            `https://example.org/query?slug=abc&query=${encodedQuery}&infer=true&sameAs=false`,
+            expect.objectContaining({ method: 'GET' }),
+          );
+        });
+
+        it('should append the query when url length is below forceGetIfUrlLengthBelow', async() => {
+          const fetcherThis = new SparqlEndpointFetcher({
+            method: 'POST',
+            fetch: fetchCbThis,
+            forceGetIfUrlLengthBelow: 600,
+          });
+          await fetcherThis.fetchRawStream(endpointQs, querySelect, 'myacceptheader');
+          expect(fetchCbThis).toHaveBeenCalledWith(
+            `https://example.org/query?slug=abc&query=${encodedQuery}`,
+            expect.objectContaining({ method: 'GET' }),
+          );
+        });
+
+        it('should append additional URL parameters when using direct HTTP POST', async() => {
+          const fetcherThis = new SparqlEndpointFetcher({
+            method: 'POST',
+            fetch: fetchCbThis,
+            directPost: true,
+            additionalUrlParams,
+          });
+          await fetcherThis.fetchRawStream(endpointQs, querySelect, 'myacceptheader');
+          expect(fetchCbThis).toHaveBeenCalledWith(
+            'https://example.org/query?slug=abc&infer=true&sameAs=false',
+            expect.objectContaining({ method: 'POST', body: querySelect }),
+          );
+        });
+
+        it('should append additional URL parameters when using HTTP QUERY', async() => {
+          const fetcherThis = new SparqlEndpointFetcher({ method: 'QUERY', fetch: fetchCbThis, additionalUrlParams });
+          await fetcherThis.fetchRawStream(endpointQs, querySelect, 'myacceptheader');
+          expect(fetchCbThis).toHaveBeenCalledWith(
+            'https://example.org/query?slug=abc&infer=true&sameAs=false',
+            expect.objectContaining({ method: 'QUERY', body: querySelect }),
+          );
+        });
+
+        it('should not add a separator to a URL ending with ?', async() => {
+          const fetcherThis = new SparqlEndpointFetcher({ method: 'GET', fetch: fetchCbThis });
+          await fetcherThis.fetchRawStream('https://example.org/sparql?', querySelect, 'myacceptheader');
+          expect(fetchCbThis).toHaveBeenCalledWith(
+            `https://example.org/sparql?query=${encodedQuery}`,
+            expect.objectContaining({ method: 'GET' }),
+          );
+        });
+
+        it('should not add a separator to a URL ending with &', async() => {
+          const fetcherThis = new SparqlEndpointFetcher({ method: 'GET', fetch: fetchCbThis });
+          await fetcherThis.fetchRawStream('https://example.org/query?slug=abc&', querySelect, 'myacceptheader');
+          expect(fetchCbThis).toHaveBeenCalledWith(
+            `https://example.org/query?slug=abc&query=${encodedQuery}`,
+            expect.objectContaining({ method: 'GET' }),
+          );
+        });
+      });
+
       it('should reject for an invalid server response', async() => {
         const fetchCbThis = () => Promise.resolve(<Response> {
           body: streamifyString('this is an invalid response'),
